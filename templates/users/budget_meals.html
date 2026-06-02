@@ -1,0 +1,87 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="nutrition-page container">
+    <div class="store-hero">
+        <h1>Budget Meal Plans</h1>
+        <p>Complete daily meal suggestions using affordable, nutritious foods.</p>
+    </div>
+
+    <div class="meals-container">
+        {% for meal in meals %}
+        <div class="budget-meal">
+            <div class="meal-header">
+                <h2>{{ meal.name }}</h2>
+                <span class="meal-cost">${{ meal.total_cost|floatformat:2 }}</span>
+            </div>
+            
+            <div class="meal-items">
+                {% for item in meal.items %}
+                <div class="meal-item-badge">{{ item }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="meal-macros">
+                <div class="macro-stat">
+                    <span class="macro-label">Protein</span>
+                    <span class="macro-value">{{ meal.total_protein|floatformat:1 }}g</span>
+                </div>
+                <div class="macro-stat">
+                    <span class="macro-label">Carbs</span>
+                    <span class="macro-value">{{ meal.total_carbs|floatformat:1 }}g</span>
+                </div>
+                <div class="macro-stat">
+                    <span class="macro-label">Fats</span>
+                    <span class="macro-value">{{ meal.total_fats|floatformat:1 }}g</span>
+                </div>
+                <div class="macro-stat">
+                    <span class="macro-label">Calories</span>
+                    <span class="macro-value">{{ meal.total_calories }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="budget-daily-totals">
+            <h3>Full Day Budget Summary</h3>
+            <div class="daily-total-rows">
+                <div class="daily-total-row">
+                    <span>Daily Cost:</span>
+                    <span class="total-cost">$3.13</span>
+                </div>
+                <div class="daily-total-row">
+                    <span>Total Calories:</span>
+                    <span>1188</span>
+                </div>
+                <div class="daily-total-row">
+                    <span>Total Protein:</span>
+                    <span>73g</span>
+                </div>
+                <div class="daily-total-row">
+                    <span>Weekly Cost (7 days):</span>
+                    <span class="total-cost">$21.91</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="budget-tips">
+            <h3>Money-Saving Nutrition Tips</h3>
+            <ul>
+                <li><strong>Buy in bulk:</strong> Purchase rice, oats, and lentils in large quantities</li>
+                <li><strong>Shop sales:</strong> Eggs and chicken breast often go on sale</li>
+                <li><strong>Use canned:</strong> Canned tuna and beans are cheaper than fresh</li>
+                <li><strong>Meal prep:</strong> Cook large batches on weekends to save time and money</li>
+                <li><strong>Seasonal produce:</strong> Buy vegetables that are in season for lower prices</li>
+                <li><strong>Store brands:</strong> Generic/store brands are usually 20-30% cheaper</li>
+                <li><strong>Skip supplements:</strong> Real food is cheaper and more nutritious</li>
+                <li><strong>Grow herbs:</strong> Fresh herbs at home cost pennies</li>
+            </ul>
+        </div>
+
+        <div class="action-buttons">
+            <a class="button button-primary" href="{% url 'nutrition-tracker' %}">Track Nutrition</a>
+            <a class="button button-secondary" href="{% url 'nutrition-calculator' %}">Calculator</a>
+            <a class="button button-secondary" href="{% url 'home' %}">Home</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

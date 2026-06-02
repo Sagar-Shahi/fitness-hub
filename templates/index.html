@@ -1,0 +1,85 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="hero-section">
+    <div class="container hero-content">
+        <div>
+            <p class="eyebrow">Welcome to Fitness Hub</p>
+            <h1>Train smarter, eat better, and feel your best.</h1>
+            <p class="hero-text">Discover workouts, inspiration, healthy shopping, and guided routines built for every fitness goal.</p>
+            <div class="hero-actions">
+                {% if user.is_authenticated %}
+                    <a class="button button-primary" href="{% url 'profile' %}">Go to Dashboard</a>
+                {% else %}
+                    <a class="button button-primary" href="{% url 'login' %}">Login</a>
+                    <a class="button button-secondary" href="{% url 'register' %}">Get Started</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="feature-card">
+                <h2>Fitness Made Easy</h2>
+                <p>Track workouts, access expert tips, and find gear that supports your progress.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+<section class="dashboard-grid container">
+    <article class="dashboard-card">
+        <h3>Exercise</h3>
+        <p>Browse workouts and follow training plans built for every fitness level.</p>
+        <a class="button button-primary" href="{% url 'exercise-list' %}">Browse Exercises</a>
+    </article>
+    <article class="dashboard-card">
+        <h3>Products</h3>
+        <p>Shop equipment, supplements, and healthy gear designed to support your goals.</p>
+        <a class="button button-primary" href="{% url 'product-list' %}">View Products</a>
+    </article>
+    <article class="dashboard-card">
+        <h3>Exercise Records</h3>
+        <p>See your recent workouts and track progress from every session.</p>
+        <a class="button button-primary" href="{% url 'exercise-records' %}">View Records</a>
+    </article>
+    <article class="dashboard-card">
+        <h3>Purchases</h3>
+        <p>Review your past store purchases and order history in one place.</p>
+        <a class="button button-primary" href="{% url 'purchase-history' %}">View Purchases</a>
+    </article>
+    <article class="dashboard-card">
+        <h3>Nutrition Plan</h3>
+        <p>Get personalized meal and calorie recommendations for your fitness goals.</p>
+        <a class="button button-primary" href="{% url 'nutrition-calculator' %}">Calculate Plan</a>
+    </article>
+</section>
+{% endif %}
+
+<section class="feature-grid container">
+    <article>
+        <h3>Workouts</h3>
+        <p>Browse structured exercise routines, mobility drills, and strength sessions for every level.</p>
+    </article>
+    <article>
+        <h3>Inspiration</h3>
+        <p>Stay motivated with fresh content, wellness ideas, and community stories from our hub.</p>
+    </article>
+    <article>
+        <h3>Nutrition</h3>
+        <p>Find healthy recipes, smart meal ideas, and simple habits that support your fitness journey.</p>
+    </article>
+</section>
+
+<section class="mission-section">
+    <div class="container">
+        <div class="mission-text">
+            <h2>Move with purpose</h2>
+            <p>Fitness Hub is designed for everyone who wants to make consistent progress. Whether you're just starting or already training hard, everything you need is in one place.</p>
+            <ul>
+                <li>Daily training ideas</li>
+                <li>Nutrition and recovery support</li>
+                <li>Motivation and community energy</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}

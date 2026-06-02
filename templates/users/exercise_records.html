@@ -1,0 +1,25 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="records-page container">
+    <div class="store-hero">
+        <h1>Exercise Records</h1>
+        <p>Review your recent workouts and keep track of your progress.</p>
+    </div>
+    <div class="record-table">
+        <div class="record-row header">
+            <span>Date</span>
+            <span>Workout</span>
+            <span>Duration</span>
+            <span>Calories</span>
+        </div>
+        {% for record in records %}
+        <div class="record-row">
+            <span>{{ record.date }}</span>
+            <span>{{ record.workout }}</span>
+            <span>{{ record.duration }}</span>
+            <span>{{ record.calories }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

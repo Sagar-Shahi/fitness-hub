@@ -1,0 +1,25 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="store-page container">
+    <div class="store-hero">
+        <h1>Fitness Hub Shop</h1>
+        <p>Discover premium workout gear, nutrition essentials, and accessories for your training journey.</p>
+    </div>
+    <div class="product-grid">
+        {% for product in products %}
+        <article class="product-card">
+            <div class="product-image" style="background-image: url('{{ product.image_url }}');"></div>
+            <div class="product-details">
+                <span class="product-category">{{ product.category }}</span>
+                <h2><a href="{% url 'product-detail' product.slug %}">{{ product.name }}</a></h2>
+                <p>{{ product.description }}</p>
+                <div class="product-meta">
+                    <span class="product-price">${{ product.price }}</span>
+                    <a class="button button-secondary" href="{% url 'product-detail' product.slug %}">View</a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

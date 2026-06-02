@@ -1,0 +1,22 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="store-page container">
+    <div class="store-hero">
+        <h1>Inspiration Feed</h1>
+        <p>Read articles, tips, and stories to keep you motivated on your fitness journey.</p>
+    </div>
+    <div class="inspiration-feed">
+        {% for post in posts %}
+        <article class="inspiration-post">
+            <div class="post-header">
+                <h2>{{ post.title }}</h2>
+                <span class="post-date">{{ post.date }}</span>
+            </div>
+            <p class="post-author">By {{ post.author }}</p>
+            <p class="post-excerpt">{{ post.excerpt }}</p>
+            <a class="button button-secondary" href="#">Read More</a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

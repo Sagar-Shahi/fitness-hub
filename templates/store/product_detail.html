@@ -1,0 +1,18 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="product-detail-page container">
+    <div class="product-detail-card">
+        <div class="detail-image" style="background-image: url('{{ product.image_url }}');"></div>
+        <div class="detail-info">
+            <span class="product-category">{{ product.category }}</span>
+            <h1>{{ product.name }}</h1>
+            <p class="product-price">${{ product.price }}</p>
+            <p>{{ product.description }}</p>
+            <div class="detail-actions">
+                <a class="button button-primary" href="{% url 'product-list' %}">Back to Shop</a>
+                <button class="button button-secondary" disabled>Add to Cart</button>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

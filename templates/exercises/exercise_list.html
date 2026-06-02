@@ -1,0 +1,23 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="store-page container">
+    <div class="store-hero">
+        <h1>Exercise Library</h1>
+        <p>Choose a workout to stay active, build strength, and improve recovery.</p>
+    </div>
+    <div class="product-grid">
+        {% for exercise in exercises %}
+        <article class="product-card">
+            <div class="product-details">
+                <span class="product-category">Workout</span>
+                <h2>{{ exercise.title }}</h2>
+                <p>{{ exercise.description }}</p>
+                <div class="product-meta">
+                    <span class="product-price">{{ exercise.duration }}</span>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

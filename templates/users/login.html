@@ -1,0 +1,27 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="auth-page container">
+    <div class="auth-card">
+        <h1>Login to Fitness Hub</h1>
+        {% if form.errors %}
+            <div class="alert alert-error">
+                Please correct the fields below.
+            </div>
+        {% endif %}
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                {{ form.password }}
+            </div>
+            <button class="button button-primary" type="submit">Login</button>
+        </form>
+        <p class="auth-help">Don't have an account? <a href="{% url 'register' %}">Sign up</a> now.</p>
+        <p class="auth-help">Need help? Return <a href="{% url 'home' %}">home</a> or contact support.</p>
+    </div>
+</section>
+{% endblock %}
