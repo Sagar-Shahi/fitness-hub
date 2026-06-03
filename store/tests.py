@@ -1,24 +1,28 @@
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
 from .models import Product
 
 
 class StoreTests(TestCase):
     def setUp(self):
-        Product.objects.create(name='Test Prod', slug='test-prod', price=9.99)
+        Product.objects.create(
+            name='Test Training Tank',
+            slug='test-training-tank',
+            description='Lightweight outfit for gym sessions.',
+            product_type=Product.TYPE_OUTFIT,
+            price=19.99,
+        )
 
-    def test_product_list(self):
-        resp = self.client.get(reverse('product-list'))
+    def test_store_home(self):
+        resp = self.client.get(reverse('store-home'))
         self.assertEqual(resp.status_code, 200)
 
-    def test_add_to_cart_session(self):
-        resp = self.client.post(reverse('add-to-cart', args=['test-prod']), {'quantity': 2})
-        # should redirect back to detail
-        self.assertEqual(resp.status_code, 302)
-        session = self.client.session
-        self.assertIn('cart', session)
-        self.assertEqual(session['cart'].get('test-prod'), 2)
-from django.test import TestCase
+    def test_outfit_product_list(self):
+        resp = self.client.get(reverse('store-product-list', args=[Product.TYPE_OUTFIT]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Test Training Tank')
 
-# Create your tests here.
+    def test_outfit_product_detail(self):
+        resp = self.client.get(reverse('store-product-detail', args=[Product.TYPE_OUTFIT, 'test-training-tank']))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Lightweight outfit for gym sessions.')

@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-change-this-in-production-2026'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,11 +22,9 @@ INSTALLED_APPS = [
     'dashboard',
     'goals',
     'exercises',
-    'diet',
     'progress',
     'store',
     'inspiration',
-    
     # Third Party
     
 ]

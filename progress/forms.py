@@ -1,11 +1,11 @@
 from django import forms
-from .models import ProgressRecord
+from exercises.models import ExerciseCompletion
 
 
-class ProgressRecordForm(forms.ModelForm):
+class ExerciseCompletionForm(forms.ModelForm):
     class Meta:
-        model = ProgressRecord
-        fields = ('date', 'weight', 'waist', 'notes')
+        model = ExerciseCompletion
+        fields = ('reps', 'hold_time_sec', 'notes')
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'})
+            'notes': forms.Textarea(attrs={'rows': 3})
         }

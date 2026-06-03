@@ -1,17 +1,70 @@
 {% extends 'layout/base.html' %}
 {% block content %}
 <section class="container py-5">
-  <h1>Progress Tracker</h1>
-  <p class="text-muted">Track workouts, weight, and measurements over time.</p>
-  <a class="btn btn-primary mb-3" href="{% url 'create-progress' %}">Add Record</a>
-  {% if records %}
-    <ul>
-      {% for r in records %}
-        <li>{{ r.date }} — {{ r.weight }} kg — <a href="{% url 'edit-progress' r.pk %}">Edit</a> | <a href="{% url 'delete-progress' r.pk %}">Delete</a></li>
+  <h1>Exercise Log</h1>
+  <p class="text-muted">Your completed exercises are automatically recorded here.</p>
+
+  {% if stats %}
+    <div class="alert alert-success mb-3">
+      <h5>Your Stats</h5>
+      <p><strong>Total Workouts:</strong> {{ stats.total_workouts }} | <strong>Current Streak:</strong> {{ stats.current_streak }} days | <strong>Longest Streak:</strong> {{ stats.longest_streak }} days</p>
+    </div>
+  {% endif %}
+
+  {% if focus_alignment %}
+    <div class="alert alert-{{ focus_alignment.message_type }} mb-3">
+      <h5>{{ focus_alignment.message_type|title }} Message</h5>
+      <p>{{ focus_alignment.message }}</p>
+      {% if focus_alignment.volume_stats %}
+        <small>
+          Weekly Volume: {{ focus_alignment.volume_stats.total_volume }}/{{ focus_alignment.volume_stats.target_volume }} 
+          ({{ focus_alignment.volume_stats.completion_percent }}%)
+          • Trend: {{ focus_alignment.volume_stats.trend_direction|title }}
+        </small>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if goal %}
+    <div class="goal-summary mb-3">
+      <strong>Current Goal:</strong> {{ goal.get_goal_type_display }}
+      {% if goal.target_weight %}<span> • Target weight: {{ goal.target_weight }} kg</span>{% endif %}
+    </div>
+  {% endif %}
+
+  {% if focus_suggestions %}
+    <div class="alert alert-info mb-3">
+      {% for suggestion in focus_suggestions %}
+        <p>{{ suggestion }}</p>
       {% endfor %}
-    </ul>
+    </div>
+  {% endif %}
+
+  {% if assigned_exercises %}
+    <section class="goal-exercises mb-4">
+      <h2>Assigned Exercises</h2>
+      <ul>
+        {% for exercise in assigned_exercises %}
+          <li><a href="{% url 'exercise-detail' exercise.slug %}">{{ exercise.name }}</a> — <a href="{% url 'log-exercise' exercise.slug %}" class="btn btn-sm btn-primary">Log</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <h2>Recent Exercise Log</h2>
+  {% if completions %}
+    <div class="exercise-log-list">
+      {% for completion in completions %}
+        <div class="log-entry">
+          <strong>{{ completion.date }}</strong> — <a href="{% url 'exercise-detail' completion.exercise.slug %}">{{ completion.exercise.name }}</a>
+          {% if completion.reps %}<span class="badge">{{ completion.reps }} reps</span>{% endif %}
+          {% if completion.hold_time_sec %}<span class="badge">{{ completion.hold_time_sec }}s hold</span>{% endif %}
+          {% if completion.notes %}<p>{{ completion.notes }}</p>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
   {% else %}
-    <p>No progress records yet.</p>
+    <p>No exercises logged yet. Start by clicking "Log" on an exercise!</p>
   {% endif %}
 </section>
 {% endblock %}

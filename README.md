@@ -30,3 +30,26 @@ Run tests locally:
 ```bash
 python manage.py test
 ```
+
+Payments (Stripe test mode):
+
+The project includes a placeholder Stripe Checkout integration. To enable it locally or in CI, set the `STRIPE_SECRET_KEY` environment variable to your Stripe test secret key. When set, the checkout flow will redirect to Stripe Checkout; otherwise the checkout is simulated and the order is marked as paid.
+
+Example (PowerShell):
+
+```powershell
+$env:STRIPE_SECRET_KEY="sk_test_..."
+python manage.py runserver
+```
+
+## Branches
+
+- `feature/diet`: Work on the diet app (diet CRUD, migrations).
+- `feature/exercises`: Exercise library improvements and exercise views.
+- `feature/store`: Store, cart, and checkout UI/logic work.
+- `feature/users`: User profiles, authentication, and account pages.
+- `feature/progress`: Progress tracking, entries, and views.
+- `refactor/models`: Model refactors and database migrations.
+- `docs/update-readme`: Documentation updates (this README section).
+
+PR pages were opened for these branches; visit your repository to create PRs.

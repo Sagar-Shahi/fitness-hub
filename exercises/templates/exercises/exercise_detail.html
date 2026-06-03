@@ -26,6 +26,9 @@
           <a href="{{ exercise.video_url }}" target="_blank" class="btn btn-outline-primary">Watch Tutorial</a>
         </div>
         {% endif %}
+        <div class="mt-3">
+          <a href="{% url 'log-exercise' exercise.slug %}" class="btn btn-success btn-block">Log This Exercise</a>
+        </div>
       </div>
     </div>
   </div>

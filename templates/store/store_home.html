@@ -1,0 +1,18 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<section class="container py-5">
+  <h1>Store Categories</h1>
+  <p>Browse our three product types: outfits, exercise gear, and nutrition items.</p>
+
+  <div class="store-categories-grid">
+    {% for category in categories %}
+    <article class="store-card">
+      <h2>{{ category.title }}</h2>
+      <p>{{ category.description }}</p>
+      <a class="button button-primary" href="{% url 'store-product-list' category.slug %}">Browse {{ category.title }}</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

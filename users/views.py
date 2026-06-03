@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from .forms import UserUpdateForm, ProfileForm
+from .forms import UserUpdateForm, ProfileForm, UserRegistrationForm, GoalSelectionForm
+from .models import Profile
+from goals.models import Goal
 
 # Affordable food database
 AFFORDABLE_FOODS = {
@@ -194,15 +195,64 @@ def about(request):
     return render(request, 'about.html')
 
 
+def _map_profile_goal_to_goal_type(selected_goal):
+    if not selected_goal:
+        return None
+    selected_goal = selected_goal.lower()
+    if selected_goal.startswith('calisthenics'):
+        return 'calisthenics'
+    if selected_goal.startswith('v_taper'):
+        return 'lean_athletic'
+    if selected_goal.startswith('weight_loss'):
+        return 'fat_loss'
+    if selected_goal.startswith('general_fitness'):
+        return 'general'
+    return None
+
+
+def _sync_goal_exercises(user_profile):
+    goal_type = _map_profile_goal_to_goal_type(user_profile.selected_goal)
+    if not goal_type:
+        return None
+    goal, created = Goal.objects.get_or_create(
+        user=user_profile.user,
+        goal_type=goal_type,
+        defaults={'description': 'Auto-synced goal from selected profile goal.'}
+    )
+    goal.sync_assigned_exercises()
+    return goal
+
+
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            profile, _ = Profile.objects.get_or_create(user=user)
+            profile.age = form.cleaned_data.get('age')
+            profile.height_cm = form.cleaned_data.get('height_cm')
+            profile.weight_kg = form.cleaned_data.get('weight_kg')
+            profile.save()
             login(request, user)
             messages.success(request, 'Your account has been created successfully.')
             return redirect('home')
     else:
-        form = UserCreationForm()
+        form = UserRegistrationForm()
 
     return render(request, 'users/register.html', {'form': form})
+
+
+@login_required
+def select_goal(request):
+    profile = getattr(request.user, 'profile', None)
+    if request.method == 'POST':
+        form = GoalSelectionForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            _sync_goal_exercises(profile)
+            messages.success(request, 'Your goal selection has been updated.')
+            return redirect('profile')
+    else:
+        form = GoalSelectionForm(instance=profile)
+
+    return render(request, 'users/select_goal.html', {'form': form})

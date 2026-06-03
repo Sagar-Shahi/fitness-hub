@@ -1,0 +1,51 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Exercises</h1>
+      <p class="text-muted">Browse available workout exercises and view details for each move.</p>
+    </div>
+    <div>
+      {% if selected_goal == 'my_plan' %}
+        <span class="badge bg-info">My Plan: Showing all exercises</span>
+      {% elif selected_goal %}
+        <span class="badge bg-success">Recommended for {{ selected_goal|title }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if exercises %}
+    <div class="row gy-4">
+      {% for exercise in exercises %}
+        <div class="col-md-6">
+          <div class="card h-100 shadow-sm">
+            {% if exercise.image_url %}
+              <img src="{{ exercise.image_url }}" class="card-img-top" alt="{{ exercise.name }}">
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ exercise.name }}</h5>
+              <p class="card-text text-muted mb-2">{{ exercise.description }}</p>
+              {% if exercise.recommended %}
+                <span class="badge bg-primary mb-2">Recommended</span>
+              {% endif %}
+              <ul class="list-inline small text-muted mb-3">
+                {% if exercise.duration %}
+                  <li class="list-inline-item">Duration: {{ exercise.duration }}</li>
+                {% endif %}
+                <li class="list-inline-item">Sets: {{ exercise.sets }}</li>
+                <li class="list-inline-item">Reps: {{ exercise.reps }}</li>
+              </ul>
+              <div class="mt-auto">
+                <a href="{% url 'exercise-detail' exercise.slug %}" class="btn btn-outline-primary btn-sm">View Details</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No exercises available at this time. Please check back later.</p>
+  {% endif %}
+</section>
+{% endblock %}

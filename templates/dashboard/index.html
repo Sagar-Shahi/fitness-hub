@@ -2,18 +2,86 @@
 {% block content %}
 <section class="container py-5">
   <h1>Dashboard</h1>
+
+  {% if focus_alignment %}
+    <div class="alert alert-{{ focus_alignment.message_type }} mb-4">
+      <h5>{{ focus_alignment.message_type|title }} — Focus on Your Goal</h5>
+      <p>{{ focus_alignment.message }}</p>
+      {% if focus_alignment.volume_stats %}
+        <small>
+          Weekly Volume: {{ focus_alignment.volume_stats.total_volume }}/{{ focus_alignment.volume_stats.target_volume }} 
+          ({{ focus_alignment.volume_stats.completion_percent }}%) 
+          • Trend: {{ focus_alignment.volume_stats.trend_direction|title }}
+        </small>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if stats %}
+    <div class="alert alert-info mb-4">
+      <h5>Your Motivation Stats</h5>
+      <p>
+        <strong>Total Workouts:</strong> {{ stats.total_workouts }} | 
+        <strong>Current Streak:</strong> {{ stats.current_streak }} 🔥 | 
+        <strong>Longest Streak:</strong> {{ stats.longest_streak }} days
+      </p>
+    </div>
+  {% endif %}
+
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h5>Active Goal</h5>
+        {% if goal %}
+          <p><strong>{{ goal.get_goal_type_display }}</strong></p>
+          {% if goal.description %}<p>{{ goal.description }}</p>{% endif %}
+          {% if goal.target_weight %}<p>Target: {{ goal.target_weight }} kg</p>{% endif %}
+          {% if goal.assigned_exercises.exists %}
+            <p>{{ goal.assigned_exercises.count }} assigned exercise{{ goal.assigned_exercises.count|pluralize }}</p>
+          {% endif %}
+          <div class="goal-readiness mt-3">
+            <strong>Goal Readiness</strong>
+            <div class="progress" style="height: 16px; background: #e9ecef; border-radius: 8px; overflow: hidden;">
+              <div class="progress-bar" style="width: {{ readiness }}%; background: #4caf50; height: 100%;"></div>
+            </div>
+            <p class="mt-2">{{ readiness }}% toward your current goal</p>
+          </div>
+        {% else %}
+          <p>No active goal selected yet. Set your goal on the profile page.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h5>Next Suggested Exercise</h5>
+        {% if next_exercise %}
+          <p><a href="{% url 'exercise-detail' next_exercise.slug %}">{{ next_exercise.name }}</a></p>
+          <p>{{ next_exercise.description|truncatechars:120 }}</p>
+        {% else %}
+          <p>Choose a goal to receive a tailored exercise suggestion.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h5>Progress Overview</h5>
+        {% if focus_alignment.weekly_stats %}
+          <p><strong>Weekly Target:</strong> {{ focus_alignment.weekly_stats.exercises_completed }}/{{ focus_alignment.weekly_stats.exercises_assigned }} exercises</p>
+          <div class="progress" style="height: 16px; background: #e9ecef; border-radius: 8px; overflow: hidden;">
+            <div class="progress-bar" style="width: {{ focus_alignment.weekly_stats.percent }}%; background: #2196F3; height: 100%;"></div>
+          </div>
+          <p class="mt-2">{{ focus_alignment.weekly_stats.percent }}% complete</p>
+        {% else %}
+          <p>Quick stats and summary will appear here.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-12">
       <div class="card p-3">
         <h5>Weekly Activity</h5>
         <canvas id="activityChart" width="400" height="200"></canvas>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card p-3">
-        <h5>Progress Overview</h5>
-        <p>Quick stats and summary will appear here.</p>
-      </div>
     </div>
   </div>
 </section>

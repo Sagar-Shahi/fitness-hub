@@ -1,22 +1,24 @@
 {% extends 'layout/base.html' %}
+
 {% block content %}
-<section class="product-detail-page container">
+<section class="container py-5">
+  <div class="product-detail-page">
     <div class="product-detail-card">
-        <div class="detail-image" style="background-image: url('{{ product.image_url }}');"></div>
-        <div class="detail-info">
-            <span class="product-category">{{ product.category }}</span>
-            <h1>{{ product.name }}</h1>
-            <p class="product-price">${{ product.price }}</p>
-            <p>{{ product.description }}</p>
-                        <div class="detail-actions">
-                                <a class="button button-primary" href="{% url 'product-list' %}">Back to Shop</a>
-                                <form method="post" action="{% url 'add-to-cart' product.slug %}" style="display:inline-block; margin-left:.5rem;">
-                                    {% csrf_token %}
-                                    {{ form.quantity }}
-                                    <button class="button button-secondary" type="submit">Add to Cart</button>
-                                </form>
-                        </div>
+      {% if product.image_url %}
+      <div class="detail-image" style="background-image: url('{{ product.image_url }}');"></div>
+      {% else %}
+      <div class="detail-image" style="background-color: var(--surface-soft);"></div>
+      {% endif %}
+      <div class="detail-info">
+        <h1>{{ product.name }}</h1>
+        <p class="product-category">{{ product.get_product_type_display }}</p>
+        <p>{{ product.description }}</p>
+        <p class="product-price">${{ product.price }}</p>
+        <div class="detail-actions">
+          <a class="button button-secondary" href="{% url 'store-product-list' product.product_type %}">← Back to {{ product.get_product_type_display }}</a>
         </div>
+      </div>
     </div>
+  </div>
 </section>
 {% endblock %}

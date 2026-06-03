@@ -1,12 +1,139 @@
 {% extends 'layout/base.html' %}
 {% block content %}
 <section class="container py-5">
-  <h1>Create Goal</h1>
-  <form method="post">
+  <div class="page-header">
+    <p class="eyebrow">Goals</p>
+    <h1>Create New Goal</h1>
+    <p class="hero-text">Design a refined training objective with clear focus areas, a premium interface, and fast goal setup.</p>
+  </div>
+
+  <form method="post" class="goal-setup-card">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-primary" type="submit">Create</button>
-    <a class="btn btn-secondary" href="{% url 'goals' %}">Cancel</a>
+    {{ form.goal_type }}
+    {{ form.focus_areas }}
+
+    <div class="section-panel">
+      <div class="section-header">
+        <div>
+          <h2>Goal type</h2>
+          <p>Choose the training style that best matches your progress plan.</p>
+        </div>
+      </div>
+      <div class="goal-selection-grid" role="radiogroup" aria-label="Goal type">
+        <button type="button" class="goal-card" data-goal="calisthenics">
+          <span class="goal-card-icon">🤸‍♂️</span>
+          <div>
+            <strong>Calisthenics Body</strong>
+            <p>Focus on bodyweight mastery.</p>
+          </div>
+        </button>
+        <button type="button" class="goal-card" data-goal="lean_athletic">
+          <span class="goal-card-icon">🏃‍♂️</span>
+          <div>
+            <strong>Lean Athletic Body</strong>
+            <p>Stay agile with a toned, athletic frame.</p>
+          </div>
+        </button>
+        <button type="button" class="goal-card" data-goal="muscle_gain">
+          <span class="goal-card-icon">💪</span>
+          <div>
+            <strong>Muscle Gain</strong>
+            <p>Build strength and bulk with smart progress.</p>
+          </div>
+        </button>
+        <button type="button" class="goal-card" data-goal="fat_loss">
+          <span class="goal-card-icon">🔥</span>
+          <div>
+            <strong>Fat Loss</strong>
+            <p>Shed body fat while maintaining energy.</p>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="section-panel">
+      <div class="section-header">
+        <div>
+          <h2>Focus area</h2>
+          <p>Select the muscle groups you want to emphasize.</p>
+        </div>
+      </div>
+      <div class="focus-grid" role="group" aria-label="Focus areas">
+        <button type="button" class="focus-pill" data-value="Shoulders">Shoulders</button>
+        <button type="button" class="focus-pill" data-value="Back">Back</button>
+        <button type="button" class="focus-pill" data-value="Core">Core</button>
+        <button type="button" class="focus-pill" data-value="Legs">Legs</button>
+      </div>
+      <div id="focus-inputs" class="focus-inputs"></div>
+    </div>
+
+    <div class="input-grid">
+      <div class="field-card">
+        <label for="id_target_weight">Target Weight</label>
+        {{ form.target_weight }}
+        {% if form.target_weight.errors %}
+          <div class="field-error">{{ form.target_weight.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="field-card">
+        <label for="id_timeline_weeks">Timeline</label>
+        {{ form.timeline_weeks }}
+        {% if form.timeline_weeks.errors %}
+          <div class="field-error">{{ form.timeline_weeks.errors }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="field-card field-card-full">
+      <label for="id_description">Specific Objectives</label>
+      {{ form.description }}
+      {% if form.description.errors %}
+        <div class="field-error">{{ form.description.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="button button-primary">Create Goal</button>
+      <a class="secondary-link" href="{% url 'goals' %}">Cancel</a>
+    </div>
   </form>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const goalInput = document.querySelector('input[name="goal_type"]');
+    const goalCards = document.querySelectorAll('.goal-card');
+    const focusPills = document.querySelectorAll('.focus-pill');
+    const focusInputs = document.getElementById('focus-inputs');
+
+    function updateFocusInputs(selected) {
+      focusInputs.innerHTML = '';
+      selected.forEach(value => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'focus_areas';
+        input.value = value;
+        focusInputs.appendChild(input);
+      });
+    }
+
+    goalCards.forEach(card => {
+      card.addEventListener('click', () => {
+        goalCards.forEach(item => item.classList.remove('selected'));
+        card.classList.add('selected');
+        goalInput.value = card.dataset.goal;
+      });
+    });
+
+    focusPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        pill.classList.toggle('selected');
+        const selected = Array.from(focusPills)
+          .filter(item => item.classList.contains('selected'))
+          .map(item => item.dataset.value);
+        updateFocusInputs(selected);
+      });
+    });
+  });
+</script>
 {% endblock %}

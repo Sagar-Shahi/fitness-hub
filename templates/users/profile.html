@@ -1,46 +1,59 @@
 {% extends 'layout/base.html' %}
+
 {% block content %}
 <section class="container py-5 profile-page">
   <div class="profile-card">
+
     <h1>Profile</h1>
+
     <div class="record-row">
       <span><strong>Username:</strong> {{ request.user.username }}</span>
       <span><strong>Email:</strong> {{ request.user.email }}</span>
     </div>
+
     {% if request.user.profile %}
     <div class="record-row">
       <span><strong>Age:</strong> {{ request.user.profile.age }}</span>
       <span><strong>Gender:</strong> {{ request.user.profile.gender }}</span>
     </div>
+
     <div class="record-row">
       <span><strong>Height (cm):</strong> {{ request.user.profile.height_cm }}</span>
       <span><strong>Weight (kg):</strong> {{ request.user.profile.weight_kg }}</span>
     </div>
+
+    <div class="record-row">
+      <span><strong>Goal:</strong> {{ request.user.profile.get_selected_goal_display }}</span>
+      <span><strong>Body Type:</strong> {{ request.user.profile.get_body_type_display }}</span>
+    </div>
+    <div class="record-row">
+      <span><strong>Focus Area:</strong> {{ request.user.profile.get_goal_focus_display }}</span>
+    </div>
     {% endif %}
-    <div class="profile-actions" style="margin-top:1rem;">
-      <a class="button button-primary" href="{% url 'edit-profile' %}">Edit Profile</a>
+
+    <hr>
+
+    <h3>Quick Actions</h3>
+
+    <div class="profile-actions">
+      <a class="button button-primary" href="{% url 'exercise-list' %}">Exercises</a>
+      <a class="button button-primary" href="{% url 'store-home' %}">Store</a>
+      <a class="button button-primary" href="{% url 'exercise-records' %}">Records</a>
+      <a class="button button-primary" href="{% url 'purchase-history' %}">Purchases</a>
+      <a class="button button-primary" href="{% url 'nutrition-calculator' %}">Nutrition</a>
+    </div>
+
+    <div class="profile-actions" style="margin-top: 1rem;">
+      <a class="button button-secondary" href="{% url 'edit-profile' %}">Edit Profile</a>
+      <a class="button button-secondary" href="{% url 'select-goal' %}">Change Goal</a>
       <a class="button button-secondary" href="{% url 'dashboard' %}">Dashboard</a>
+      <form action="{% url 'logout' %}" method="post" class="logout-form-inline" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="button button-secondary">Logout</button>
+      </form>
+      <a class="button button-secondary" href="{% url 'home' %}">Home</a>
     </div>
+
   </div>
-</section>
-{% endblock %}
-{% extends 'layout/base.html' %}
-{% block content %}
-<section class="profile-page container">
-    <div class="profile-card">
-        <h1>Welcome back, {{ user.username }}!</h1>
-        <p>From here, you can start a workout, shop products, or check your recent records and purchases.</p>
-        <div class="profile-actions">
-            <a class="button button-primary" href="{% url 'exercise-list' %}">Exercises</a>
-            <a class="button button-primary" href="{% url 'product-list' %}">Products</a>
-            <a class="button button-primary" href="{% url 'exercise-records' %}">Records</a>
-            <a class="button button-primary" href="{% url 'purchase-history' %}">Purchases</a>
-            <a class="button button-primary" href="{% url 'nutrition-calculator' %}">Nutrition</a>
-        </div>
-        <div class="profile-actions" style="margin-top: 1rem;">
-            <a class="button button-secondary" href="{% url 'logout' %}">Logout</a>
-            <a class="button button-secondary" href="{% url 'home' %}">Home</a>
-        </div>
-    </div>
 </section>
 {% endblock %}

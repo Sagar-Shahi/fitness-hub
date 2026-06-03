@@ -34,6 +34,7 @@ jobs:
       - name: Run migrations
         run: |
           python manage.py migrate --noinput
-      - name: Run tests
+      - name: Run tests with coverage
         run: |
-          python manage.py test --verbosity=1
+          coverage run --source='.' manage.py test --verbosity=1
+          coverage report -m

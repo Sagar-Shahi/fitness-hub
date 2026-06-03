@@ -11,3 +11,21 @@ if (menuToggle && mainNav) {
 window.addEventListener('load', () => {
     document.body.dataset.loaded = 'true';
 });
+
+// Toggle inline form guide for exercises
+document.addEventListener('click', (e) => {
+    const toggle = e.target.closest('.form-toggle');
+    if (!toggle) return;
+    const card = toggle.closest('.exercise-card');
+    if (!card) return;
+    const guide = card.querySelector('.form-guide');
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+    if (guide) {
+        if (guide.hasAttribute('hidden')) {
+            guide.removeAttribute('hidden');
+        } else {
+            guide.setAttribute('hidden', '');
+        }
+    }
+});

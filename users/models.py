@@ -22,6 +22,33 @@ class Profile(models.Model):
 	activity_level = models.CharField(max_length=20, choices=ACTIVITY_LEVELS, blank=True)
 	bio = models.TextField(blank=True)
 
+	GOAL_CHOICES = (
+		('calisthenics_body', 'Calisthenics Body'),
+		('v_taper', 'V-Taper'),
+		('weight_loss', 'Weight Loss'),
+		('general_fitness', 'General Fitness'),
+		('my_plan', 'My Plan'),
+	)
+
+	GOAL_FOCUS_CHOICES = (
+		('upper_body', 'Upper Body'),
+		('lower_body', 'Lower Body'),
+		('core', 'Core Stability'),
+		('pull_strength', 'Pull Strength'),
+		('push_strength', 'Push Strength'),
+		('mobility', 'Mobility'),
+	)
+
+	BODY_TYPES = (
+		('lean', 'Lean'),
+		('average', 'Average'),
+		('stocky', 'Stocky'),
+	)
+
+	selected_goal = models.CharField(max_length=30, choices=GOAL_CHOICES, blank=True)
+	goal_focus = models.CharField(max_length=30, choices=GOAL_FOCUS_CHOICES, blank=True)
+	body_type = models.CharField(max_length=20, choices=BODY_TYPES, blank=True)
+
 	def __str__(self):
 		return f"Profile: {self.user.username}"
 

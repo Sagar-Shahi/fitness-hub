@@ -1,32 +1,56 @@
 {% extends 'layout/base.html' %}
+
 {% block content %}
-<section class="store-page container">
-    <div class="store-hero">
-        <h1>Fitness Hub Shop</h1>
-        <p>Discover premium workout gear, nutrition essentials, and accessories for your training journey.</p>
+<section class="container py-5">
+  <div class="store-header">
+    <h1>{{ category_title }}</h1>
+    <a class="button button-secondary" href="{% url 'store-home' %}">← Back to Categories</a>
+  </div>
+  <p class="store-description">Explore our curated selection of {{ category_title|lower }}.</p>
+
+  {% if products %}
+  <!-- Location Selector -->
+  <div class="location-selector">
+    <span class="location-icon">📍</span>
+    <span class="location-text">Deliver to {% if user.is_authenticated %}{{ user.first_name|default:"You" }}{% else %}You{% endif %}</span>
+    <span class="location-dropdown">▼</span>
+  </div>
+
+  <div class="amazon-grid">
+    {% for product in products %}
+    <div class="product-item">
+      <div class="product-image-wrapper">
+        {% if product.image_url %}
+        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-img">
+        {% else %}
+        <div class="product-img-placeholder"></div>
+        {% endif %}
+      </div>
+      <div class="product-info">
+        <h2 class="product-name"><a href="{% url 'store-product-detail' product.product_type product.slug %}">{{ product.name }}</a></h2>
+        <div class="product-rating">
+          <span class="stars">★★★★★</span>
+          <span class="rating-count">(0)</span>
+        </div>
+        <p class="product-brief">{{ product.description }}</p>
+        <div class="price-section">
+          <span class="price-label">Price:</span>
+          <span class="price-value">${{ product.price }}</span>
+        </div>
+        <div class="delivery-badge">
+          <span class="delivery-icon">🚚</span>
+          <span class="delivery-text">FREE delivery tomorrow</span>
+        </div>
+      </div>
+      <div class="button-container">
+        <a href="{% url 'store-product-detail' product.product_type product.slug %}" class="add-to-cart-btn">Add to Cart</a>
+        <button class="buy-now-btn">Buy Now</button>
+      </div>
     </div>
-    <div class="product-grid">
-        {% for product in products %}
-        <article class="product-card">
-            <div class="product-image" style="background-image: url('{{ product.image_url }}');"></div>
-            <div class="product-details">
-                <span class="product-category">{{ product.category }}</span>
-                <h2><a href="{% url 'product-detail' product.slug %}">{{ product.name }}</a></h2>
-                <p>{{ product.description }}</p>
-                <div class="product-meta">
-                    <span class="product-price">${{ product.price }}</span>
-                                        <div style="display:flex; gap:.5rem; align-items:center;">
-                                            <a class="button button-secondary" href="{% url 'product-detail' product.slug %}">View</a>
-                                            <form method="post" action="{% url 'add-to-cart' product.slug %}">
-                                                {% csrf_token %}
-                                                <input type="number" name="quantity" value="1" min="1" style="width:64px; padding:.35rem; border-radius:.5rem; border:1px solid rgba(255,255,255,0.08); background:transparent; color:var(--text);">
-                                                <button class="button button-primary" type="submit">Add</button>
-                                            </form>
-                                        </div>
-                </div>
-            </div>
-        </article>
-        {% endfor %}
-    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No products are available in this category yet.</p>
+  {% endif %}
 </section>
 {% endblock %}

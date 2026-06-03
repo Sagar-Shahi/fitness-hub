@@ -2,6 +2,7 @@
 {% block content %}
 <section class="container py-5">
   <h1>Edit Progress Record</h1>
+  <p class="text-muted">Update your exercise-specific metrics or body measurements.</p>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
