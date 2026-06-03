@@ -3,6 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.shortcuts import get_object_or_404
+from .forms import UserUpdateForm, ProfileForm
 
 # Affordable food database
 AFFORDABLE_FOODS = {
@@ -120,6 +122,26 @@ def profile(request):
 
 
 @login_required
+def edit_profile(request):
+    user = request.user
+    profile = getattr(user, 'profile', None)
+
+    if request.method == 'POST':
+        uform = UserUpdateForm(request.POST, instance=user)
+        pform = ProfileForm(request.POST, instance=profile)
+        if uform.is_valid() and pform.is_valid():
+            uform.save()
+            pform.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('profile')
+    else:
+        uform = UserUpdateForm(instance=user)
+        pform = ProfileForm(instance=profile)
+
+    return render(request, 'users/edit_profile.html', {'uform': uform, 'pform': pform})
+
+
+@login_required
 def exercise_records(request):
     records = [
         {'date': '2026-06-01', 'workout': 'Full-Body Strength', 'duration': '32 mins', 'calories': 420},
@@ -166,6 +188,10 @@ def nutrition_calculator(request):
             messages.error(request, 'Please enter valid numbers for all fields.')
     
     return render(request, 'users/nutrition_calculator.html')
+
+
+def about(request):
+    return render(request, 'about.html')
 
 
 def register(request):

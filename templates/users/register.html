@@ -24,9 +24,18 @@
                 <label for="id_password2">Confirm Password</label>
                 {{ form.password2 }}
             </div>
-            <button class="button button-primary" type="submit">Sign Up</button>
+            <div class="profile-actions">
+                <button class="button button-primary" type="submit">Sign Up</button>
+                <a class="button button-secondary" href="{% url 'login' %}">Login</a>
+            </div>
+            {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+                {{ form.errors }}
+            </div>
+            {% endif %}
         </form>
         <p class="auth-help">Already have an account? <a href="{% url 'login' %}">Login</a>.</p>
     </div>
 </section>
+
 {% endblock %}

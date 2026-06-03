@@ -1,0 +1,8 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="container py-5">
+  <h1>Order Received</h1>
+  <p>Thank you! Your order <strong>#{{ order.id }}</strong> has been placed.</p>
+  <a class="btn btn-primary" href="{% url 'product-list' %}">Continue Shopping</a>
+</section>
+{% endblock %}

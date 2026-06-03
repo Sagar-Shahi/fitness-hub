@@ -30,4 +30,14 @@ def index(request):
 
 
 def exercise_list(request):
-    return render(request, 'exercises/exercise_list.html', {'exercises': EXERCISES})
+    from .models import Exercise
+    exercises = Exercise.objects.all() if Exercise.objects.exists() else EXERCISES
+    return render(request, 'exercises/exercise_list.html', {'exercises': exercises})
+
+
+def exercise_detail(request, slug):
+    from .models import Exercise
+    ex = Exercise.objects.filter(slug=slug).first()
+    if not ex:
+        return render(request, '404.html', status=404)
+    return render(request, 'exercises/exercise_detail.html', {'exercise': ex})

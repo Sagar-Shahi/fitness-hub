@@ -1,0 +1,12 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="container py-5">
+  <h1>Delete Progress Record</h1>
+  <p>Are you sure you want to delete the progress record for {{ record.date }}?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Delete</button>
+    <a class="btn btn-secondary" href="{% url 'progress' %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

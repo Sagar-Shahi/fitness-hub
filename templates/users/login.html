@@ -18,7 +18,10 @@
                 <label for="id_password">Password</label>
                 {{ form.password }}
             </div>
-            <button class="button button-primary" type="submit">Login</button>
+            <div class="profile-actions">
+                <button class="button button-primary" type="submit">Login</button>
+                <a class="button button-secondary" href="{% url 'home' %}">Back</a>
+            </div>
         </form>
         <p class="auth-help">Don't have an account? <a href="{% url 'register' %}">Sign up</a> now.</p>
         <p class="auth-help">Need help? Return <a href="{% url 'home' %}">home</a> or contact support.</p>

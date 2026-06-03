@@ -17,8 +17,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # Our Apps
+    'core',
     'users',
+    'dashboard',
+    'goals',
     'exercises',
+    'diet',
+    'progress',
     'store',
     'inspiration',
     

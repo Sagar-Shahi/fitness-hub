@@ -1,0 +1,17 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="container py-5">
+  <h1>Progress Tracker</h1>
+  <p class="text-muted">Track workouts, weight, and measurements over time.</p>
+  <a class="btn btn-primary mb-3" href="{% url 'create-progress' %}">Add Record</a>
+  {% if records %}
+    <ul>
+      {% for r in records %}
+        <li>{{ r.date }} — {{ r.weight }} kg — <a href="{% url 'edit-progress' r.pk %}">Edit</a> | <a href="{% url 'delete-progress' r.pk %}">Delete</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No progress records yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="container py-5">
+  <h1>Diet Planner</h1>
+  <p class="text-muted">Personalized meal plans and nutrition tools.</p>
+  <a class="btn btn-primary mb-3" href="{% url 'create-record' %}">Add Record</a>
+  {% if records %}
+    <ul>
+      {% for r in records %}
+        <li>{{ r.date }} — {{ r.calories }} kcal — <a href="{% url 'edit-record' r.pk %}">Edit</a> | <a href="{% url 'delete-record' r.pk %}">Delete</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No nutrition records yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

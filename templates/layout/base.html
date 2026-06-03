@@ -13,13 +13,18 @@
         <div class="container nav-wrapper">
             <a class="brand" href="{% url 'home' %}">Fitness Hub</a>
             <nav class="main-nav" id="mainNav">
-                <a href="{% url 'home' %}">Home</a>
-                <a href="{% url 'inspiration-feed' %}">Inspiration</a>
-                <a href="{% url 'product-list' %}">Store</a>
                 {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                    <a href="{% url 'goals' %}">Goals</a>
+                    <a href="{% url 'exercise-list' %}">Exercises</a>
+                    <a href="{% url 'diet' %}">Diet Planner</a>
+                    <a href="{% url 'progress' %}">Progress</a>
+                    <a href="{% url 'product-list' %}">Store</a>
                     <a href="{% url 'profile' %}">Profile</a>
                     <a href="{% url 'logout' %}">Logout</a>
                 {% else %}
+                    <a href="{% url 'home' %}">Home</a>
+                    <a href="{% url 'about' %}">About Us</a>
                     <a href="{% url 'login' %}">Login</a>
                     <a href="{% url 'register' %}">Sign Up</a>
                 {% endif %}

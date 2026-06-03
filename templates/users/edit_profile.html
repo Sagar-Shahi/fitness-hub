@@ -1,0 +1,13 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="container py-5">
+  <h1>Edit Profile</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">{{ uform.as_p }}</div>
+    <div class="mb-3">{{ pform.as_p }}</div>
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-secondary" href="{% url 'profile' %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

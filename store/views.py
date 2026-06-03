@@ -1,5 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Product
+from .forms import AddToCartForm
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from .models import Order, OrderItem
 
 PRODUCT_SEED = [
     {
@@ -74,4 +78,73 @@ def product_list(request):
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
-    return render(request, 'store/product_detail.html', {'product': product})
+    form = AddToCartForm()
+    return render(request, 'store/product_detail.html', {'product': product, 'form': form})
+
+
+def add_to_cart(request, slug):
+    if request.method == 'POST':
+        form = AddToCartForm(request.POST)
+        if form.is_valid():
+            qty = form.cleaned_data['quantity']
+            cart = request.session.get('cart', {})
+            cart[str(slug)] = cart.get(str(slug), 0) + qty
+            request.session['cart'] = cart
+    return redirect('product-detail', slug=slug)
+
+
+def view_cart(request):
+    cart = request.session.get('cart', {})
+    items = []
+    total = 0
+    for slug, qty in cart.items():
+        try:
+            product = Product.objects.get(slug=slug)
+        except Product.DoesNotExist:
+            continue
+        subtotal = product.price * qty
+        items.append({'product': product, 'quantity': qty, 'subtotal': subtotal})
+        total += subtotal
+    return render(request, 'store/cart.html', {'items': items, 'total': total})
+
+
+def update_cart(request):
+    if request.method == 'POST':
+        cart = request.session.get('cart', {})
+        for key, value in request.POST.items():
+            if key.startswith('qty_'):
+                slug = key.split('qty_')[1]
+                try:
+                    qty = int(value)
+                except ValueError:
+                    qty = 0
+                if qty > 0:
+                    cart[slug] = qty
+                elif slug in cart:
+                    del cart[slug]
+        request.session['cart'] = cart
+    return redirect('view-cart')
+
+
+def remove_from_cart(request, slug):
+    cart = request.session.get('cart', {})
+    if str(slug) in cart:
+        del cart[str(slug)]
+        request.session['cart'] = cart
+    return redirect('view-cart')
+
+
+@login_required
+def checkout(request):
+    cart = request.session.get('cart', {})
+    if not cart:
+        return redirect('product-list')
+    order = Order.objects.create(user=request.user)
+    for slug, qty in cart.items():
+        try:
+            product = Product.objects.get(slug=slug)
+        except Product.DoesNotExist:
+            continue
+        OrderItem.objects.create(order=order, product=product, quantity=qty)
+    request.session['cart'] = {}
+    return render(request, 'store/checkout_success.html', {'order': order})

@@ -1,5 +1,31 @@
 {% extends 'layout/base.html' %}
 {% block content %}
+<section class="container py-5 profile-page">
+  <div class="profile-card">
+    <h1>Profile</h1>
+    <div class="record-row">
+      <span><strong>Username:</strong> {{ request.user.username }}</span>
+      <span><strong>Email:</strong> {{ request.user.email }}</span>
+    </div>
+    {% if request.user.profile %}
+    <div class="record-row">
+      <span><strong>Age:</strong> {{ request.user.profile.age }}</span>
+      <span><strong>Gender:</strong> {{ request.user.profile.gender }}</span>
+    </div>
+    <div class="record-row">
+      <span><strong>Height (cm):</strong> {{ request.user.profile.height_cm }}</span>
+      <span><strong>Weight (kg):</strong> {{ request.user.profile.weight_kg }}</span>
+    </div>
+    {% endif %}
+    <div class="profile-actions" style="margin-top:1rem;">
+      <a class="button button-primary" href="{% url 'edit-profile' %}">Edit Profile</a>
+      <a class="button button-secondary" href="{% url 'dashboard' %}">Dashboard</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% extends 'layout/base.html' %}
+{% block content %}
 <section class="profile-page container">
     <div class="profile-card">
         <h1>Welcome back, {{ user.username }}!</h1>

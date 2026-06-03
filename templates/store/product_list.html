@@ -15,7 +15,14 @@
                 <p>{{ product.description }}</p>
                 <div class="product-meta">
                     <span class="product-price">${{ product.price }}</span>
-                    <a class="button button-secondary" href="{% url 'product-detail' product.slug %}">View</a>
+                                        <div style="display:flex; gap:.5rem; align-items:center;">
+                                            <a class="button button-secondary" href="{% url 'product-detail' product.slug %}">View</a>
+                                            <form method="post" action="{% url 'add-to-cart' product.slug %}">
+                                                {% csrf_token %}
+                                                <input type="number" name="quantity" value="1" min="1" style="width:64px; padding:.35rem; border-radius:.5rem; border:1px solid rgba(255,255,255,0.08); background:transparent; color:var(--text);">
+                                                <button class="button button-primary" type="submit">Add</button>
+                                            </form>
+                                        </div>
                 </div>
             </div>
         </article>

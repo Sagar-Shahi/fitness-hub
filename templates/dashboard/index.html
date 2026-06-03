@@ -1,0 +1,31 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<section class="container py-5">
+  <h1>Dashboard</h1>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>Weekly Activity</h5>
+        <canvas id="activityChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>Progress Overview</h5>
+        <p>Quick stats and summary will appear here.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('activityChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ label: 'Minutes', data: [30,40,25,50,45,20,60], borderColor: 'rgb(75, 192, 192)', tension: 0.3 }] },
+  options: { responsive: true }
+});
+</script>
+
+{% endblock %}
