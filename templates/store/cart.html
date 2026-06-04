@@ -1,0 +1,106 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'store/css/store.css' %}">
+{% endblock %}
+{% block content %}
+<section class="store-page">
+  <div class="page-head">
+    <div>
+      <h1>Shopping Cart</h1>
+      <p class="lead">Review your items before checkout.</p>
+    </div>
+    <div class="page-head-actions">
+      <a class="btn btn-secondary" href="{% url 'store-home' %}">Continue Shopping</a>
+    </div>
+  </div>
+
+  {% if cart.items.exists %}
+  <div class="cart-layout">
+    <div class="cart-items">
+      <div class="cart-items-head">
+        <h2>Items ({{ cart.item_count }})</h2>
+        <a href="{% url 'view-cart' %}" class="clear-link" onclick="return false;"></a>
+      </div>
+      {% for item in cart.items.all %}
+      <div class="cart-item">
+        <a class="cart-item-img" href="{% url 'store-product-detail' item.product.slug %}">
+          {% if item.product.image_url %}
+            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
+          {% else %}
+            <div class="img-placeholder">📦</div>
+          {% endif %}
+        </a>
+        <div class="cart-item-info">
+          <span class="item-category">{{ item.product.category.name }}</span>
+          <h3>
+            <a href="{% url 'store-product-detail' item.product.slug %}">{{ item.product.name }}</a>
+          </h3>
+          {% if item.product.brand %}<p class="item-brand">{{ item.product.brand }}</p>{% endif %}
+          <p class="item-price">${{ item.product.price }} each</p>
+        </div>
+        <form method="post" action="{% url 'update-cart' item.id %}" class="cart-qty-form">
+          {% csrf_token %}
+          <div class="qty-input">
+            <button type="button" class="qty-btn" onclick="updateCartQty(this, -1)">−</button>
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.product.stock|add:item.quantity }}" onchange="this.form.submit()">
+            <button type="button" class="qty-btn" onclick="updateCartQty(this, 1)">+</button>
+          </div>
+        </form>
+        <div class="cart-item-total">
+          <div class="line-total">${{ item.line_total }}</div>
+          <a class="cart-item-remove" href="{% url 'remove-from-cart' item.id %}" onclick="return confirm('Remove this item?');">Remove</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <aside class="order-summary">
+      <h2>Order Summary</h2>
+      <div class="order-summary-row">
+        <span class="label">Subtotal ({{ cart.item_count }} item{{ cart.item_count|pluralize }})</span>
+        <span class="value">${{ cart.subtotal }}</span>
+      </div>
+      <div class="order-summary-row">
+        <span class="label">Shipping</span>
+        <span class="value">
+          {% if cart.shipping == 0 %}
+            <span class="ship-free">FREE</span>
+          {% else %}
+            ${{ cart.shipping }}
+          {% endif %}
+        </span>
+      </div>
+      <div class="order-summary-row">
+        <span class="label">Tax (8%)</span>
+        <span class="value">${{ cart.tax }}</span>
+      </div>
+      <div class="order-summary-divider"></div>
+      <div class="order-summary-total">
+        <span class="label">Total</span>
+        <span class="value">${{ cart.total }}</span>
+      </div>
+      <a class="btn btn-primary btn-block btn-lg" href="{% url 'checkout' %}">Proceed to Checkout</a>
+      <p class="summary-note">Free shipping on orders over $50. Your items are reserved for 30 minutes.</p>
+    </aside>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🛒</div>
+    <h2>Your cart is empty</h2>
+    <p>Browse our store and add items to your cart to get started.</p>
+    <a class="btn btn-primary" href="{% url 'store-home' %}">Start Shopping</a>
+  </div>
+  {% endif %}
+</section>
+
+<script>
+function updateCartQty(btn, delta) {
+  const input = btn.parentElement.querySelector('input');
+  let val = parseInt(input.value) || 1;
+  val = Math.max(0, val + delta);
+  input.value = val;
+  input.form.submit();
+}
+</script>
+{% endblock %}

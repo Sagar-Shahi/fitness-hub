@@ -11,6 +11,7 @@ urlpatterns = [
     path('progress/', include('progress.urls')),
     path('users/', include('users.urls')),
     path('store/', include('store.urls')),
+    path('diet/', include('diet.urls')),
     path('inspiration/', include('inspiration.urls')),
 ]
 

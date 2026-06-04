@@ -1,18 +1,107 @@
 {% extends 'layout/base.html' %}
-
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'store/css/store.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Store Categories</h1>
-  <p>Browse our three product types: outfits, exercise gear, and nutrition items.</p>
+<section class="store-page">
+  <div class="store-hero">
+    <div class="store-hero-content">
+      <p class="eyebrow">Fitness Hub Store</p>
+      <h1>Gear up. Fuel up. Perform.</h1>
+      <p class="hero-text">Curated apparel, equipment, and supplements chosen by coaches to support every stage of your training.</p>
+      <form class="store-search" method="get" action="{% url 'store-product-list' %}">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="search" name="q" placeholder="Search products, brands, categories...">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+  </div>
 
-  <div class="store-categories-grid">
-    {% for category in categories %}
-    <article class="store-card">
-      <h2>{{ category.title }}</h2>
-      <p>{{ category.description }}</p>
-      <a class="button button-primary" href="{% url 'store-product-list' category.slug %}">Browse {{ category.title }}</a>
-    </article>
-    {% endfor %}
+  <div class="store-section">
+    <div class="section-head">
+      <h2>Shop by Category</h2>
+      <p>Explore our hand-picked collections.</p>
+    </div>
+    <div class="category-grid">
+      {% for cat in categories %}
+      <a class="category-card" href="{% url 'store-category' cat.slug %}" style="--cat-img: url('{{ cat.image_url }}')">
+        <div class="category-card-bg"></div>
+        <div class="category-card-content">
+          <span class="category-icon">{{ cat.icon|default:"" }}</span>
+          <h3>{{ cat.name }}</h3>
+          <p>{{ cat.description }}</p>
+          <span class="category-link">Browse {{ cat.name }} →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if featured %}
+  <div class="store-section">
+    <div class="section-head">
+      <h2>Featured Products</h2>
+      <a class="section-link" href="{% url 'store-product-list' %}">View all →</a>
+    </div>
+    <div class="product-grid">
+      {% for product in featured %}
+        {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if top_rated %}
+  <div class="store-section">
+    <div class="section-head">
+      <h2>Top Rated</h2>
+      <a class="section-link" href="{% url 'store-product-list' %}?sort=rating">See more →</a>
+    </div>
+    <div class="product-grid product-grid-4">
+      {% for product in top_rated %}
+        {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="store-section">
+    <div class="section-head">
+      <h2>Latest Arrivals</h2>
+      <a class="section-link" href="{% url 'store-product-list' %}?sort=newest">View all →</a>
+    </div>
+    <div class="product-grid">
+      {% for product in latest %}
+        {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="store-banners">
+    <div class="store-banner">
+      <div class="banner-content">
+        <h3>Free Shipping</h3>
+        <p>On every order over $50</p>
+      </div>
+      <span class="banner-icon">🚚</span>
+    </div>
+    <div class="store-banner">
+      <div class="banner-content">
+        <h3>30-Day Returns</h3>
+        <p>No-questions-asked policy</p>
+      </div>
+      <span class="banner-icon">↩️</span>
+    </div>
+    <div class="store-banner">
+      <div class="banner-content">
+        <h3>Secure Checkout</h3>
+        <p>SSL-encrypted payment</p>
+      </div>
+      <span class="banner-icon">🔒</span>
+    </div>
   </div>
 </section>
 {% endblock %}

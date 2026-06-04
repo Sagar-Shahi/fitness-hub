@@ -1,0 +1,161 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'goals/css/goals.css' %}">
+{% endblock %}
+{% block content %}
+<section class="container py-5 goal-page">
+  <div class="goal-form-wrap">
+    <div class="goal-form-card">
+      <div class="page-header">
+        <p class="eyebrow">Goals</p>
+        <h1>Edit Goal</h1>
+        <p>Update your training objective.</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        {{ form.goal_type }}
+        {{ form.focus_areas }}
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <span class="step">1</span>
+            <h2>Goal type</h2>
+          </div>
+          <div class="goal-radio-grid" role="radiogroup" aria-label="Goal type">
+            <button type="button" class="goal-radio-card{% if goal.goal_type == 'calisthenics' %} selected{% endif %}" data-goal="calisthenics">
+              <span class="card-emoji">🤸</span>
+              <div><span class="card-label">Calisthenics Body</span><span class="card-sub">Bodyweight mastery</span></div>
+            </button>
+            <button type="button" class="goal-radio-card{% if goal.goal_type == 'lean_athletic' %} selected{% endif %}" data-goal="lean_athletic">
+              <span class="card-emoji">🏃</span>
+              <div><span class="card-label">Lean Athletic Body</span><span class="card-sub">Agile, toned frame</span></div>
+            </button>
+            <button type="button" class="goal-radio-card{% if goal.goal_type == 'muscle_gain' %} selected{% endif %}" data-goal="muscle_gain">
+              <span class="card-emoji">💪</span>
+              <div><span class="card-label">Muscle Gain</span><span class="card-sub">Strength &amp; bulk</span></div>
+            </button>
+            <button type="button" class="goal-radio-card{% if goal.goal_type == 'fat_loss' %} selected{% endif %}" data-goal="fat_loss">
+              <span class="card-emoji">🔥</span>
+              <div><span class="card-label">Fat Loss</span><span class="card-sub">Shed fat, keep energy</span></div>
+            </button>
+            <button type="button" class="goal-radio-card{% if goal.goal_type == 'lean_bulk' %} selected{% endif %}" data-goal="lean_bulk">
+              <span class="card-emoji">🦍</span>
+              <div><span class="card-label">Lean Bulk</span><span class="card-sub">Quality mass gain</span></div>
+            </button>
+            <button type="button" class="goal-radio-card{% if goal.goal_type == 'recomp' %} selected{% endif %}" data-goal="recomp">
+              <span class="card-emoji">🔄</span>
+              <div><span class="card-label">Body Recomposition</span><span class="card-sub">Build &amp; burn</span></div>
+            </button>
+            <button type="button" class="goal-radio-card{% if goal.goal_type == 'strength' %} selected{% endif %}" data-goal="strength">
+              <span class="card-emoji">🏋️</span>
+              <div><span class="card-label">Strength Training</span><span class="card-sub">Pure power</span></div>
+            </button>
+            <button type="button" class="goal-radio-card{% if goal.goal_type == 'general' %} selected{% endif %}" data-goal="general">
+              <span class="card-emoji">💯</span>
+              <div><span class="card-label">General Fitness</span><span class="card-sub">All-round health</span></div>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <span class="step">2</span>
+            <h2>Focus areas</h2>
+            <p>Pick your targets</p>
+          </div>
+          <div class="focus-grid" role="group" aria-label="Focus areas">
+            {% for value, label in form.focus_areas.field.choices %}
+            <button type="button" class="focus-pill{% if value in goal.focus_areas %} selected{% endif %}" data-value="{{ value }}">
+              <span class="pill-check">✓</span>
+              {{ label }}
+            </button>
+            {% endfor %}
+          </div>
+          <div id="focus-inputs"></div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <span class="step">3</span>
+            <h2>Goal details</h2>
+            <p>Set your metrics</p>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="id_target_weight">Target Weight (kg)</label>
+              {{ form.target_weight }}
+              {% if form.target_weight.errors %}
+              <div class="form-error">{{ form.target_weight.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="id_timeline_weeks">Timeline (weeks)</label>
+              {{ form.timeline_weeks }}
+              {% if form.timeline_weeks.errors %}
+              <div class="form-error">{{ form.timeline_weeks.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="id_description">Specific Objectives</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="form-error">{{ form.description.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            <span>✓</span> Save Changes
+          </button>
+          <a class="btn btn-ghost" href="{% url 'goals' %}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const goalInput = document.querySelector('input[name="goal_type"]');
+    const goalCards = document.querySelectorAll('.goal-radio-card');
+    const focusPills = document.querySelectorAll('.focus-pill');
+    const focusInputs = document.getElementById('focus-inputs');
+
+    function updateFocusInputs(selected) {
+      focusInputs.innerHTML = '';
+      selected.forEach(value => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'focus_areas';
+        input.value = value;
+        focusInputs.appendChild(input);
+      });
+    }
+
+    const initiallySelected = Array.from(focusPills).filter(p => p.classList.contains('selected')).map(p => p.dataset.value);
+    updateFocusInputs(initiallySelected);
+
+    goalCards.forEach(card => {
+      card.addEventListener('click', () => {
+        goalCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        goalInput.value = card.dataset.goal;
+      });
+    });
+
+    focusPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        pill.classList.toggle('selected');
+        const selected = Array.from(focusPills)
+          .filter(p => p.classList.contains('selected'))
+          .map(p => p.dataset.value);
+        updateFocusInputs(selected);
+      });
+    });
+  });
+</script>
+{% endblock %}

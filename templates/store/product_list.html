@@ -1,56 +1,115 @@
 {% extends 'layout/base.html' %}
-
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'store/css/store.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <div class="store-header">
-    <h1>{{ category_title }}</h1>
-    <a class="button button-secondary" href="{% url 'store-home' %}">← Back to Categories</a>
-  </div>
-  <p class="store-description">Explore our curated selection of {{ category_title|lower }}.</p>
-
-  {% if products %}
-  <!-- Location Selector -->
-  <div class="location-selector">
-    <span class="location-icon">📍</span>
-    <span class="location-text">Deliver to {% if user.is_authenticated %}{{ user.first_name|default:"You" }}{% else %}You{% endif %}</span>
-    <span class="location-dropdown">▼</span>
-  </div>
-
-  <div class="amazon-grid">
-    {% for product in products %}
-    <div class="product-item">
-      <div class="product-image-wrapper">
-        {% if product.image_url %}
-        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-img">
+<section class="store-page">
+  <div class="page-head">
+    <div>
+      <nav class="breadcrumbs">
+        <a href="{% url 'store-home' %}">Store</a>
+        {% if category %}
+          <span class="sep">/</span>
+          <span>{{ category.name }}</span>
         {% else %}
-        <div class="product-img-placeholder"></div>
+          <span class="sep">/</span>
+          <span>All Products</span>
         {% endif %}
-      </div>
-      <div class="product-info">
-        <h2 class="product-name"><a href="{% url 'store-product-detail' product.product_type product.slug %}">{{ product.name }}</a></h2>
-        <div class="product-rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-count">(0)</span>
-        </div>
-        <p class="product-brief">{{ product.description }}</p>
-        <div class="price-section">
-          <span class="price-label">Price:</span>
-          <span class="price-value">${{ product.price }}</span>
-        </div>
-        <div class="delivery-badge">
-          <span class="delivery-icon">🚚</span>
-          <span class="delivery-text">FREE delivery tomorrow</span>
-        </div>
-      </div>
-      <div class="button-container">
-        <a href="{% url 'store-product-detail' product.product_type product.slug %}" class="add-to-cart-btn">Add to Cart</a>
-        <button class="buy-now-btn">Buy Now</button>
-      </div>
+      </nav>
+      <h1>{% if category %}{{ category.name }}{% else %}All Products{% endif %}</h1>
+      <p class="lead">
+        {% if category %}{{ category.description }}{% else %}Browse our full catalog of fitness essentials.{% endif %}
+      </p>
     </div>
-    {% endfor %}
+    <div class="page-head-actions">
+      <span class="result-count">{{ page_obj.paginator.count }} product{{ page_obj.paginator.count|pluralize }}</span>
+    </div>
   </div>
-  {% else %}
-  <p>No products are available in this category yet.</p>
-  {% endif %}
+
+  <div class="product-layout">
+    <aside class="product-filters">
+      <form method="get" class="filter-form">
+        {% if search %}<input type="hidden" name="q" value="{{ search }}">{% endif %}
+
+        <div class="filter-block">
+          <h4>Categories</h4>
+          <ul class="filter-list">
+            <li>
+              <a href="{% url 'store-product-list' %}" class="{% if not category %}active{% endif %}">All Products</a>
+            </li>
+            {% for c in categories %}
+              <li>
+                <a href="{% url 'store-category' c.slug %}" class="{% if category.slug == c.slug %}active{% endif %}">
+                  {{ c.name }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="filter-block">
+          <h4>Sort By</h4>
+          <select name="sort" class="form-select" onchange="this.form.submit()">
+            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+            <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top Rated</option>
+            <option value="name" {% if sort == 'name' %}selected{% endif %}>Name</option>
+          </select>
+        </div>
+
+        <div class="filter-block">
+          <h4>Price Range</h4>
+          <div class="price-inputs">
+            <input type="number" name="min_price" placeholder="Min" value="{{ min_price }}" class="form-input" step="0.01" min="0">
+            <span>—</span>
+            <input type="number" name="max_price" placeholder="Max" value="{{ max_price }}" class="form-input" step="0.01" min="0">
+          </div>
+          <button type="submit" class="btn btn-secondary btn-block">Apply</button>
+        </div>
+
+        {% if search or min_price or max_price %}
+        <a href="{% if category %}{% url 'store-category' category.slug %}{% else %}{% url 'store-product-list' %}{% endif %}" class="btn btn-ghost btn-block">Clear Filters</a>
+        {% endif %}
+      </form>
+    </aside>
+
+    <div class="product-results">
+      {% if search %}
+        <div class="search-banner">
+          <span>Results for <strong>"{{ search }}"</strong></span>
+          <a href="{% if category %}{% url 'store-category' category.slug %}{% else %}{% url 'store-product-list' %}{% endif %}">Clear</a>
+        </div>
+      {% endif %}
+
+      {% if products %}
+        <div class="product-grid">
+          {% for product in products %}
+            {% include 'store/partials/product_card.html' with product=product %}
+          {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <nav class="pagination">
+          {% if page_obj.has_previous %}
+            <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-link">← Previous</a>
+          {% endif %}
+          <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+          {% if page_obj.has_next %}
+            <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-link">Next →</a>
+          {% endif %}
+        </nav>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h2>No products found</h2>
+          <p>Try a different search or clear the filters to see more options.</p>
+          <a href="{% url 'store-product-list' %}" class="btn btn-primary">Browse All</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </section>
 {% endblock %}

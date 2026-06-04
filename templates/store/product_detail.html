@@ -1,24 +1,108 @@
 {% extends 'layout/base.html' %}
-
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'store/css/store.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <div class="product-detail-page">
-    <div class="product-detail-card">
+<section class="store-page">
+  <nav class="breadcrumbs">
+    <a href="{% url 'store-home' %}">Store</a>
+    <span class="sep">/</span>
+    <a href="{% url 'store-category' product.category.slug %}">{{ product.category.name }}</a>
+    <span class="sep">/</span>
+    <span>{{ product.name }}</span>
+  </nav>
+
+  <div class="product-detail">
+    <div class="product-detail-gallery">
       {% if product.image_url %}
-      <div class="detail-image" style="background-image: url('{{ product.image_url }}');"></div>
+        <img src="{{ product.image_url }}" alt="{{ product.name }}">
       {% else %}
-      <div class="detail-image" style="background-color: var(--surface-soft);"></div>
+        <div class="img-placeholder-large">📦</div>
       {% endif %}
-      <div class="detail-info">
-        <h1>{{ product.name }}</h1>
-        <p class="product-category">{{ product.get_product_type_display }}</p>
-        <p>{{ product.description }}</p>
-        <p class="product-price">${{ product.price }}</p>
-        <div class="detail-actions">
-          <a class="button button-secondary" href="{% url 'store-product-list' product.product_type %}">← Back to {{ product.get_product_type_display }}</a>
+      {% if product.is_on_sale %}
+        <span class="detail-badge">-{{ product.discount_percent }}% OFF</span>
+      {% endif %}
+    </div>
+    <div class="product-detail-info">
+      <span class="detail-category">{{ product.category.name }}</span>
+      <h1>{{ product.name }}</h1>
+
+      {% if product.rating %}
+      <div class="detail-rating">
+        <span class="stars">{% include 'store/partials/stars.html' with rating=product.rating %}</span>
+        <span class="rating-text">{{ product.rating }} ({{ product.review_count }} reviews)</span>
+      </div>
+      {% endif %}
+
+      <div class="detail-price">
+        {% if product.is_on_sale %}
+          <span class="price-current-lg">${{ product.price }}</span>
+          <span class="price-compare-lg">${{ product.compare_at_price }}</span>
+          <span class="price-save">Save ${{ product.compare_at_price|add:"-"|add:product.price }}</span>
+        {% else %}
+          <span class="price-current-lg">${{ product.price }}</span>
+        {% endif %}
+      </div>
+
+      <p class="detail-description">{{ product.description|linebreaksbr }}</p>
+
+      <div class="detail-meta">
+        {% if product.brand %}<div class="meta-row"><span class="meta-label">Brand</span><span>{{ product.brand }}</span></div>{% endif %}
+        {% if product.sku %}<div class="meta-row"><span class="meta-label">SKU</span><span>{{ product.sku }}</span></div>{% endif %}
+        <div class="meta-row">
+          <span class="meta-label">Availability</span>
+          <span class="stock-pill {% if product.in_stock %}in-stock{% else %}out-stock{% endif %}">
+            {% if product.in_stock %}In Stock ({{ product.stock }} available){% else %}Out of Stock{% endif %}
+          </span>
         </div>
+      </div>
+
+      <form method="post" action="{% url 'add-to-cart' product.slug %}" class="detail-form">
+        {% csrf_token %}
+        <div class="qty-control">
+          <label for="qty">Quantity</label>
+          <div class="qty-input">
+            <button type="button" class="qty-btn" onclick="adjustQty(-1)">−</button>
+            <input type="number" id="qty" name="quantity" value="1" min="1" max="{{ product.stock }}">
+            <button type="button" class="qty-btn" onclick="adjustQty(1)">+</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block" {% if not product.in_stock %}disabled{% endif %}>
+          {% if product.in_stock %}Add to Cart — ${{ product.price }}{% else %}Sold Out{% endif %}
+        </button>
+      </form>
+
+      <div class="detail-perks">
+        <div class="perk"><span>🚚</span><span>Free shipping over $50</span></div>
+        <div class="perk"><span>↩️</span><span>30-day returns</span></div>
+        <div class="perk"><span>🔒</span><span>Secure checkout</span></div>
       </div>
     </div>
   </div>
+
+  {% if related %}
+  <div class="store-section">
+    <div class="section-head">
+      <h2>You may also like</h2>
+    </div>
+    <div class="product-grid">
+      {% for product in related %}
+        {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 </section>
+
+<script>
+function adjustQty(delta) {
+  const input = document.getElementById('qty');
+  const min = parseInt(input.min) || 1;
+  const max = parseInt(input.max) || 99;
+  let val = parseInt(input.value) || 1;
+  val = Math.max(min, Math.min(max, val + delta));
+  input.value = val;
+}
+</script>
 {% endblock %}

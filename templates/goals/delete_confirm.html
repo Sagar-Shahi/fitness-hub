@@ -1,0 +1,28 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'goals/css/goals.css' %}">
+{% endblock %}
+{% block content %}
+<section class="container py-5 goal-page">
+  <div class="goal-form-wrap">
+    <div class="goal-form-card">
+      <div class="page-header">
+        <h1>Delete Goal</h1>
+        <p>This action cannot be undone</p>
+      </div>
+      <div class="delete-warning">
+        <div class="icon">⚠️</div>
+        <p>Are you sure you want to delete your <strong>{{ goal.get_goal_type_display }}</strong> goal?</p>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-actions" style="justify-content: center;">
+          <button class="btn btn-danger" type="submit">🗑️ Delete</button>
+          <a class="btn btn-ghost" href="{% url 'goals' %}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

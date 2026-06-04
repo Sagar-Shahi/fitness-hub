@@ -1,17 +1,132 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'diet/css/diet.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Diet Planner</h1>
-  <p class="text-muted">Personalized meal plans and nutrition tools.</p>
-  <a class="btn btn-primary mb-3" href="{% url 'create-record' %}">Add Record</a>
+<section class="diet-page">
+  <div class="page-head">
+    <div>
+      <h1>Diet Planner</h1>
+      <p class="lead">Personalized clinical nutrition targets and daily records.</p>
+    </div>
+    <div class="page-head-actions">
+      <a class="btn btn-secondary" href="{% url 'diet-suggest' %}">Get Nutrition Plan</a>
+      <a class="btn btn-primary" href="{% url 'create-record' %}">+ Add Record</a>
+    </div>
+  </div>
+
+  {% if plan and plan.ready %}
+  <div class="diet-hero">
+    <div class="diet-hero-grid">
+      <div class="diet-hero-stat">
+        <div class="stat-label">Body Type</div>
+        <div class="stat-value">{{ plan.body_type_name }}</div>
+        <div class="stat-sub">Classified by build &amp; metabolism</div>
+      </div>
+      <div class="diet-hero-stat">
+        <div class="stat-label">Primary Goal</div>
+        <div class="stat-value">{{ plan.goal_name }}</div>
+        <div class="stat-sub">Caloric target: {{ plan.calories }} kcal</div>
+      </div>
+      <div class="diet-hero-stat">
+        <div class="stat-label">Activity Level</div>
+        <div class="stat-value">{{ plan.activity_name }}</div>
+        <div class="stat-sub">TDEE: {{ plan.tdee }} kcal</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Your Daily Targets</h2>
+  <div class="macro-card-grid">
+    <div class="macro-card calories">
+      <div class="macro-icon">🔥</div>
+      <div class="macro-label">Calories</div>
+      <div class="macro-value">{{ plan.calories }}<span class="macro-unit">kcal</span></div>
+      <div class="macro-foot">Daily energy intake</div>
+    </div>
+    <div class="macro-card protein">
+      <div class="macro-icon">🥩</div>
+      <div class="macro-label">Protein</div>
+      <div class="macro-value">{{ plan.protein }}<span class="macro-unit">g</span></div>
+      <div class="macro-foot">Muscle preservation &amp; growth</div>
+    </div>
+    <div class="macro-card carbs">
+      <div class="macro-icon">🌾</div>
+      <div class="macro-label">Carbs</div>
+      <div class="macro-value">{{ plan.carbs }}<span class="macro-unit">g</span></div>
+      <div class="macro-foot">Energy for training</div>
+    </div>
+    <div class="macro-card fats">
+      <div class="macro-icon">🥑</div>
+      <div class="macro-label">Fats</div>
+      <div class="macro-value">{{ plan.fats }}<span class="macro-unit">g</span></div>
+      <div class="macro-foot">Hormone &amp; cell function</div>
+    </div>
+  </div>
+  <div class="diet-actions-row">
+    <a class="btn btn-primary" href="{% url 'create-record' %}">Log These Targets</a>
+    <a class="btn btn-secondary" href="{% url 'diet-suggest' %}">View Full Plan</a>
+  </div>
+
+  {% elif plan and not plan.ready %}
+  <div class="diet-notice">
+    <div class="notice-icon">!</div>
+    <div class="notice-body">
+      <div class="notice-title">Profile Incomplete</div>
+      <p class="notice-text">{{ plan.error }}</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'edit-profile' %}">Complete Profile</a>
+  </div>
+  {% endif %}
+
+  <div class="section-header">
+    <h2>Recent Records</h2>
+    <span class="section-sub">{{ records|length }} entr{{ records|length|pluralize:"y,ies" }}</span>
+  </div>
+
   {% if records %}
-    <ul>
-      {% for r in records %}
-        <li>{{ r.date }} — {{ r.calories }} kcal — <a href="{% url 'edit-record' r.pk %}">Edit</a> | <a href="{% url 'delete-record' r.pk %}">Delete</a></li>
-      {% endfor %}
-    </ul>
+  <div class="diet-records">
+    <div class="diet-records-head">
+      <h3 style="margin:0;">Logged Entries</h3>
+    </div>
+    <table class="diet-records-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Calories</th>
+          <th>Protein</th>
+          <th>Carbs</th>
+          <th>Fats</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td>{{ r.date }}</td>
+          <td class="col-num col-cal">{{ r.calories }} kcal</td>
+          <td class="col-num col-pro">{{ r.protein }} g</td>
+          <td class="col-num col-carb">{{ r.carbs }} g</td>
+          <td class="col-num col-fat">{{ r.fats }} g</td>
+          <td class="col-actions">
+            <a class="row-action" href="{% url 'edit-record' r.pk %}">Edit</a>
+            <a class="row-action danger" href="{% url 'delete-record' r.pk %}">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
   {% else %}
-    <p>No nutrition records yet.</p>
+  <div class="diet-records">
+    <div class="diet-records-empty">
+      <div class="empty-icon">📋</div>
+      <h3>No records yet</h3>
+      <p>Start tracking your daily nutrition to see your progress here.</p>
+      <a class="btn btn-primary" href="{% url 'create-record' %}" style="margin-top: 1rem;">+ Add First Record</a>
+    </div>
+  </div>
   {% endif %}
 </section>
 {% endblock %}

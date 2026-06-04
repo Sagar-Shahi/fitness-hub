@@ -15,11 +15,13 @@
             <a class="brand" href="{% url 'home' %}">Fitness Hub</a>
             <nav class="main-nav" id="mainNav">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}">Dashboard</a>
                     <a href="{% url 'goals' %}">Goals</a>
-                    <a href="{% url 'exercise-list' %}">Exercises</a>
+                    <a href="{% url 'exercise-list' %}">Workouts</a>
                     <a href="{% url 'progress' %}">Progress</a>
+                    <a href="{% url 'diet' %}">Diet</a>
                     <a href="{% url 'store-home' %}">Store</a>
+                    <a href="{% url 'view-cart' %}" class="nav-cart">Cart <span class="nav-cart-badge">{{ cart_count|default:0 }}</span></a>
+                    <a href="{% url 'inspiration-feed' %}">Inspiration</a>
                     <a href="{% url 'profile' %}">Profile</a>
                     <form action="{% url 'logout' %}" method="post" class="nav-form" style="display: inline;">
                         {% csrf_token %}

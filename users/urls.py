@@ -12,7 +12,6 @@ urlpatterns = [
     path('profile/edit/', views.edit_profile, name='edit-profile'),
     path('profile/goal/', views.select_goal, name='select-goal'),
     path('records/', views.exercise_records, name='exercise-records'),
-    path('purchases/', views.purchase_history, name='purchase-history'),
     path('nutrition/', views.nutrition_calculator, name='nutrition-calculator'),
     path('nutrition/tracker/', views.nutrition_tracker, name='nutrition-tracker'),
     path('nutrition/budget-meals/', views.budget_meals, name='budget-meals'),

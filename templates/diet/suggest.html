@@ -1,0 +1,122 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'diet/css/diet.css' %}">
+{% endblock %}
+{% block content %}
+<section class="diet-page">
+  <div class="page-head">
+    <div>
+      <h1>Daily Nutrition Plan</h1>
+      <p class="lead">Clinical targets calculated from your profile using the Harris-Benedict equation.</p>
+    </div>
+    <div class="page-head-actions">
+      <a class="btn btn-secondary" href="{% url 'diet' %}">Back to Diet</a>
+    </div>
+  </div>
+
+  {% if plan and plan.ready %}
+  <div class="diet-suggest-hero">
+    <div class="diet-suggest-meta">
+      <span class="meta-pill">Body Type: <strong>{{ plan.body_type_name }}</strong></span>
+      <span class="meta-pill">Goal: <strong>{{ plan.goal_name }}</strong></span>
+      <span class="meta-pill">Activity: <strong>{{ plan.activity_name }}</strong></span>
+    </div>
+
+    <div class="energy-row">
+      <div class="energy-pill">
+        <span class="label">BMR</span>
+        <span class="value">{{ plan.bmr }} <span style="font-size: 0.9rem; color: var(--diet-text-dim);">kcal</span></span>
+      </div>
+      <div class="energy-pill">
+        <span class="label">TDEE</span>
+        <span class="value">{{ plan.tdee }} <span style="font-size: 0.9rem; color: var(--diet-text-dim);">kcal</span></span>
+      </div>
+      <div class="energy-pill target">
+        <span class="label">Target</span>
+        <span class="value">{{ plan.calories }} <span style="font-size: 0.9rem;">kcal</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2>Daily Macros</h2>
+    <span class="section-sub">Auto-fills the Add Record form</span>
+  </div>
+
+  <div class="macro-card-grid">
+    <div class="macro-card calories">
+      <div class="macro-icon">🔥</div>
+      <div class="macro-label">Calories</div>
+      <div class="macro-value">{{ plan.calories }}<span class="macro-unit">kcal</span></div>
+      <div class="macro-foot">Daily energy intake</div>
+    </div>
+    <div class="macro-card protein">
+      <div class="macro-icon">🥩</div>
+      <div class="macro-label">Protein</div>
+      <div class="macro-value">{{ plan.protein }}<span class="macro-unit">g</span></div>
+      <div class="macro-foot">Muscle preservation &amp; growth</div>
+    </div>
+    <div class="macro-card carbs">
+      <div class="macro-icon">🌾</div>
+      <div class="macro-label">Carbs</div>
+      <div class="macro-value">{{ plan.carbs }}<span class="macro-unit">g</span></div>
+      <div class="macro-foot">Energy for training</div>
+    </div>
+    <div class="macro-card fats">
+      <div class="macro-icon">🥑</div>
+      <div class="macro-label">Fats</div>
+      <div class="macro-value">{{ plan.fats }}<span class="macro-unit">g</span></div>
+      <div class="macro-foot">Hormone &amp; cell function</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2>Copy-Paste Format</h2>
+    <span class="section-sub">For external logging</span>
+  </div>
+
+  <pre class="copy-block" id="copyBlock"><strong>Calories:</strong> {{ plan.calories }}
+<strong>Protein:</strong> {{ plan.protein }}
+<strong>Carbs:</strong> {{ plan.carbs }}
+<strong>Fats:</strong> {{ plan.fats }}
+<strong>Notes:</strong> {{ plan.notes }}</pre>
+
+  <div class="diet-actions-row">
+    <button class="btn btn-primary" onclick="copyPlan()">Copy to Clipboard</button>
+    <a class="btn btn-secondary" href="{% url 'create-record' %}">Log These Targets</a>
+  </div>
+
+  <div class="section-header">
+    <h2>Clinical Rationale</h2>
+    <span class="section-sub">Why these numbers</span>
+  </div>
+
+  <div class="rationale-card">
+    <p>{{ plan.notes }}</p>
+  </div>
+
+  {% else %}
+  <div class="diet-notice">
+    <div class="notice-icon">!</div>
+    <div class="notice-body">
+      <div class="notice-title">Profile Incomplete</div>
+      <p class="notice-text">{{ plan.error|default:"No profile data available. Please complete your profile to generate a plan." }}</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'edit-profile' %}">Complete Profile</a>
+  </div>
+  {% endif %}
+</section>
+
+<script>
+  function copyPlan() {
+    const text = document.getElementById('copyBlock').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.target;
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    });
+  }
+</script>
+{% endblock %}

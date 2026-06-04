@@ -8,7 +8,7 @@
             <p class="hero-text">Discover workouts, inspiration, healthy shopping, and guided routines built for every fitness goal.</p>
             <div class="hero-actions">
                 {% if user.is_authenticated %}
-                    <a class="button button-primary" href="{% url 'profile' %}">Go to Dashboard</a>
+                    <a class="button button-primary" href="{% url 'dashboard' %}">Go to Dashboard</a>
                 {% else %}
                     <a class="button button-primary" href="{% url 'login' %}">Login</a>
                     <a class="button button-secondary" href="{% url 'register' %}">Get Started</a>
@@ -27,24 +27,14 @@
 {% if user.is_authenticated %}
 <section class="dashboard-grid container">
     <article class="dashboard-card">
-        <h3>Exercise</h3>
+        <h3>Workouts</h3>
         <p>Browse workouts and follow training plans built for every fitness level.</p>
-        <a class="button button-primary" href="{% url 'exercise-list' %}">Browse Exercises</a>
+        <a class="button button-primary" href="{% url 'exercise-list' %}">Browse Workouts</a>
     </article>
     <article class="dashboard-card">
-        <h3>Store</h3>
-        <p>Explore our store for equipment, supplements, and healthy fitness gear.</p>
-        <a class="button button-primary" href="{% url 'store-home' %}">Visit Store</a>
-    </article>
-    <article class="dashboard-card">
-        <h3>Exercise Records</h3>
+        <h3>Workout Records</h3>
         <p>See your recent workouts and track progress from every session.</p>
         <a class="button button-primary" href="{% url 'exercise-records' %}">View Records</a>
-    </article>
-    <article class="dashboard-card">
-        <h3>Purchases</h3>
-        <p>Review your past store purchases and order history in one place.</p>
-        <a class="button button-primary" href="{% url 'purchase-history' %}">View Purchases</a>
     </article>
     <article class="dashboard-card">
         <h3>Nutrition Plan</h3>

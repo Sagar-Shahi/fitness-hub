@@ -1,0 +1,42 @@
+<article class="product-card">
+  <a class="product-card-img" href="{% url 'store-product-detail' product.slug %}">
+    {% if product.image_url %}
+      <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+    {% else %}
+      <div class="img-placeholder">📦</div>
+    {% endif %}
+    {% if product.is_on_sale %}
+      <span class="product-badge badge-sale">-{{ product.discount_percent }}%</span>
+    {% endif %}
+    {% if not product.in_stock %}
+      <span class="product-badge badge-out">Out of Stock</span>
+    {% endif %}
+  </a>
+  <div class="product-card-body">
+    <span class="product-card-category">{{ product.category.name }}</span>
+    <h3 class="product-card-name">
+      <a href="{% url 'store-product-detail' product.slug %}">{{ product.name }}</a>
+    </h3>
+    {% if product.rating %}
+    <div class="product-card-rating">
+      <span class="stars">{% include 'store/partials/stars.html' with rating=product.rating %}</span>
+      <span class="rating-count">({{ product.review_count }})</span>
+    </div>
+    {% endif %}
+    <div class="product-card-price">
+      {% if product.is_on_sale %}
+        <span class="price-current">${{ product.price }}</span>
+        <span class="price-compare">${{ product.compare_at_price }}</span>
+      {% else %}
+        <span class="price-current">${{ product.price }}</span>
+      {% endif %}
+    </div>
+    <form method="post" action="{% url 'add-to-cart' product.slug %}" class="product-card-action">
+      {% csrf_token %}
+      <input type="hidden" name="quantity" value="1">
+      <button type="submit" class="btn btn-primary btn-block" {% if not product.in_stock %}disabled{% endif %}>
+        {% if product.in_stock %}Add to Cart{% else %}Sold Out{% endif %}
+      </button>
+    </form>
+  </div>
+</article>

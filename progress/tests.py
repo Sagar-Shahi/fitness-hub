@@ -8,8 +8,8 @@ class ProgressViewTests(TestCase):
         resp = self.client.get(reverse('progress'))
         self.assertEqual(resp.status_code, 302)
 
-    def test_create_progress_logged_in(self):
+    def test_progress_logged_in(self):
         u = User.objects.create_user('puser', 'p@example.com', 'pass')
         self.client.login(username='puser', password='pass')
-        resp = self.client.get(reverse('create-progress'))
+        resp = self.client.get(reverse('progress'))
         self.assertEqual(resp.status_code, 200)

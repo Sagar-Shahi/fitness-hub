@@ -1,12 +1,82 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'diet/css/diet.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Add Nutrition Record</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-primary" type="submit">Save</button>
-    <a class="btn btn-secondary" href="{% url 'diet' %}">Cancel</a>
-  </form>
+<section class="diet-page">
+  <div class="diet-form-card">
+    <div class="diet-form-head">
+      <h1>Add Nutrition Record</h1>
+      <p class="text-muted">Log your daily intake. Fields are pre-filled with your calculated targets.</p>
+    </div>
+
+    {% if plan and plan.ready %}
+    <div class="diet-hero" style="margin-bottom: 2rem; padding: 1.5rem;">
+      <div class="diet-hero-grid">
+        <div class="diet-hero-stat">
+          <div class="stat-label">Calorie Target</div>
+          <div class="stat-value">{{ plan.calories }} <span style="font-size:0.9rem; color: var(--diet-text-dim);">kcal</span></div>
+        </div>
+        <div class="diet-hero-stat">
+          <div class="stat-label">Protein Target</div>
+          <div class="stat-value">{{ plan.protein }} <span style="font-size:0.9rem; color: var(--diet-text-dim);">g</span></div>
+        </div>
+        <div class="diet-hero-stat">
+          <div class="stat-label">Goal</div>
+          <div class="stat-value">{{ plan.goal_name }}</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="diet-form-grid">
+        <div class="diet-form-field">
+          <label for="{{ form.date.id_for_label }}">Date</label>
+          {{ form.date }}
+          {% if form.date.errors %}<div class="error">{{ form.date.errors }}</div>{% endif %}
+        </div>
+
+        <div class="diet-form-field">
+          <label for="{{ form.calories.id_for_label }}">Calories (kcal)</label>
+          {{ form.calories }}
+          {% if form.calories.errors %}<div class="error">{{ form.calories.errors }}</div>{% endif %}
+        </div>
+
+        <div class="diet-form-field">
+          <label for="{{ form.protein.id_for_label }}">Protein (g)</label>
+          {{ form.protein }}
+          {% if form.protein.errors %}<div class="error">{{ form.protein.errors }}</div>{% endif %}
+        </div>
+
+        <div class="diet-form-field">
+          <label for="{{ form.carbs.id_for_label }}">Carbs (g)</label>
+          {{ form.carbs }}
+          {% if form.carbs.errors %}<div class="error">{{ form.carbs.errors }}</div>{% endif %}
+        </div>
+
+        <div class="diet-form-field full">
+          <label for="{{ form.fats.id_for_label }}">Fats (g)</label>
+          {{ form.fats }}
+          {% if form.fats.errors %}<div class="error">{{ form.fats.errors }}</div>{% endif %}
+        </div>
+
+        <div class="diet-form-field full">
+          <label for="{{ form.notes.id_for_label }}">Notes</label>
+          {{ form.notes }}
+          <span class="help-text">Optional context about your intake, meal timing, or training day.</span>
+          {% if form.notes.errors %}<div class="error">{{ form.notes.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="diet-form-actions">
+        <a class="btn btn-secondary" href="{% url 'diet' %}">Cancel</a>
+        <button class="btn btn-primary" type="submit">Save Record</button>
+      </div>
+    </form>
+  </div>
 </section>
 {% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'store/css/store.css' %}">
+{% endblock %}
+{% block content %}
+<section class="store-page">
+  <div class="page-head">
+    <div>
+      <h1>Checkout</h1>
+      <p class="lead">Complete your order below.</p>
+    </div>
+    <div class="page-head-actions">
+      <a class="btn btn-secondary" href="{% url 'view-cart' %}">← Back to Cart</a>
+    </div>
+  </div>
+
+  <form method="post" class="checkout-layout">
+    {% csrf_token %}
+    <div class="checkout-main">
+      <section class="checkout-section">
+        <h2><span class="step-num">1</span> Contact Information</h2>
+        <div class="form-grid">
+          <div class="form-field form-field-full">
+            <label for="{{ form.full_name.id_for_label }}">Full Name *</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}<div class="field-error">{{ form.full_name.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="form-field">
+            <label for="{{ form.email.id_for_label }}">Email *</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="field-error">{{ form.email.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="form-field">
+            <label for="{{ form.phone.id_for_label }}">Phone</label>
+            {{ form.phone }}
+          </div>
+        </div>
+      </section>
+
+      <section class="checkout-section">
+        <h2><span class="step-num">2</span> Shipping Address</h2>
+        <div class="form-grid">
+          <div class="form-field form-field-full">
+            <label for="{{ form.address.id_for_label }}">Street Address *</label>
+            {{ form.address }}
+            {% if form.address.errors %}<div class="field-error">{{ form.address.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="form-field">
+            <label for="{{ form.city.id_for_label }}">City *</label>
+            {{ form.city }}
+            {% if form.city.errors %}<div class="field-error">{{ form.city.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="form-field">
+            <label for="{{ form.state.id_for_label }}">State *</label>
+            {{ form.state }}
+            {% if form.state.errors %}<div class="field-error">{{ form.state.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="form-field">
+            <label for="{{ form.zip_code.id_for_label }}">ZIP Code *</label>
+            {{ form.zip_code }}
+            {% if form.zip_code.errors %}<div class="field-error">{{ form.zip_code.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="form-field">
+            <label for="{{ form.country.id_for_label }}">Country *</label>
+            {{ form.country }}
+            {% if form.country.errors %}<div class="field-error">{{ form.country.errors|join:", " }}</div>{% endif %}
+          </div>
+        </div>
+      </section>
+
+      <section class="checkout-section">
+        <h2><span class="step-num">3</span> Payment Method</h2>
+        <div class="form-field">
+          <label for="{{ form.payment_method.id_for_label }}">Choose payment method</label>
+          {{ form.payment_method }}
+        </div>
+        <div class="form-field form-field-full" style="margin-top: 1rem;">
+          <label for="{{ form.notes.id_for_label }}">Order Notes (optional)</label>
+          {{ form.notes }}
+        </div>
+      </section>
+    </div>
+
+    <aside class="checkout-summary">
+      <h2>Order Summary</h2>
+      <div class="checkout-items">
+        {% for item in cart.items.all %}
+        <div class="checkout-item">
+          <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="checkout-item-img">
+          <div class="checkout-item-info">
+            <h4>{{ item.product.name }}</h4>
+            <p>Qty: {{ item.quantity }} × ${{ item.product.price }}</p>
+          </div>
+          <div class="checkout-item-total">${{ item.line_total }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="order-summary-divider"></div>
+      <div class="order-summary-row">
+        <span class="label">Subtotal</span>
+        <span class="value">${{ cart.subtotal }}</span>
+      </div>
+      <div class="order-summary-row">
+        <span class="label">Shipping</span>
+        <span class="value">{% if cart.shipping == 0 %}<span class="ship-free">FREE</span>{% else %}${{ cart.shipping }}{% endif %}</span>
+      </div>
+      <div class="order-summary-row">
+        <span class="label">Tax</span>
+        <span class="value">${{ cart.tax }}</span>
+      </div>
+      <div class="order-summary-divider"></div>
+      <div class="order-summary-total">
+        <span class="label">Total</span>
+        <span class="value">${{ cart.total }}</span>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;">
+        Place Order — ${{ cart.total }}
+      </button>
+      <p class="summary-note">By placing this order you agree to our terms and conditions.</p>
+    </aside>
+  </form>
+</section>
+{% endblock %}

@@ -1,13 +1,16 @@
+from typing import Optional, Dict, Any, List, Tuple
+from datetime import timedelta, date
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum, Count
 from django.utils import timezone
-from datetime import timedelta
+from django.http import HttpRequest
 
 from .models import ProgressRecord, UserWorkoutStats
 from exercises.models import ExerciseCompletion, Exercise
 from goals.models import Goal
 from .forms import ExerciseCompletionForm
+from core.utils import get_current_goal
 
 CALISTHENICS_BENCHMARKS = {
     'pull-up': 8,
@@ -28,62 +31,7 @@ FOCUS_VOLUME_TARGETS = {
 }
 
 
-def map_profile_goal(selected_goal):
-    if not selected_goal:
-        return None
-    key = selected_goal.lower()
-    if key.startswith('calisthenics'):
-        return 'calisthenics'
-    if key.startswith('lean_athletic'):
-        return 'lean_athletic'
-    if key.startswith('muscle_gain'):
-        return 'muscle_gain'
-    if key.startswith('lean_bulk'):
-        return 'lean_bulk'
-    if key.startswith('fat_loss'):
-        return 'fat_loss'
-    if key.startswith('recomp'):
-        return 'recomp'
-    if key.startswith('strength'):
-        return 'strength'
-    if key.startswith('my_plan'):
-        return None
-    return 'general'
-
-
-def get_current_goal(request):
-    selected_goal = None
-    if hasattr(request.user, 'profile'):
-        selected_goal = getattr(request.user.profile, 'selected_goal', None)
-    goal_type = map_profile_goal(selected_goal)
-    if goal_type:
-        goal, created = Goal.objects.get_or_create(
-            user=request.user,
-            goal_type=goal_type,
-            defaults={'description': 'Auto-synced goal from profile selection.'}
-        )
-        if created or not goal.assigned_exercises.exists():
-            goal.sync_assigned_exercises()
-        return goal
-
-    return Goal.objects.filter(user=request.user).order_by('-id').first()
-
-
 def finish_exercise(user, exercise, reps=None, hold_time_sec=None, notes=''):
-    """
-    Handler to record completed exercise and update user workout statistics.
-    
-    Args:
-        user: User instance
-        exercise: Exercise instance
-        reps: Number of reps completed
-        hold_time_sec: Hold time in seconds
-        notes: Optional notes about the exercise
-    
-    Returns:
-        ExerciseCompletion instance
-    """
-    # Create exercise completion record
     completion = ExerciseCompletion.objects.create(
         user=user,
         exercise=exercise,
@@ -107,24 +55,7 @@ def finish_exercise(user, exercise, reps=None, hold_time_sec=None, notes=''):
     return completion
 
 
-def calculate_volume_trend(user, focus_area, days=7):
-    """
-    Calculate volume trend (Sets x Reps) for a specific focus area over time.
-    
-    Args:
-        user: User instance
-        focus_area: One of the GOAL_FOCUS_CHOICES
-        days: Number of days to look back (default 7)
-    
-    Returns:
-        {
-            'total_volume': total_sets_x_reps,
-            'target_volume': target_for_focus_area,
-            'completion_percent': percentage_of_target,
-            'daily_breakdown': [(date, volume), ...],
-            'trend_direction': 'up' | 'down' | 'stable'
-        }
-    """
+def calculate_volume_trend(user, focus_area: str, days: int = 7) -> Dict[str, Any]:
     from exercises.models import ExerciseCompletion
     from users.models import Profile
 
@@ -188,23 +119,11 @@ def calculate_volume_trend(user, focus_area, days=7):
     }
 
 
-def calculate_weekly_completion_percent(user, goal=None):
-    """
-    Calculate completion percentage for weekly target.
-    
-    Args:
-        user: User instance
-        goal: Optional Goal instance
-    
-    Returns:
-        {
-            'percent': completion_percent,
-            'exercises_completed': number_completed,
-            'exercises_assigned': number_assigned,
-        }
-    """
+def calculate_weekly_completion_percent(user, goal: Optional[Goal] = None) -> Dict[str, Any]:
     if not goal:
-        goal = get_current_goal(get_current_goal.__self__)
+        request = HttpRequest()
+        request.user = user
+        goal = get_current_goal(request)
 
     if not goal:
         return {'percent': 0, 'exercises_completed': 0, 'exercises_assigned': 0}
@@ -230,24 +149,8 @@ def calculate_weekly_completion_percent(user, goal=None):
     }
 
 
-def generate_focus_alignment_message(user, goal=None):
-    """
-    Generate dynamic focus alignment message based on volume trends and progress.
-    
-    Args:
-        user: User instance
-        goal: Optional Goal instance
-    
-    Returns:
-        {
-            'message': message_text,
-            'message_type': 'alert' | 'info' | 'success' | 'warning',
-            'volume_stats': volume_trend_data,
-            'weekly_stats': weekly_completion_data,
-        }
-    """
+def generate_focus_alignment_message(user, goal: Optional[Goal] = None) -> Dict[str, Any]:
     if not goal:
-        from django.http import HttpRequest
         request = HttpRequest()
         request.user = user
         goal = get_current_goal(request)
@@ -389,3 +292,25 @@ def log_exercise(request, slug):
     else:
         form = ExerciseCompletionForm()
     return render(request, 'progress/log_exercise.html', {'form': form, 'exercise': exercise})
+
+
+@login_required
+def edit_completion(request, pk):
+    completion = get_object_or_404(ExerciseCompletion, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = ExerciseCompletionForm(request.POST, instance=completion)
+        if form.is_valid():
+            form.save()
+            return redirect('progress')
+    else:
+        form = ExerciseCompletionForm(instance=completion)
+    return render(request, 'progress/edit.html', {'form': form, 'record': completion})
+
+
+@login_required
+def delete_completion(request, pk):
+    completion = get_object_or_404(ExerciseCompletion, pk=pk, user=request.user)
+    if request.method == 'POST':
+        completion.delete()
+        return redirect('progress')
+    return render(request, 'progress/delete_confirm.html', {'record': completion})

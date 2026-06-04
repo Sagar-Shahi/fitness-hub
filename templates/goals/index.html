@@ -87,8 +87,8 @@
       </div>
 
       <div class="goal-card-actions">
-        <a class="btn btn-primary" href="#">View Details</a>
-        <button class="btn btn-danger">Delete</button>
+        <a class="btn btn-primary" href="{% url 'edit-goal' g.id %}">Edit</a>
+        <a class="btn btn-danger" href="{% url 'delete-goal' g.id %}">Delete</a>
       </div>
     </article>
     {% endfor %}

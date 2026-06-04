@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from .forms import UserUpdateForm, ProfileForm, UserRegistrationForm, GoalSelectionForm
 from .models import Profile
-from goals.models import Goal
+from core.utils import map_profile_goal_to_goal_type, sync_goal_from_profile
 
 # Affordable food database
 AFFORDABLE_FOODS = {
@@ -153,15 +153,6 @@ def exercise_records(request):
 
 
 @login_required
-def purchase_history(request):
-    purchases = [
-        {'date': '2026-05-25', 'item': 'Whey Protein Powder', 'amount': '$34.99'},
-        {'date': '2026-05-18', 'item': 'Pro Dumbbell Set', 'amount': '$59.99'},
-    ]
-    return render(request, 'users/purchase_history.html', {'purchases': purchases})
-
-
-@login_required
 def nutrition_tracker(request):
     return render(request, 'users/nutrition_tracker.html', {'affordable_foods': AFFORDABLE_FOODS})
 
@@ -195,34 +186,6 @@ def about(request):
     return render(request, 'about.html')
 
 
-def _map_profile_goal_to_goal_type(selected_goal):
-    if not selected_goal:
-        return None
-    selected_goal = selected_goal.lower()
-    if selected_goal.startswith('calisthenics'):
-        return 'calisthenics'
-    if selected_goal.startswith('v_taper'):
-        return 'lean_athletic'
-    if selected_goal.startswith('weight_loss'):
-        return 'fat_loss'
-    if selected_goal.startswith('general_fitness'):
-        return 'general'
-    return None
-
-
-def _sync_goal_exercises(user_profile):
-    goal_type = _map_profile_goal_to_goal_type(user_profile.selected_goal)
-    if not goal_type:
-        return None
-    goal, created = Goal.objects.get_or_create(
-        user=user_profile.user,
-        goal_type=goal_type,
-        defaults={'description': 'Auto-synced goal from selected profile goal.'}
-    )
-    goal.sync_assigned_exercises()
-    return goal
-
-
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -249,7 +212,8 @@ def select_goal(request):
         form = GoalSelectionForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
-            _sync_goal_exercises(profile)
+            profile.refresh_from_db()
+            sync_goal_from_profile(request.user, profile)
             messages.success(request, 'Your goal selection has been updated.')
             return redirect('profile')
     else:

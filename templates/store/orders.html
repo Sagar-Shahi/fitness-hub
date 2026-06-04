@@ -1,0 +1,64 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'store/css/store.css' %}">
+{% endblock %}
+{% block content %}
+<section class="store-page">
+  <div class="page-head">
+    <div>
+      <h1>My Orders</h1>
+      <p class="lead">Track and review your past purchases.</p>
+    </div>
+    <div class="page-head-actions">
+      <a class="btn btn-secondary" href="{% url 'store-home' %}">Continue Shopping</a>
+    </div>
+  </div>
+
+  {% if orders %}
+  <div class="orders-list">
+    {% for order in orders %}
+    <a class="order-card" href="{% url 'order-detail' order.order_number %}">
+      <div class="order-card-head">
+        <div>
+          <span class="order-number">{{ order.order_number }}</span>
+          <span class="order-date">{{ order.created_at|date:"M j, Y" }}</span>
+        </div>
+        <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+      </div>
+      <div class="order-card-body">
+        <div class="order-items-preview">
+          {% for item in order.items.all|slice:":3" %}
+            <div class="preview-item">
+              {% if item.product %}<img src="{{ item.product.image_url }}" alt="{{ item.product_name }}">{% endif %}
+            </div>
+          {% endfor %}
+          {% if order.items.count > 3 %}
+            <div class="preview-item preview-more">+{{ order.items.count|add:"-3" }}</div>
+          {% endif %}
+        </div>
+        <div class="order-info">
+          <div class="order-info-row">
+            <span class="label">Items</span>
+            <span>{{ order.item_count }}</span>
+          </div>
+          <div class="order-info-row">
+            <span class="label">Total</span>
+            <span class="order-total">${{ order.total }}</span>
+          </div>
+        </div>
+        <span class="order-arrow">→</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h2>No orders yet</h2>
+    <p>When you place an order, it will appear here.</p>
+    <a class="btn btn-primary" href="{% url 'store-home' %}">Start Shopping</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

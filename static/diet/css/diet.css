@@ -1,0 +1,752 @@
+/* ============================================
+   DIET - Professional Clinical Nutritionist UI
+   ============================================ */
+
+:root {
+  --diet-bg: #0b1220;
+  --diet-card: #111a2e;
+  --diet-card-elev: #162038;
+  --diet-border: rgba(255, 255, 255, 0.08);
+  --diet-text: #e6edf7;
+  --diet-text-dim: #94a3b8;
+  --diet-accent: #22c55e;
+  --diet-accent-soft: rgba(34, 197, 94, 0.12);
+  --diet-protein: #ef4444;
+  --diet-protein-soft: rgba(239, 68, 68, 0.12);
+  --diet-carbs: #f59e0b;
+  --diet-carbs-soft: rgba(245, 158, 11, 0.12);
+  --diet-fats: #3b82f6;
+  --diet-fats-soft: rgba(59, 130, 246, 0.12);
+  --diet-calories: #8b5cf6;
+  --diet-calories-soft: rgba(139, 92, 246, 0.12);
+  --diet-radius: 16px;
+  --diet-radius-sm: 10px;
+  --diet-shadow: 0 8px 32px rgba(0, 0, 0, 0.32);
+}
+
+.diet-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+  color: var(--diet-text);
+}
+
+.diet-page h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.diet-page h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 2rem 0 1rem;
+}
+
+.diet-page h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--diet-text);
+  margin: 0;
+}
+
+.diet-page p {
+  color: var(--diet-text-dim);
+  line-height: 1.6;
+  margin: 0.25rem 0;
+}
+
+.diet-page .text-muted {
+  color: var(--diet-text-dim);
+  font-size: 0.95rem;
+}
+
+.diet-page .page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--diet-border);
+}
+
+.diet-page .page-head .lead {
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+  color: var(--diet-text-dim);
+}
+
+.diet-page .page-head-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- Buttons ---------- */
+.diet-page .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--diet-radius-sm);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.diet-page .btn-primary {
+  background: var(--diet-accent);
+  color: #04130a;
+}
+
+.diet-page .btn-primary:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px var(--diet-accent-soft);
+}
+
+.diet-page .btn-secondary {
+  background: var(--diet-card-elev);
+  color: var(--diet-text);
+  border-color: var(--diet-border);
+}
+
+.diet-page .btn-secondary:hover {
+  background: #1d2944;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.diet-page .btn-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.diet-page .btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* ---------- Hero / Profile Summary Card ---------- */
+.diet-hero {
+  background: linear-gradient(135deg, var(--diet-card) 0%, var(--diet-card-elev) 100%);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--diet-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.diet-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, var(--diet-accent-soft) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.diet-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.diet-hero-stat {
+  border-left: 3px solid var(--diet-accent);
+  padding-left: 1rem;
+}
+
+.diet-hero-stat .stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--diet-text-dim);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.diet-hero-stat .stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--diet-text);
+  letter-spacing: -0.02em;
+}
+
+.diet-hero-stat .stat-sub {
+  font-size: 0.85rem;
+  color: var(--diet-text-dim);
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .diet-hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Target Cards Grid ---------- */
+.macro-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .macro-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .macro-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.macro-card {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 1.5rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.macro-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--card-accent, var(--diet-accent));
+}
+
+.macro-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.macro-card.calories { --card-accent: var(--diet-calories); }
+.macro-card.protein  { --card-accent: var(--diet-protein); }
+.macro-card.carbs    { --card-accent: var(--diet-carbs); }
+.macro-card.fats     { --card-accent: var(--diet-fats); }
+
+.macro-card .macro-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  background: var(--card-accent);
+  color: white;
+  opacity: 0.9;
+}
+
+.macro-card .macro-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--diet-text-dim);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.macro-card .macro-value {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--diet-text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.macro-card .macro-unit {
+  font-size: 1rem;
+  color: var(--diet-text-dim);
+  font-weight: 500;
+  margin-left: 0.2rem;
+}
+
+.macro-card .macro-foot {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--diet-text-dim);
+}
+
+/* ---------- Profile Incomplete Notice ---------- */
+.diet-notice {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.04));
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-left: 3px solid var(--diet-carbs);
+  border-radius: var(--diet-radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.diet-notice .notice-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--diet-carbs-soft);
+  color: var(--diet-carbs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.diet-notice .notice-body {
+  flex: 1;
+}
+
+.diet-notice .notice-title {
+  font-weight: 600;
+  color: var(--diet-text);
+  margin-bottom: 0.25rem;
+}
+
+.diet-notice .notice-text {
+  color: var(--diet-text-dim);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.diet-notice .btn {
+  flex-shrink: 0;
+}
+
+/* ---------- Form Card ---------- */
+.diet-form-card {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 2.5rem;
+  box-shadow: var(--diet-shadow);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.diet-form-head {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--diet-border);
+}
+
+.diet-form-head h1 {
+  margin: 0 0 0.5rem;
+}
+
+.diet-form-head p {
+  margin: 0;
+}
+
+.diet-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .diet-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.diet-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.diet-form-field.full {
+  grid-column: 1 / -1;
+}
+
+.diet-form-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--diet-text-dim);
+}
+
+.diet-form-field input,
+.diet-form-field textarea,
+.diet-form-field select {
+  background: var(--diet-bg);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius-sm);
+  color: var(--diet-text);
+  padding: 0.75rem 1rem;
+  font-size: 0.98rem;
+  font-family: inherit;
+  transition: all 0.18s ease;
+  width: 100%;
+}
+
+.diet-form-field input:focus,
+.diet-form-field textarea:focus,
+.diet-form-field select:focus {
+  outline: none;
+  border-color: var(--diet-accent);
+  box-shadow: 0 0 0 3px var(--diet-accent-soft);
+}
+
+.diet-form-field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.diet-form-field .help-text {
+  font-size: 0.82rem;
+  color: var(--diet-text-dim);
+  margin-top: 0.25rem;
+}
+
+.diet-form-field .error {
+  color: #fca5a5;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.diet-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--diet-border);
+}
+
+/* ---------- Records Table ---------- */
+.diet-records {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  overflow: hidden;
+  box-shadow: var(--diet-shadow);
+}
+
+.diet-records-head {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--diet-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.diet-records-head h2 {
+  margin: 0;
+}
+
+.diet-records-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.diet-records-table th {
+  text-align: left;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--diet-text-dim);
+  font-weight: 600;
+  background: var(--diet-bg);
+  border-bottom: 1px solid var(--diet-border);
+}
+
+.diet-records-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--diet-border);
+  font-size: 0.95rem;
+  color: var(--diet-text);
+}
+
+.diet-records-table tr:last-child td {
+  border-bottom: none;
+}
+
+.diet-records-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.diet-records-table .col-num {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.diet-records-table .col-cal {
+  color: var(--diet-calories);
+}
+
+.diet-records-table .col-pro {
+  color: var(--diet-protein);
+}
+
+.diet-records-table .col-carb {
+  color: var(--diet-carbs);
+}
+
+.diet-records-table .col-fat {
+  color: var(--diet-fats);
+}
+
+.diet-records-table .col-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.diet-records-table .row-action {
+  color: var(--diet-text-dim);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-left: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.diet-records-table .row-action:hover {
+  color: var(--diet-text);
+  background: var(--diet-card-elev);
+}
+
+.diet-records-table .row-action.danger:hover {
+  color: #fca5a5;
+  background: var(--diet-protein-soft);
+}
+
+.diet-records-empty {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--diet-text-dim);
+}
+
+.diet-records-empty .empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.4;
+  margin-bottom: 1rem;
+}
+
+/* ---------- Suggest Page ---------- */
+.diet-suggest-hero {
+  background: linear-gradient(135deg, var(--diet-card) 0%, var(--diet-card-elev) 100%);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--diet-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.diet-suggest-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--diet-calories-soft) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.diet-suggest-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.meta-pill {
+  background: var(--diet-card-elev);
+  border: 1px solid var(--diet-border);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--diet-text-dim);
+}
+
+.meta-pill strong {
+  color: var(--diet-text);
+  font-weight: 600;
+  margin-left: 0.25rem;
+}
+
+.energy-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .energy-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.energy-pill {
+  background: var(--diet-bg);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius-sm);
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.energy-pill .label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--diet-text-dim);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.energy-pill .value {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--diet-text);
+  letter-spacing: -0.02em;
+}
+
+.energy-pill.target {
+  background: var(--diet-accent-soft);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.energy-pill.target .value {
+  color: var(--diet-accent);
+}
+
+.copy-block {
+  background: var(--diet-bg);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius-sm);
+  padding: 1.5rem;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--diet-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 1rem 0;
+}
+
+.copy-block strong {
+  color: var(--diet-accent);
+}
+
+.diet-actions-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.rationale-card {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-left: 3px solid var(--diet-accent);
+  border-radius: var(--diet-radius);
+  padding: 1.5rem 2rem;
+  margin-top: 1rem;
+}
+
+.rationale-card p {
+  margin: 0;
+  color: var(--diet-text);
+  line-height: 1.7;
+}
+
+/* ---------- Section Headers ---------- */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 2.5rem 0 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--diet-border);
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.section-header .section-sub {
+  color: var(--diet-text-dim);
+  font-size: 0.9rem;
+}
+
+/* ---------- Delete Confirm ---------- */
+.diet-confirm-card {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 2.5rem;
+  max-width: 540px;
+  margin: 0 auto;
+  text-align: center;
+  box-shadow: var(--diet-shadow);
+}
+
+.diet-confirm-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--diet-protein-soft);
+  color: var(--diet-protein);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  margin: 0 auto 1.5rem;
+}
+
+.diet-confirm-card h1 {
+  margin: 0 0 0.75rem;
+}
+
+.diet-confirm-card p {
+  margin: 0 0 2rem;
+  color: var(--diet-text-dim);
+}
+
+.diet-confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}

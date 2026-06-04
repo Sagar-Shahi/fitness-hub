@@ -1,12 +1,21 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'diet/css/diet.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Delete Record</h1>
-  <p>Are you sure you want to delete the record for {{ record.date }}?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button class="btn btn-danger" type="submit">Delete</button>
-    <a class="btn btn-secondary" href="{% url 'diet' %}">Cancel</a>
-  </form>
+<section class="diet-page">
+  <div class="diet-confirm-card">
+    <div class="diet-confirm-icon">!</div>
+    <h1>Delete Record</h1>
+    <p>This action cannot be undone. The record for <strong>{{ record.date }}</strong> will be permanently removed.</p>
+    <form method="post" style="display: inline;">
+      {% csrf_token %}
+      <div class="diet-confirm-actions">
+        <a class="btn btn-secondary" href="{% url 'diet' %}">Cancel</a>
+        <button class="btn btn-danger" type="submit">Delete Record</button>
+      </div>
+    </form>
+  </div>
 </section>
 {% endblock %}

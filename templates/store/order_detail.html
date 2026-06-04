@@ -1,0 +1,90 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'store/css/store.css' %}">
+{% endblock %}
+{% block content %}
+<section class="store-page">
+  <div class="page-head">
+    <div>
+      <nav class="breadcrumbs">
+        <a href="{% url 'order-history' %}">My Orders</a>
+        <span class="sep">/</span>
+        <span>{{ order.order_number }}</span>
+      </nav>
+      <h1>Order {{ order.order_number }}</h1>
+      <p class="lead">Placed on {{ order.created_at|date:"F j, Y \a\t g:i A" }}</p>
+    </div>
+    <div class="page-head-actions">
+      <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+    </div>
+  </div>
+
+  <div class="order-detail-layout">
+    <div class="order-detail-main">
+      <div class="order-progress">
+        {% for s, label in order.STATUS_CHOICES %}
+          {% if s != 'cancelled' %}
+            <div class="progress-step {% if forloop.counter0 <= order.STATUS_CHOICES|length %} {% endif %}">
+              <div class="step-dot"></div>
+              <div class="step-label">{{ label }}</div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <h2>Items in this Order</h2>
+      <div class="order-items">
+        {% for item in order.items.all %}
+        <div class="order-item">
+          <div class="order-item-img">
+            {% if item.product %}
+              <img src="{{ item.product.image_url }}" alt="{{ item.product_name }}">
+            {% else %}
+              <div class="img-placeholder">📦</div>
+            {% endif %}
+          </div>
+          <div class="order-item-info">
+            <h3>{{ item.product_name }}</h3>
+            {% if item.product %}
+              <p class="item-brand">{{ item.product.brand|default:item.product.category.name }}</p>
+            {% endif %}
+            <p class="item-qty">Quantity: {{ item.quantity }} × ${{ item.product_price }}</p>
+          </div>
+          <div class="order-item-total">${{ item.line_total }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <aside class="order-detail-summary">
+      <h2>Order Summary</h2>
+      <div class="order-summary-row"><span class="label">Subtotal</span><span class="value">${{ order.subtotal }}</span></div>
+      <div class="order-summary-row"><span class="label">Shipping</span><span class="value">${{ order.shipping_cost }}</span></div>
+      <div class="order-summary-row"><span class="label">Tax</span><span class="value">${{ order.tax }}</span></div>
+      <div class="order-summary-divider"></div>
+      <div class="order-summary-total"><span class="label">Total</span><span class="value">${{ order.total }}</span></div>
+
+      <h3 style="margin-top: 2rem;">Shipping Address</h3>
+      <div class="address-card">
+        <strong>{{ order.full_name }}</strong>
+        <p>{{ order.address }}<br>
+        {{ order.city }}, {{ order.state }} {{ order.zip_code }}<br>
+        {{ order.country }}</p>
+        <p style="margin-top: 0.75rem;">
+          <span class="meta-label">Email:</span> {{ order.email }}<br>
+          {% if order.phone %}<span class="meta-label">Phone:</span> {{ order.phone }}{% endif %}
+        </p>
+      </div>
+
+      <h3 style="margin-top: 1.5rem;">Payment</h3>
+      <p style="color: var(--store-text-dim); font-size: 0.9rem;">{{ order.get_payment_method_display }}</p>
+
+      {% if order.notes %}
+      <h3 style="margin-top: 1.5rem;">Notes</h3>
+      <p style="color: var(--store-text-dim); font-size: 0.9rem;">{{ order.notes }}</p>
+      {% endif %}
+    </aside>
+  </div>
+</section>
+{% endblock %}
