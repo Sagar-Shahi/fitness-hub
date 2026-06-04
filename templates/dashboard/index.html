@@ -1,99 +1,208 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'goals/css/goals.css' %}">
+<link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Dashboard</h1>
+<section class="container py-5 dashboard-page">
+  <div class="page-head">
+    <h1>Dashboard</h1>
+    <p>Your training overview at a glance</p>
+  </div>
 
   {% if focus_alignment %}
-    <div class="alert alert-{{ focus_alignment.message_type }} mb-4">
+  <div class="dash-banner">
+    <div class="dash-banner-icon {{ focus_alignment.message_type }}">
+      {% if focus_alignment.message_type == 'success' %}✅{% elif focus_alignment.message_type == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+    </div>
+    <div class="dash-banner-body">
       <h5>{{ focus_alignment.message_type|title }} — Focus on Your Goal</h5>
       <p>{{ focus_alignment.message }}</p>
       {% if focus_alignment.volume_stats %}
-        <small>
-          Weekly Volume: {{ focus_alignment.volume_stats.total_volume }}/{{ focus_alignment.volume_stats.target_volume }} 
-          ({{ focus_alignment.volume_stats.completion_percent }}%) 
-          • Trend: {{ focus_alignment.volume_stats.trend_direction|title }}
-        </small>
+      <small>
+        Weekly Volume: {{ focus_alignment.volume_stats.total_volume }}/{{ focus_alignment.volume_stats.target_volume }}
+        ({{ focus_alignment.volume_stats.completion_percent }}%)
+        &middot; Trend: {{ focus_alignment.volume_stats.trend_direction|title }}
+      </small>
       {% endif %}
     </div>
+  </div>
   {% endif %}
 
   {% if stats %}
-    <div class="alert alert-info mb-4">
-      <h5>Your Motivation Stats</h5>
-      <p>
-        <strong>Total Workouts:</strong> {{ stats.total_workouts }} | 
-        <strong>Current Streak:</strong> {{ stats.current_streak }} 🔥 | 
-        <strong>Longest Streak:</strong> {{ stats.longest_streak }} days
-      </p>
+  <div class="dash-stats">
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon green">💪</div>
+      <div class="dash-stat-info">
+        <span class="dash-stat-value">{{ stats.total_workouts }}</span>
+        <span class="dash-stat-label">Total Workouts</span>
+      </div>
     </div>
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon amber">🔥</div>
+      <div class="dash-stat-info">
+        <span class="dash-stat-value">{{ stats.current_streak }}</span>
+        <span class="dash-stat-label">Current Streak</span>
+      </div>
+    </div>
+    <div class="dash-stat-card">
+      <div class="dash-stat-icon blue">🏆</div>
+      <div class="dash-stat-info">
+        <span class="dash-stat-value">{{ stats.longest_streak }}</span>
+        <span class="dash-stat-label">Longest Streak (days)</span>
+      </div>
+    </div>
+  </div>
   {% endif %}
 
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card p-3">
+  <div class="dash-grid">
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="card-icon green">🎯</div>
         <h5>Active Goal</h5>
+      </div>
+      <div class="dash-card-body">
         {% if goal %}
-          <p><strong>{{ goal.get_goal_type_display }}</strong></p>
-          {% if goal.description %}<p>{{ goal.description }}</p>{% endif %}
-          {% if goal.target_weight %}<p>Target: {{ goal.target_weight }} kg</p>{% endif %}
-          {% if goal.assigned_exercises.exists %}
-            <p>{{ goal.assigned_exercises.count }} assigned exercise{{ goal.assigned_exercises.count|pluralize }}</p>
-          {% endif %}
-          <div class="goal-readiness mt-3">
-            <strong>Goal Readiness</strong>
-            <div class="progress" style="height: 16px; background: #e9ecef; border-radius: 8px; overflow: hidden;">
-              <div class="progress-bar" style="width: {{ readiness }}%; background: #4caf50; height: 100%;"></div>
-            </div>
-            <p class="mt-2">{{ readiness }}% toward your current goal</p>
+        <div class="goal-mini-card">
+          <div class="goal-emoji {{ goal.goal_type }}">
+            {% if goal.goal_type == 'calisthenics' %}🤸{% elif goal.goal_type == 'lean_athletic' %}🏃{% elif goal.goal_type == 'muscle_gain' %}💪{% elif goal.goal_type == 'fat_loss' %}🔥{% elif goal.goal_type == 'lean_bulk' %}🦍{% elif goal.goal_type == 'recomp' %}🔄{% elif goal.goal_type == 'strength' %}🏋️{% else %}💯{% endif %}
           </div>
+          <div class="goal-mini-info">
+            <div class="goal-mini-name">{{ goal.get_goal_type_display }}</div>
+            {% if goal.goal_type %}
+            <div class="goal-mini-desc">{% if goal.target_weight %}Target: {{ goal.target_weight }} kg{% else %}No weight target{% endif %}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="dash-progress">
+          <div class="dash-progress-header">
+            <span>Goal Readiness</span>
+            <span class="dash-progress-pct">{{ readiness }}%</span>
+          </div>
+          <div class="dash-progress-track">
+            <div class="dash-progress-fill" style="width: {{ readiness }}%"></div>
+          </div>
+        </div>
+        {% if goal.focus_areas %}
+        <div class="dash-pills">
+          {% for area in goal.focus_areas %}
+          <span class="dash-pill">{{ area }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if goal.assigned_exercises.exists %}
+        <p>{{ goal.assigned_exercises.count }} assigned exercise{{ goal.assigned_exercises.count|pluralize }}</p>
+        {% endif %}
         {% else %}
-          <p>No active goal selected yet. Set your goal on the profile page.</p>
+        <div class="dash-empty">
+          <p>No active goal set.</p>
+          <a class="btn" href="{% url 'create-goal' %}">+ Create Goal</a>
+        </div>
         {% endif %}
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card p-3">
+
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="card-icon blue">📋</div>
         <h5>Next Suggested Exercise</h5>
+      </div>
+      <div class="dash-card-body">
         {% if next_exercise %}
-          <p><a href="{% url 'exercise-detail' next_exercise.slug %}">{{ next_exercise.name }}</a></p>
-          <p>{{ next_exercise.description|truncatechars:120 }}</p>
+        <p><strong><a href="{% url 'exercise-detail' next_exercise.slug %}">{{ next_exercise.name }}</a></strong></p>
+        <p>{{ next_exercise.description|truncatechars:140 }}</p>
         {% else %}
-          <p>Choose a goal to receive a tailored exercise suggestion.</p>
+        <div class="dash-empty">
+          <p>Choose a goal to receive tailored exercise suggestions.</p>
+        </div>
         {% endif %}
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card p-3">
+
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="card-icon purple">📊</div>
         <h5>Progress Overview</h5>
+      </div>
+      <div class="dash-card-body">
         {% if focus_alignment.weekly_stats %}
-          <p><strong>Weekly Target:</strong> {{ focus_alignment.weekly_stats.exercises_completed }}/{{ focus_alignment.weekly_stats.exercises_assigned }} exercises</p>
-          <div class="progress" style="height: 16px; background: #e9ecef; border-radius: 8px; overflow: hidden;">
-            <div class="progress-bar" style="width: {{ focus_alignment.weekly_stats.percent }}%; background: #2196F3; height: 100%;"></div>
+        <p><strong>Weekly Target:</strong> {{ focus_alignment.weekly_stats.exercises_completed }}/{{ focus_alignment.weekly_stats.exercises_assigned }} exercises</p>
+        <div class="dash-progress">
+          <div class="dash-progress-header">
+            <span>Completion</span>
+            <span class="dash-progress-pct">{{ focus_alignment.weekly_stats.percent }}%</span>
           </div>
-          <p class="mt-2">{{ focus_alignment.weekly_stats.percent }}% complete</p>
+          <div class="dash-progress-track">
+            <div class="dash-progress-fill blue" style="width: {{ focus_alignment.weekly_stats.percent }}%"></div>
+          </div>
+        </div>
         {% else %}
-          <p>Quick stats and summary will appear here.</p>
+        <div class="dash-empty">
+          <p>Quick stats will appear here once you start exercising.</p>
+        </div>
         {% endif %}
       </div>
     </div>
   </div>
-  <div class="row mt-4">
-    <div class="col-md-12">
-      <div class="card p-3">
+
+  <div class="dash-grid">
+    <div class="dash-card dash-card-full">
+      <div class="dash-card-header">
+        <div class="card-icon green">📈</div>
         <h5>Weekly Activity</h5>
-        <canvas id="activityChart" width="400" height="200"></canvas>
+      </div>
+      <div class="dash-card-body">
+        <div class="chart-wrap">
+          <canvas id="activityChart"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const ctx = document.getElementById('activityChart').getContext('2d');
-new Chart(ctx, {
-  type: 'line',
-  data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ label: 'Minutes', data: [30,40,25,50,45,20,60], borderColor: 'rgb(75, 192, 192)', tension: 0.3 }] },
-  options: { responsive: true }
+document.addEventListener('DOMContentLoaded', () => {
+  const ctx = document.getElementById('activityChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets: [{
+        label: 'Minutes',
+        data: [30, 40, 25, 50, 45, 20, 60],
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34,197,94,0.06)',
+        borderWidth: 2,
+        tension: 0.35,
+        pointBackgroundColor: '#22c55e',
+        pointBorderColor: '#0f172a',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.03)' },
+          ticks: { color: '#94a3b8', font: { size: 11 } },
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.03)' },
+          ticks: { color: '#94a3b8', font: { size: 11 } },
+          beginAtZero: true,
+        }
+      }
+    }
+  });
 });
 </script>
-
 {% endblock %}

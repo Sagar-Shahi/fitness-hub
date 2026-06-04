@@ -1,70 +1,135 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'progress/css/progress.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Exercise Log</h1>
-  <p class="text-muted">Your completed exercises are automatically recorded here.</p>
+<section class="container py-5 progress-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <h1>Exercise Log</h1>
+      <p>Your completed exercises are automatically recorded here.</p>
+    </div>
+  </div>
 
   {% if stats %}
-    <div class="alert alert-success mb-3">
-      <h5>Your Stats</h5>
-      <p><strong>Total Workouts:</strong> {{ stats.total_workouts }} | <strong>Current Streak:</strong> {{ stats.current_streak }} days | <strong>Longest Streak:</strong> {{ stats.longest_streak }} days</p>
+  <div class="progress-stats">
+    <div class="progress-stat-card">
+      <div class="progress-stat-icon green">💪</div>
+      <div class="progress-stat-info">
+        <span class="progress-stat-value">{{ stats.total_workouts }}</span>
+        <span class="progress-stat-label">Total Workouts</span>
+      </div>
     </div>
+    <div class="progress-stat-card">
+      <div class="progress-stat-icon amber">🔥</div>
+      <div class="progress-stat-info">
+        <span class="progress-stat-value">{{ stats.current_streak }}</span>
+        <span class="progress-stat-label">Current Streak</span>
+      </div>
+    </div>
+    <div class="progress-stat-card">
+      <div class="progress-stat-icon blue">🏆</div>
+      <div class="progress-stat-info">
+        <span class="progress-stat-value">{{ stats.longest_streak }}</span>
+        <span class="progress-stat-label">Longest Streak (days)</span>
+      </div>
+    </div>
+  </div>
   {% endif %}
 
   {% if focus_alignment %}
-    <div class="alert alert-{{ focus_alignment.message_type }} mb-3">
-      <h5>{{ focus_alignment.message_type|title }} Message</h5>
+  <div class="pr-banner">
+    <div class="pr-banner-icon {{ focus_alignment.message_type }}">
+      {% if focus_alignment.message_type == 'success' %}✅{% elif focus_alignment.message_type == 'warning' %}⚠️{% elif focus_alignment.message_type == 'alert' %}🚨{% else %}ℹ️{% endif %}
+    </div>
+    <div class="pr-banner-body">
+      <h5>{{ focus_alignment.message_type|title }} — Progress Update</h5>
       <p>{{ focus_alignment.message }}</p>
       {% if focus_alignment.volume_stats %}
-        <small>
-          Weekly Volume: {{ focus_alignment.volume_stats.total_volume }}/{{ focus_alignment.volume_stats.target_volume }} 
-          ({{ focus_alignment.volume_stats.completion_percent }}%)
-          • Trend: {{ focus_alignment.volume_stats.trend_direction|title }}
-        </small>
+      <small>
+        Weekly Volume: {{ focus_alignment.volume_stats.total_volume }}/{{ focus_alignment.volume_stats.target_volume }}
+        ({{ focus_alignment.volume_stats.completion_percent }}%)
+        &middot; Trend: {{ focus_alignment.volume_stats.trend_direction|title }}
+      </small>
       {% endif %}
     </div>
+  </div>
   {% endif %}
 
   {% if goal %}
-    <div class="goal-summary mb-3">
-      <strong>Current Goal:</strong> {{ goal.get_goal_type_display }}
-      {% if goal.target_weight %}<span> • Target weight: {{ goal.target_weight }} kg</span>{% endif %}
+  <div class="pr-goal-summary">
+    <div class="pr-goal-emoji {{ goal.goal_type }}">
+      {% if goal.goal_type == 'calisthenics' %}🤸{% elif goal.goal_type == 'lean_athletic' %}🏃{% elif goal.goal_type == 'muscle_gain' %}💪{% elif goal.goal_type == 'fat_loss' %}🔥{% elif goal.goal_type == 'lean_bulk' %}🦍{% elif goal.goal_type == 'recomp' %}🔄{% elif goal.goal_type == 'strength' %}🏋️{% else %}💯{% endif %}
     </div>
+    <div class="pr-goal-info">
+      <div class="pr-goal-name">{{ goal.get_goal_type_display }}</div>
+      {% if goal.target_weight %}<div class="pr-goal-target">Target: {{ goal.target_weight }} kg</div>{% endif %}
+    </div>
+  </div>
   {% endif %}
 
   {% if focus_suggestions %}
-    <div class="alert alert-info mb-3">
-      {% for suggestion in focus_suggestions %}
-        <p>{{ suggestion }}</p>
-      {% endfor %}
-    </div>
+  <div class="pr-suggestions">
+    {% for suggestion in focus_suggestions %}
+    <span class="pr-suggestion">{{ suggestion }}</span>
+    {% endfor %}
+  </div>
   {% endif %}
 
   {% if assigned_exercises %}
-    <section class="goal-exercises mb-4">
-      <h2>Assigned Exercises</h2>
-      <ul>
-        {% for exercise in assigned_exercises %}
-          <li><a href="{% url 'exercise-detail' exercise.slug %}">{{ exercise.name }}</a> — <a href="{% url 'log-exercise' exercise.slug %}" class="btn btn-sm btn-primary">Log</a></li>
-        {% endfor %}
-      </ul>
-    </section>
+  <div class="pr-section-title">
+    <h2>Assigned Exercises</h2>
+    <span class="badge-count">{{ assigned_exercises|length }}</span>
+  </div>
+  <div class="exercise-grid">
+    {% for exercise in assigned_exercises %}
+    <a class="exercise-mini-card" href="{% url 'exercise-detail' exercise.slug %}">
+      <div class="exercise-mini-icon">🏋️</div>
+      <div class="exercise-mini-info">
+        <div class="exercise-mini-name">{{ exercise.name }}</div>
+        <div class="exercise-mini-cat">{{ exercise.category }}</div>
+      </div>
+      <div class="exercise-mini-action">
+        <a class="btn-sm" href="{% url 'log-exercise' exercise.slug %}">Log</a>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
   {% endif %}
 
-  <h2>Recent Exercise Log</h2>
+  <div class="pr-section-title">
+    <h2>Recent Activity</h2>
+    {% if completions %}<span class="badge-count">{{ completions|length }}</span>{% endif %}
+  </div>
+
   {% if completions %}
-    <div class="exercise-log-list">
-      {% for completion in completions %}
-        <div class="log-entry">
-          <strong>{{ completion.date }}</strong> — <a href="{% url 'exercise-detail' completion.exercise.slug %}">{{ completion.exercise.name }}</a>
-          {% if completion.reps %}<span class="badge">{{ completion.reps }} reps</span>{% endif %}
-          {% if completion.hold_time_sec %}<span class="badge">{{ completion.hold_time_sec }}s hold</span>{% endif %}
-          {% if completion.notes %}<p>{{ completion.notes }}</p>{% endif %}
+  <div class="log-list">
+    {% for completion in completions %}
+    <div class="log-entry">
+      <div class="log-entry-date">{{ completion.date }}</div>
+      <div class="log-entry-main">
+        <a class="log-entry-exercise" href="{% url 'exercise-detail' completion.exercise.slug %}">{{ completion.exercise.name }}</a>
+        <div class="log-entry-meta">
+          {% if completion.reps %}<span class="log-badge reps">{{ completion.reps }} reps</span>{% endif %}
+          {% if completion.hold_time_sec %}<span class="log-badge hold">{{ completion.hold_time_sec }}s hold</span>{% endif %}
         </div>
-      {% endfor %}
+        {% if completion.notes %}
+        <div class="log-entry-notes">{{ completion.notes }}</div>
+        {% endif %}
+      </div>
+      <div class="log-entry-actions">
+        <a class="btn-icon" href="{% url 'progress-edit' completion.pk %}" title="Edit">✏️</a>
+        <a class="btn-icon danger" href="{% url 'progress-delete' completion.pk %}" title="Delete">🗑️</a>
+      </div>
     </div>
+    {% endfor %}
+  </div>
   {% else %}
-    <p>No exercises logged yet. Start by clicking "Log" on an exercise!</p>
+  <div class="pr-empty">
+    <h3>No exercises logged yet</h3>
+    <p>Start by logging an exercise from your assigned list above, or explore the exercise library.</p>
+  </div>
   {% endif %}
 </section>
 {% endblock %}

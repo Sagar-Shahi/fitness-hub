@@ -1,17 +1,113 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'goals/css/goals.css' %}">
+<script defer src="{% static 'goals/js/goals.js' %}"></script>
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Your Goals</h1>
-  <p class="text-muted">Manage and track your fitness goals here.</p>
-  <a class="btn btn-primary mb-3" href="{% url 'create-goal' %}">Create New Goal</a>
+<section class="container py-5 goal-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <h1>Your Goals</h1>
+      <p>Track, manage, and crush every fitness goal</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'create-goal' %}">
+      <span>+</span> New Goal
+    </a>
+  </div>
+
   {% if goals %}
-    <ul>
-      {% for g in goals %}
-        <li>{{ g.get_goal_type_display }} — {{ g.progress_percent }}% — {{ g.description }}</li>
-      {% endfor %}
-    </ul>
+  <div class="goal-stats">
+    <div class="goal-stat-card">
+      <div class="goal-stat-icon green">🎯</div>
+      <div class="goal-stat-info">
+        <span class="goal-stat-value">{{ goals|length }}</span>
+        <span class="goal-stat-label">Total Goals</span>
+      </div>
+    </div>
+    <div class="goal-stat-card">
+      <div class="goal-stat-icon blue">📈</div>
+      <div class="goal-stat-info">
+        <span class="goal-stat-value">{{ goals|length }}</span>
+        <span class="goal-stat-label">Active Goals</span>
+      </div>
+    </div>
+    <div class="goal-stat-card">
+      <div class="goal-stat-icon amber">🔥</div>
+      <div class="goal-stat-info">
+        <span class="goal-stat-value">{{ goals|length }}</span>
+        <span class="goal-stat-label">Total Goals</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if goals %}
+  <div class="goals-grid">
+    {% for g in goals %}
+    <article class="goal-card">
+      <div class="goal-card-top">
+        <div class="goal-card-left">
+          <div class="goal-card-emoji {{ g.goal_type }}">
+            {% if g.goal_type == 'calisthenics' %}🤸{% elif g.goal_type == 'lean_athletic' %}🏃{% elif g.goal_type == 'muscle_gain' %}💪{% elif g.goal_type == 'fat_loss' %}🔥{% elif g.goal_type == 'lean_bulk' %}🦍{% elif g.goal_type == 'recomp' %}🔄{% elif g.goal_type == 'strength' %}🏋️{% else %}💯{% endif %}
+          </div>
+          <div>
+            <div class="goal-card-name">{{ g.get_goal_type_display }}</div>
+          </div>
+        </div>
+        <button class="goal-card-menu" data-tooltip="Options">⋮</button>
+      </div>
+
+      {% if g.description %}
+      <p class="goal-card-desc">{{ g.description|truncatechars:120 }}</p>
+      {% endif %}
+
+      <div class="goal-progress">
+        <div class="goal-progress-header">
+          <span>Progress</span>
+          <span class="goal-progress-pct">{{ g.progress_percent }}%</span>
+        </div>
+        <div class="goal-progress-track">
+          <div class="goal-progress-fill" data-pct="{{ g.progress_percent }}%" style="width: {{ g.progress_percent }}%"></div>
+        </div>
+      </div>
+
+      <div class="goal-card-meta">
+        {% if g.target_weight %}
+        <span class="goal-meta-pill weight">⚖️ {{ g.target_weight }} kg</span>
+        {% endif %}
+        {% if g.timeline_weeks %}
+        <span class="goal-meta-pill">📅 {{ g.timeline_weeks }} weeks</span>
+        {% endif %}
+        {% if g.focus_areas %}
+          {% for area in g.focus_areas %}
+          <span class="goal-meta-pill focus">{{ area }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="goal-card-actions">
+        <a class="btn btn-primary" href="#">View Details</a>
+        <button class="btn btn-danger">Delete</button>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
   {% else %}
-    <p>No goals yet. Create one to get started.</p>
+  <div class="goal-empty">
+    <div class="goal-empty-fig">
+      <svg viewBox="0 0 100 100">
+        <circle class="ring" cx="50" cy="50" r="38"/>
+        <circle class="ring-fill" cx="50" cy="50" r="38"/>
+        <circle class="dot" cx="50" cy="50" r="6"/>
+      </svg>
+    </div>
+    <h2>No goals yet</h2>
+    <p>Set your first fitness objective to start tracking progress and unlock personalized exercise recommendations.</p>
+    <a class="btn" href="{% url 'create-goal' %}">
+      <span>+</span> Create Your First Goal
+    </a>
+  </div>
   {% endif %}
 </section>
 {% endblock %}

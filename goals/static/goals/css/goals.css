@@ -1,0 +1,991 @@
+/* ============================================
+   Goals App — Professional Design System
+   ============================================ */
+
+/* --- Design Tokens --- */
+.goal-page {
+  --gl-card-bg: rgba(255, 255, 255, 0.03);
+  --gl-card-border: rgba(255, 255, 255, 0.06);
+  --gl-card-hover-border: rgba(34, 197, 94, 0.25);
+  --gl-glass-bg: rgba(15, 23, 42, 0.8);
+  --gl-glass-border: rgba(255, 255, 255, 0.08);
+  --gl-accent: #22c55e;
+  --gl-accent-glow: rgba(34, 197, 94, 0.2);
+  --gl-cyan: #06b6d4;
+  --gl-text: #f8fafc;
+  --gl-muted: #94a3b8;
+  --gl-radius: 1.25rem;
+  --gl-radius-sm: 0.75rem;
+}
+
+/* --- Page Header --- */
+.goal-page .page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.goal-page .page-head-text h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  background: linear-gradient(135deg, var(--gl-text), var(--gl-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.goal-page .page-head-text p {
+  margin: 0.4rem 0 0;
+  color: var(--gl-muted);
+  font-size: 0.95rem;
+}
+
+/* Stats Bar */
+.goal-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.goal-stat-card {
+  background: var(--gl-glass-bg);
+  border: 1px solid var(--gl-glass-border);
+  border-radius: var(--gl-radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.goal-stat-card:hover {
+  border-color: var(--gl-card-hover-border);
+  transform: translateY(-2px);
+}
+
+.goal-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.goal-stat-icon.green { background: rgba(34, 197, 94, 0.12); }
+.goal-stat-icon.blue { background: rgba(6, 182, 212, 0.12); }
+.goal-stat-icon.amber { background: rgba(251, 191, 36, 0.12); }
+
+.goal-stat-info { display: flex; flex-direction: column; }
+.goal-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--gl-text);
+}
+.goal-stat-label {
+  font-size: 0.8rem;
+  color: var(--gl-muted);
+  margin-top: 0.15rem;
+}
+
+/* --- Goals Grid --- */
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+/* --- Goal Card --- */
+.goal-card {
+  position: relative;
+  background: var(--gl-glass-bg);
+  border: 1px solid var(--gl-glass-border);
+  border-radius: var(--gl-radius);
+  padding: 1.5rem;
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+.goal-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--gl-radius);
+  background: linear-gradient(135deg, transparent 40%, rgba(34, 197, 94, 0.03) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.goal-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gl-card-hover-border);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(34, 197, 94, 0.05);
+}
+
+.goal-card:hover::before { opacity: 1; }
+
+.goal-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.goal-card-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.goal-card-emoji {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.goal-card-emoji.calisthenics { background: rgba(99, 102, 241, 0.15); }
+.goal-card-emoji.lean_athletic { background: rgba(6, 182, 212, 0.15); }
+.goal-card-emoji.muscle_gain { background: rgba(239, 68, 68, 0.15); }
+.goal-card-emoji.fat_loss { background: rgba(251, 191, 36, 0.15); }
+.goal-card-emoji.lean_bulk { background: rgba(168, 85, 247, 0.15); }
+.goal-card-emoji.recomp { background: rgba(34, 197, 94, 0.15); }
+.goal-card-emoji.strength { background: rgba(249, 115, 22, 0.15); }
+.goal-card-emoji.general { background: rgba(148, 163, 184, 0.15); }
+
+.goal-card-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--gl-text);
+  line-height: 1.3;
+}
+
+.goal-card-target {
+  font-size: 0.8rem;
+  color: var(--gl-muted);
+  white-space: nowrap;
+}
+
+.goal-card-menu {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--gl-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  transition: background 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.goal-card-menu:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--gl-text);
+}
+
+.goal-card-desc {
+  color: var(--gl-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.goal-card-desc:empty { display: none; }
+
+/* Progress */
+.goal-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.goal-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--gl-muted);
+}
+
+.goal-progress-pct {
+  font-weight: 700;
+  color: var(--gl-accent);
+  font-size: 0.85rem;
+}
+
+.goal-progress-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gl-accent), var(--gl-cyan));
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.goal-progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Meta */
+.goal-card-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.goal-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gl-muted);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.goal-meta-pill.focus {
+  background: rgba(6, 182, 212, 0.08);
+  color: #67e8f9;
+  border-color: rgba(6, 182, 212, 0.12);
+}
+
+.goal-meta-pill.weight {
+  background: rgba(251, 191, 36, 0.08);
+  color: #fcd34d;
+  border-color: rgba(251, 191, 36, 0.12);
+}
+
+/* Card Actions */
+.goal-card-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.15rem;
+  position: relative;
+  z-index: 1;
+}
+
+.goal-card-actions .btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--gl-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.goal-card-actions .btn-primary {
+  background: linear-gradient(135deg, var(--gl-accent), var(--gl-cyan));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.2);
+}
+
+.goal-card-actions .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+}
+
+.goal-card-actions .btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--gl-text);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.goal-card-actions .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.goal-card-actions .btn-danger {
+  background: rgba(244, 63, 94, 0.1);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.15);
+}
+
+.goal-card-actions .btn-danger:hover {
+  background: rgba(244, 63, 94, 0.2);
+}
+
+/* --- Empty State --- */
+.goal-empty {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: var(--gl-glass-bg);
+  border: 1px solid var(--gl-glass-border);
+  border-radius: var(--gl-radius);
+  backdrop-filter: blur(12px);
+}
+
+.goal-empty-fig {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1.5rem;
+  position: relative;
+}
+
+.goal-empty-fig svg {
+  width: 100%;
+  height: 100%;
+}
+
+.goal-empty-fig .ring {
+  fill: none;
+  stroke: rgba(34, 197, 94, 0.15);
+  stroke-width: 3;
+}
+
+.goal-empty-fig .ring-fill {
+  fill: none;
+  stroke: var(--gl-accent);
+  stroke-width: 3;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 180;
+  stroke-linecap: round;
+  animation: ringAnim 3s ease-in-out infinite;
+}
+
+.goal-empty-fig .dot {
+  fill: var(--gl-accent);
+  opacity: 0.6;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes ringAnim {
+  0%, 100% { stroke-dashoffset: 180; transform: rotate(0deg); transform-origin: center; }
+  50% { stroke-dashoffset: 40; transform: rotate(180deg); transform-origin: center; }
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.6; r: 6; }
+  50% { opacity: 1; r: 8; }
+}
+
+.goal-empty h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.4rem;
+  color: var(--gl-text);
+}
+
+.goal-empty p {
+  color: var(--gl-muted);
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.goal-empty .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--gl-radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--gl-accent), var(--gl-cyan));
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25);
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.goal-empty .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.35);
+}
+
+/* ============================================
+   Create / Edit Form
+   ============================================ */
+
+.goal-form-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.goal-form-card {
+  background: var(--gl-glass-bg);
+  border: 1px solid var(--gl-glass-border);
+  border-radius: var(--gl-radius);
+  padding: 2.5rem;
+  backdrop-filter: blur(12px);
+}
+
+.goal-form-card .page-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.goal-form-card .page-header h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.5vw, 2rem);
+  background: linear-gradient(135deg, var(--gl-text), var(--gl-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.goal-form-card .page-header p {
+  color: var(--gl-muted);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section:last-child { margin-bottom: 0; }
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.form-section-title .step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gl-accent), var(--gl-cyan));
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.form-section-title h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--gl-text);
+  font-weight: 600;
+}
+
+.form-section-title p {
+  margin: 0 0 0 auto;
+  font-size: 0.75rem;
+  color: var(--gl-muted);
+}
+
+/* Goal Selection Cards */
+.goal-radio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
+
+.goal-radio-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.1rem;
+  border-radius: var(--gl-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--gl-text);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.goal-radio-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.goal-radio-card.selected {
+  background: rgba(34, 197, 94, 0.06);
+  border-color: var(--gl-accent);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+}
+
+.goal-radio-card .card-emoji {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.goal-radio-card.selected .card-emoji {
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.goal-radio-card .card-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: block;
+}
+
+.goal-radio-card .card-sub {
+  font-size: 0.75rem;
+  color: var(--gl-muted);
+  display: block;
+  margin-top: 0.15rem;
+}
+
+/* Focus Area Pills */
+.focus-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.focus-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--gl-text);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.focus-pill:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.focus-pill.selected {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: var(--gl-cyan);
+  color: #67e8f9;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.12);
+}
+
+.focus-pill .pill-check {
+  display: none;
+  font-size: 0.7rem;
+}
+
+.focus-pill.selected .pill-check { display: inline; }
+
+/* Form Fields */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group:last-child { margin-bottom: 0; }
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gl-text);
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: var(--gl-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--gl-text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  box-sizing: border-box;
+}
+
+.form-control::placeholder { color: rgba(255, 255, 255, 0.15); }
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--gl-accent);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-error {
+  margin-top: 0.4rem;
+  color: #fb7185;
+  font-size: 0.78rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.form-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--gl-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.form-actions .btn-primary {
+  background: linear-gradient(135deg, var(--gl-accent), var(--gl-cyan));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.2);
+}
+
+.form-actions .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+}
+
+.form-actions .btn-ghost {
+  background: transparent;
+  color: var(--gl-muted);
+}
+
+.form-actions .btn-ghost:hover {
+  color: var(--gl-text);
+}
+
+/* ============================================
+   Global Buttons (page-level, outside cards)
+   ============================================ */
+
+.goal-page .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--gl-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.goal-page .btn-primary {
+  background: linear-gradient(135deg, var(--gl-accent), var(--gl-cyan));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.2);
+}
+
+.goal-page .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(34, 197, 94, 0.35);
+}
+
+.goal-page .btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}
+
+.goal-page .btn-ghost {
+  background: transparent;
+  color: var(--gl-muted);
+  border: 1px solid transparent;
+}
+
+.goal-page .btn-ghost:hover {
+  color: var(--gl-text);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================
+   Page Transitions & Loading
+   ============================================ */
+
+.goal-page {
+  animation: pageFadeIn 0.4s ease;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Skeleton loading placeholder */
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.03) 25%,
+    rgba(255,255,255,0.06) 50%,
+    rgba(255,255,255,0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+
+.goal-page ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.goal-page ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.goal-page ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.goal-page ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================
+   Focus & Accessibility
+   ============================================ */
+
+.goal-page *:focus-visible {
+  outline: 2px solid var(--gl-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================
+   Form Validation States
+   ============================================ */
+
+.form-control.error,
+.form-control:user-invalid {
+  border-color: #fb7185;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.form-control.success,
+.form-control:user-valid {
+  border-color: var(--gl-accent);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.08);
+}
+
+/* ============================================
+   Goal Card Status Variants
+   ============================================ */
+
+.goal-card.completed {
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.goal-card.completed .goal-progress-fill {
+  background: linear-gradient(90deg, var(--gl-accent), #4ade80);
+}
+
+.goal-card.at-risk {
+  border-color: rgba(251, 191, 36, 0.2);
+}
+
+.goal-card.at-risk .goal-progress-fill {
+  background: linear-gradient(90deg, #fbbf24, #fb923c);
+}
+
+/* ============================================
+   Tooltip
+   ============================================ */
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #1e293b;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--gl-text);
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* ============================================
+   Empty State Enhancements
+   ============================================ */
+
+.goal-empty {
+  position: relative;
+  overflow: hidden;
+}
+
+.goal-empty::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(34,197,94,0.02) 0%, transparent 60%);
+  animation: emptyBreath 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes emptyBreath {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* ============================================
+   Card Responsive Enhancements
+   ============================================ */
+
+@media (hover: hover) {
+  .goal-card {
+    cursor: default;
+  }
+}
+
+@media (max-width: 480px) {
+  .goal-card-actions { flex-direction: column; }
+  .goal-card-actions .btn { width: 100%; }
+  .goal-stats { grid-template-columns: 1fr; }
+  .goal-empty { padding: 3rem 1.5rem; }
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.goal-card { animation: fadeInUp 0.4s ease both; }
+.goal-card:nth-child(1) { animation-delay: 0.02s; }
+.goal-card:nth-child(2) { animation-delay: 0.06s; }
+.goal-card:nth-child(3) { animation-delay: 0.1s; }
+.goal-card:nth-child(4) { animation-delay: 0.14s; }
+.goal-card:nth-child(5) { animation-delay: 0.18s; }
+.goal-card:nth-child(6) { animation-delay: 0.22s; }
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 860px) {
+  .goal-stats { grid-template-columns: 1fr; gap: 0.75rem; }
+  .goal-radio-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .goal-page .page-head { flex-direction: column; align-items: flex-start; }
+  .goals-grid { grid-template-columns: 1fr; }
+  .goal-form-card { padding: 1.5rem; }
+}

@@ -1,13 +1,25 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'progress/css/progress.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Log Exercise: {{ exercise.name }}</h1>
-  <p class="text-muted">Record your performance for this exercise.</p>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-primary" type="submit">Save</button>
-    <a class="btn btn-secondary" href="{% url 'exercise-detail' exercise.slug %}">Cancel</a>
-  </form>
+<section class="container py-5 progress-page">
+  <div class="pr-form-wrap">
+    <div class="pr-form-card">
+      <div class="page-header">
+        <h1>Log: {{ exercise.name }}</h1>
+        <p>Record your performance for this exercise</p>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="pr-form-actions">
+          <button class="btn btn-primary" type="submit">💾 Save</button>
+          <a class="btn btn-secondary" href="{% url 'exercise-detail' exercise.slug %}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </section>
 {% endblock %}

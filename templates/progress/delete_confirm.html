@@ -1,12 +1,28 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'progress/css/progress.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <h1>Delete Progress Record</h1>
-  <p>Are you sure you want to delete the progress record for {{ record.date }}?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button class="btn btn-danger" type="submit">Delete</button>
-    <a class="btn btn-secondary" href="{% url 'progress' %}">Cancel</a>
-  </form>
+<section class="container py-5 progress-page">
+  <div class="pr-form-wrap">
+    <div class="pr-form-card">
+      <div class="page-header">
+        <h1>Delete Record</h1>
+        <p>This action cannot be undone</p>
+      </div>
+      <div class="delete-warning">
+        <div class="icon">⚠️</div>
+        <p>Are you sure you want to delete the progress record for <strong>{{ record.date }}</strong>?</p>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="pr-form-actions" style="justify-content: center;">
+          <button class="btn btn-danger" type="submit">🗑️ Delete</button>
+          <a class="btn btn-secondary" href="{% url 'progress' %}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </section>
 {% endblock %}
