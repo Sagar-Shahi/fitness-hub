@@ -1,0 +1,134 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'diet/css/diet.css' %}">
+{% endblock %}
+{% block content %}
+<section class="diet-page">
+  <div class="page-head">
+    <div>
+      <nav class="breadcrumbs">
+        <a href="{% url 'diet' %}">Diet</a>
+        <span class="sep">/</span>
+        <span>Food Tracker</span>
+      </nav>
+      <h1>Affordable Food Tracker</h1>
+      <p class="lead">Build a meal by clicking foods. Totals update live.</p>
+    </div>
+    <div class="page-head-actions">
+      <a class="btn btn-secondary" href="{% url 'diet' %}">Back to Diet</a>
+      <a class="btn btn-primary" href="{% url 'diet-budget-meals' %}">Budget Meals</a>
+    </div>
+  </div>
+
+  <div class="foods-summary">
+    <div class="summary-stat calories">
+      <span class="stat-label">Calories</span>
+      <span class="stat-value" id="total-calories">0</span>
+    </div>
+    <div class="summary-stat protein">
+      <span class="stat-label">Protein</span>
+      <span class="stat-value" id="total-protein">0<span class="stat-unit">g</span></span>
+    </div>
+    <div class="summary-stat carbs">
+      <span class="stat-label">Carbs</span>
+      <span class="stat-value" id="total-carbs">0<span class="stat-unit">g</span></span>
+    </div>
+    <div class="summary-stat fats">
+      <span class="stat-label">Fats</span>
+      <span class="stat-value" id="total-fats">0<span class="stat-unit">g</span></span>
+    </div>
+    <div class="summary-stat cost">
+      <span class="stat-label">Cost</span>
+      <span class="stat-value" id="total-cost">NRS 0.00</span>
+    </div>
+  </div>
+
+  {% for category, items in foods.items %}
+  <div class="foods-category">
+    <h2 class="foods-category-title">{{ category|title }}</h2>
+    <div class="foods-grid">
+      {% for food in items %}
+      <button type="button" class="food-card"
+              onclick="addFood('{{ food.name }}', {{ food.protein }}, {{ food.carbs }}, {{ food.fats }}, {{ food.calories }}, {{ food.cost }})">
+        <div class="food-card-head">
+          <span class="food-name">{{ food.name }}</span>
+          <span class="food-cost">NRS {{ food.cost|floatformat:2 }}</span>
+        </div>
+        <div class="food-serving">{{ food.serving }}</div>
+        <div class="food-macros">
+          <span class="macro-pill protein">P {{ food.protein|floatformat:1 }}g</span>
+          <span class="macro-pill carbs">C {{ food.carbs|floatformat:1 }}g</span>
+          <span class="macro-pill fats">F {{ food.fats|floatformat:1 }}g</span>
+          <span class="macro-pill cal">{{ food.calories }} kcal</span>
+        </div>
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="logged-foods">
+    <div class="logged-head">
+      <h2>Today's Log</h2>
+      <button type="button" class="btn btn-ghost" id="clearBtn" onclick="clearLog()">Clear</button>
+    </div>
+    <div id="food-log" class="food-log-list">
+      <div class="log-empty">No foods logged yet. Click any food above to add it.</div>
+    </div>
+  </div>
+</section>
+
+<script>
+let dailyLog = [];
+
+function addFood(name, protein, carbs, fats, calories, cost) {
+    dailyLog.push({name, protein, carbs, fats, calories, cost});
+    updateTotals();
+    updateLog();
+}
+
+function removeFood(idx) {
+    dailyLog.splice(idx, 1);
+    updateTotals();
+    updateLog();
+}
+
+function clearLog() {
+    dailyLog = [];
+    updateTotals();
+    updateLog();
+}
+
+function updateTotals() {
+    let totals = {protein: 0, carbs: 0, fats: 0, calories: 0, cost: 0};
+    dailyLog.forEach(food => {
+        totals.protein += food.protein;
+        totals.carbs += food.carbs;
+        totals.fats += food.fats;
+        totals.calories += food.calories;
+        totals.cost += food.cost;
+    });
+    document.getElementById('total-protein').firstChild.textContent = totals.protein.toFixed(1);
+    document.getElementById('total-carbs').firstChild.textContent = totals.carbs.toFixed(1);
+    document.getElementById('total-fats').firstChild.textContent = totals.fats.toFixed(1);
+    document.getElementById('total-calories').textContent = Math.round(totals.calories);
+    document.getElementById('total-cost').textContent = 'NRS ' + totals.cost.toFixed(2);
+}
+
+function updateLog() {
+    const logDiv = document.getElementById('food-log');
+    if (dailyLog.length === 0) {
+        logDiv.innerHTML = '<div class="log-empty">No foods logged yet. Click any food above to add it.</div>';
+        return;
+    }
+    logDiv.innerHTML = dailyLog.map((food, idx) => `
+        <div class="log-entry">
+            <span class="log-name">${food.name}</span>
+            <span class="log-macros">${food.protein.toFixed(1)}P / ${food.carbs.toFixed(1)}C / ${food.fats.toFixed(1)}F / ${Math.round(food.calories)} cal / NRS ${food.cost.toFixed(2)}</span>
+            <button onclick="removeFood(${idx})" class="btn-icon danger" type="button">Remove</button>
+        </div>
+    `).join('');
+}
+</script>
+{% endblock %}

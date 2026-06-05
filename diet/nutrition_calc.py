@@ -53,7 +53,12 @@ PROTEIN_PER_KG = {
 }
 
 
-def calculate_bmr(weight_kg: float, height_cm: float, age: int, sex: str) -> float:
+FT_TO_CM = 30.48
+
+
+def calculate_bmr(weight_kg: float, height_ft: float, age: int, sex: str) -> float:
+    """Mifflin-St Jeor BMR using kg + cm (height is converted from feet)."""
+    height_cm = float(height_ft) * FT_TO_CM
     if sex == 'male':
         return 88.362 + (13.397 * weight_kg) + (4.799 * height_cm) - (5.677 * age)
     return 447.593 + (9.247 * weight_kg) + (3.098 * height_cm) - (4.330 * age)
@@ -87,27 +92,27 @@ def calculate_macros(target_calories: int, weight_kg: float, body_type: str, goa
     }
 
 
-def generate_nutrition_plan(profile, weight_kg: Optional[float] = None, height_cm: Optional[float] = None,
+def generate_nutrition_plan(profile, weight_kg: Optional[float] = None, height_ft: Optional[float] = None,
                             age: Optional[int] = None, sex: Optional[str] = None,
                             activity_level: Optional[str] = None, goal: Optional[str] = None) -> Dict[str, Any]:
     weight_kg = weight_kg or getattr(profile, 'weight_kg', None)
-    height_cm = height_cm or getattr(profile, 'height_cm', None)
+    height_ft = height_ft or getattr(profile, 'height_ft', None)
     age = age or getattr(profile, 'age', None)
     sex = sex or getattr(profile, 'gender', 'male')
     activity_level = activity_level or getattr(profile, 'activity_level', 'moderate')
     goal = goal or getattr(profile, 'selected_goal', 'general')
 
-    if not all([weight_kg, height_cm, age]):
+    if not all([weight_kg, height_ft, age]):
         return {
             'ready': False,
             'error': 'Please complete your profile with age, weight, and height to get a nutrition plan.',
         }
 
     weight_kg = float(weight_kg)
-    height_cm = float(height_cm)
+    height_ft = float(height_ft)
     age = int(age)
 
-    bmr = calculate_bmr(weight_kg, height_cm, age, sex)
+    bmr = calculate_bmr(weight_kg, height_ft, age, sex)
     tdee = calculate_tdee(bmr, activity_level)
     target_calories = calculate_target_calories(tdee, goal)
 
@@ -123,9 +128,10 @@ def generate_nutrition_plan(profile, weight_kg: Optional[float] = None, height_c
     goal_name = goal.replace('_', ' ').title() if goal else 'Maintenance'
     activity_name = ACTIVITY_LABELS.get(activity_level, activity_level.title())
 
+    height_cm = round(height_ft * FT_TO_CM, 1)
     notes = (
         f"Targets calculated for a {age}-year-old {sex} ({body_type_name}) at "
-        f"{weight_kg} kg, {height_cm} cm, {activity_name.lower()}, "
+        f"{weight_kg} kg, {height_ft} ft ({height_cm} cm), {activity_name.lower()}, "
         f"with a {goal_name} goal. "
         f"BMR: {int(round(bmr))} kcal -> TDEE: {int(round(tdee))} kcal -> "
         f"Target: {target_calories} kcal. "

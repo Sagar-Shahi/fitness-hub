@@ -6,12 +6,15 @@
 {% block content %}
 <section class="store-page">
   <div class="page-head">
-    <div>
-      <h1>My Orders</h1>
-      <p class="lead">Track and review your past purchases.</p>
+    <div class="page-head-text">
+      <span class="icon-badge is-violet">📦</span>
+      <div>
+        <h1>My Orders</h1>
+        <p class="lead">Track and review your past purchases.</p>
+      </div>
     </div>
     <div class="page-head-actions">
-      <a class="btn btn-secondary" href="{% url 'store-home' %}">Continue Shopping</a>
+      <a class="btn btn-secondary" href="{% url 'store-home' %}"><span class="icon-inline">⬅</span>Continue Shopping</a>
     </div>
   </div>
 
@@ -21,7 +24,7 @@
     <a class="order-card" href="{% url 'order-detail' order.order_number %}">
       <div class="order-card-head">
         <div>
-          <span class="order-number">{{ order.order_number }}</span>
+          <span class="order-number">📦 {{ order.order_number }}</span>
           <span class="order-date">{{ order.created_at|date:"M j, Y" }}</span>
         </div>
         <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
@@ -44,7 +47,7 @@
           </div>
           <div class="order-info-row">
             <span class="label">Total</span>
-            <span class="order-total">${{ order.total }}</span>
+            <span class="order-total">NRS {{ order.total }}</span>
           </div>
         </div>
         <span class="order-arrow">→</span>
@@ -54,10 +57,10 @@
   </div>
   {% else %}
   <div class="empty-state">
-    <div class="empty-icon">📦</div>
+    <span class="icon-badge is-violet size-xl">📦</span>
     <h2>No orders yet</h2>
     <p>When you place an order, it will appear here.</p>
-    <a class="btn btn-primary" href="{% url 'store-home' %}">Start Shopping</a>
+    <a class="btn btn-primary" href="{% url 'store-home' %}"><span class="icon-inline">🛍</span>Start Shopping</a>
   </div>
   {% endif %}
 </section>

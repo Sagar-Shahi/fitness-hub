@@ -1,75 +1,178 @@
 {% extends 'layout/base.html' %}
+{% load static %}
 {% block content %}
+
+{% if not user.is_authenticated %}
+
 <section class="hero-section">
-    <div class="container hero-content">
-        <div>
-            <p class="eyebrow">Welcome to Fitness Hub</p>
-            <h1>Train smarter, eat better, and feel your best.</h1>
-            <p class="hero-text">Discover workouts, inspiration, healthy shopping, and guided routines built for every fitness goal.</p>
-            <div class="hero-actions">
-                {% if user.is_authenticated %}
-                    <a class="button button-primary" href="{% url 'dashboard' %}">Go to Dashboard</a>
-                {% else %}
-                    <a class="button button-primary" href="{% url 'login' %}">Login</a>
-                    <a class="button button-secondary" href="{% url 'register' %}">Get Started</a>
-                {% endif %}
-            </div>
-        </div>
-        <div class="hero-visual">
-            <div class="feature-card">
-                <h2>Fitness Made Easy</h2>
-                <p>Track workouts, access expert tips, and find gear that supports your progress.</p>
-            </div>
-        </div>
+  <div class="container hero-content">
+    <div>
+      <span class="eyebrow"><span class="icon-inline">🏠</span> Welcome to Fitness Hub</span>
+      <h1>Train smarter. Eat better. Feel your best.</h1>
+      <p class="hero-text">
+        A complete fitness portal with a real workout library, clinical nutrition targets,
+        progress tracking, an honest gear store, and daily inspiration from the athletes
+        who shaped the sport.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-primary button-lg" href="{% url 'register' %}">Create your account</a>
+        <a class="button button-secondary button-lg" href="{% url 'login' %}">Sign in</a>
+      </div>
+      <p class="hero-text" style="margin-top:1rem; font-size:0.9rem; color: var(--text-mute);">
+        No credit card. No install. Works on every device.
+      </p>
     </div>
+    <div class="hero-visual">
+      <div class="feature-card">
+        <span class="eyebrow"><span class="icon-inline">📦</span> What you get on day one</span>
+        <h2>One portal. Six systems.</h2>
+        <p>Workouts, nutrition, progress, shopping, records, and inspiration — built to actually fit together.</p>
+        <div class="feature-card-stat">
+          <div><span>36</span><span><span class="icon-inline">🏋️</span>Workouts</span></div>
+          <div><span>13</span><span><span class="icon-inline">🔥</span>Icons</span></div>
+          <div><span>55+</span><span><span class="icon-inline">💬</span>Quotes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-{% if user.is_authenticated %}
-<section class="dashboard-grid container">
-    <article class="dashboard-card">
-        <h3>Workouts</h3>
-        <p>Browse workouts and follow training plans built for every fitness level.</p>
-        <a class="button button-primary" href="{% url 'exercise-list' %}">Browse Workouts</a>
+<section class="container">
+  <div class="section-head-with-icon">
+    <span class="icon-badge is-mint">🧭</span>
+    <h2>Everything you need in one place</h2>
+  </div>
+  <div class="feature-grid fh-anim-in">
+    <article>
+      <div class="feature-icon">🏋️</div>
+      <h3>Workouts</h3>
+      <p>36 guided exercises across strength, hypertrophy, mobility, and cardio — auto-ranked against your active goal.</p>
     </article>
-    <article class="dashboard-card">
-        <h3>Workout Records</h3>
-        <p>See your recent workouts and track progress from every session.</p>
-        <a class="button button-primary" href="{% url 'exercise-records' %}">View Records</a>
+    <article>
+      <div class="feature-icon">🥗</div>
+      <h3>Diet Planner</h3>
+      <p>Clinical-grade BMR / TDEE targets, macro split, food tracker, and a 1-click budget meal generator.</p>
     </article>
-    <article class="dashboard-card">
-        <h3>Nutrition Plan</h3>
-        <p>Get personalized meal and calorie recommendations for your fitness goals.</p>
-        <a class="button button-primary" href="{% url 'nutrition-calculator' %}">Calculate Plan</a>
+    <article>
+      <div class="feature-icon">📈</div>
+      <h3>Progress</h3>
+      <p>Log workouts, weigh-ins, and measurements. Watch weekly volume and streaks move in real time.</p>
     </article>
+    <article>
+      <div class="feature-icon">🛒</div>
+      <h3>Store</h3>
+      <p>Outfits, gear, and supplements from real brands. Cart, checkout, and order history included.</p>
+    </article>
+    <article>
+      <div class="feature-icon">🔥</div>
+      <h3>Inspiration</h3>
+      <p>Daily quote, athlete profiles, training principles, and videos from the people who built the sport.</p>
+    </article>
+    <article>
+      <div class="feature-icon">⚙️</div>
+      <h3>Settings</h3>
+      <p>Change your username, password, and account details whenever you need to. Email-based recovery.</p>
+    </article>
+  </div>
+
+  <section class="mission-section">
+    <div class="mission-text">
+      <span class="eyebrow"><span class="icon-inline">🛡</span> Our promise</span>
+      <h2>Move with purpose</h2>
+      <p>Fitness Hub is built for the people who actually train. No filler content, no fake promises — just a portal that does the boring stuff so you can do the work.</p>
+      <ul>
+        <li><span class="icon-inline">🏋️</span>Real workout library</li>
+        <li><span class="icon-inline">📊</span>Clinical nutrition math</li>
+        <li><span class="icon-inline">📈</span>Honest progress tracking</li>
+        <li><span class="icon-inline">🛒</span>Curated gear, no junk</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="public-cta-band">
+    <h2><span class="icon-inline">🚀</span>Ready to start?</h2>
+    <p>Two minutes to set up. Free forever for personal use. Your data stays on your account.</p>
+    <div class="hero-actions">
+      <a class="button button-primary button-lg" href="{% url 'register' %}">Create your account</a>
+      <a class="button button-ghost button-lg" href="{% url 'login' %}">I already have one</a>
+    </div>
+  </div>
 </section>
+
+{% else %}
+
+<section class="hero-section">
+  <div class="container hero-content">
+    <div>
+      <span class="eyebrow"><span class="icon-inline">👋</span> {% now "l, F j" %}</span>
+      <h1>Welcome back, {{ user.first_name|default:user.username }}.</h1>
+      <p class="hero-text">Pick up where you left off. Your goals, records, and today's recommendation are all in one place.</p>
+      <div class="hero-actions">
+        <a class="button button-primary button-lg" href="{% url 'dashboard' %}"><span class="icon-inline">📊</span>Open dashboard</a>
+        <a class="button button-secondary button-lg" href="{% url 'exercise-list' %}"><span class="icon-inline">🏋️</span>Browse workouts</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="feature-card">
+        <span class="eyebrow"><span class="icon-inline">⚡</span> Quick links</span>
+        <h2>Jump back in</h2>
+        <p>Shortcuts to the screens you open most often.</p>
+        <div class="feature-card-stat" style="display:flex; flex-direction:column; gap:0.5rem; align-items:stretch;">
+          <a class="button button-secondary button-sm" href="{% url 'exercise-list' %}"><span class="icon-inline">🏋️</span>Workouts</a>
+          <a class="button button-secondary button-sm" href="{% url 'exercise-records' %}"><span class="icon-inline">📋</span>Records</a>
+          <a class="button button-secondary button-sm" href="{% url 'diet' %}"><span class="icon-inline">🥗</span>Diet</a>
+          <a class="button button-secondary button-sm" href="{% url 'inspiration-feed' %}"><span class="icon-inline">🔥</span>Inspiration</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <div class="section-head-with-icon">
+    <span class="icon-badge is-mint">🧭</span>
+    <h2>Your portal</h2>
+  </div>
+  <div class="feature-grid fh-anim-in">
+    <a class="dashboard-card" href="{% url 'exercise-list' %}">
+      <div class="feature-icon">🏋️</div>
+      <h3>Workouts</h3>
+      <p>36 exercises ranked against your active goal. One tap to mark complete.</p>
+      <span class="button button-secondary button-sm" style="margin-top:0.85rem;">Browse</span>
+    </a>
+    <a class="dashboard-card" href="{% url 'exercise-records' %}">
+      <div class="feature-icon">📋</div>
+      <h3>Records</h3>
+      <p>See your sessions grouped by day, with reps, hold time, and calories per exercise.</p>
+      <span class="button button-secondary button-sm" style="margin-top:0.85rem;">View records</span>
+    </a>
+    <a class="dashboard-card" href="{% url 'diet' %}">
+      <div class="feature-icon">🥗</div>
+      <h3>Diet Planner</h3>
+      <p>BMR / TDEE, macros, food tracker, and budget meals tailored to your body.</p>
+      <span class="button button-secondary button-sm" style="margin-top:0.85rem;">Open diet</span>
+    </a>
+    <a class="dashboard-card" href="{% url 'store-home' %}">
+      <div class="feature-icon">🛒</div>
+      <h3>Store</h3>
+      <p>Outfits, gear, and supplements. Cart, checkout, and order history included.</p>
+      <span class="button button-secondary button-sm" style="margin-top:0.85rem;">Visit store</span>
+    </a>
+    <a class="dashboard-card" href="{% url 'inspiration-feed' %}">
+      <div class="feature-icon">🔥</div>
+      <h3>Inspiration</h3>
+      <p>Daily quote, 13 real icons, training principles, and videos worth watching.</p>
+      <span class="button button-secondary button-sm" style="margin-top:0.85rem;">Get inspired</span>
+    </a>
+    <a class="dashboard-card" href="{% url 'settings-hub' %}">
+      <div class="feature-icon">⚙️</div>
+      <h3>Settings</h3>
+      <p>Change your username, password, and account details any time.</p>
+      <span class="button button-secondary button-sm" style="margin-top:0.85rem;">Settings</span>
+    </a>
+  </div>
+</section>
+
 {% endif %}
 
-<section class="feature-grid container">
-    <article>
-        <h3>Workouts</h3>
-        <p>Browse structured exercise routines, mobility drills, and strength sessions for every level.</p>
-    </article>
-    <article>
-        <h3>Inspiration</h3>
-        <p>Stay motivated with fresh content, wellness ideas, and community stories from our hub.</p>
-    </article>
-    <article>
-        <h3>Nutrition</h3>
-        <p>Find healthy recipes, smart meal ideas, and simple habits that support your fitness journey.</p>
-    </article>
-</section>
-
-<section class="mission-section">
-    <div class="container">
-        <div class="mission-text">
-            <h2>Move with purpose</h2>
-            <p>Fitness Hub is designed for everyone who wants to make consistent progress. Whether you're just starting or already training hard, everything you need is in one place.</p>
-            <ul>
-                <li>Daily training ideas</li>
-                <li>Nutrition and recovery support</li>
-                <li>Motivation and community energy</li>
-            </ul>
-        </div>
-    </div>
-</section>
 {% endblock %}

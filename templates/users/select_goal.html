@@ -1,12 +1,19 @@
 {% extends 'layout/base.html' %}
 {% block content %}
 <section class="container py-5">
-  <h1>Select Your Fitness Goal</h1>
-  <p class="text-muted">Choose the goal you'd like to focus on and update your body type. This will refresh the exercises and progress tracking for that goal.</p>
+  <div class="page-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-amber">🎯</span>
+      <div>
+        <h1>Select Your Fitness Goal</h1>
+        <p class="text-muted">Choose the goal you'd like to focus on and update your body type. This will refresh the exercises and progress tracking for that goal.</p>
+      </div>
+    </div>
+  </div>
   <form method="post">
     {% csrf_token %}
     <div class="goal-selection-group">
-      <h3>Select Your Goal</h3>
+      <h3><span class="icon-inline">🎯</span>Select Your Goal</h3>
       {% for radio in form.selected_goal %}
         <label class="radio-button">
           {{ radio.tag }} {{ radio.choice_label }}
@@ -14,7 +21,7 @@
       {% endfor %}
     </div>
     <div class="goal-selection-group mt-3">
-      <h3>Any specific focus area?</h3>
+      <h3><span class="icon-inline">🔍</span>Any specific focus area?</h3>
       {% for radio in form.goal_focus %}
         <label class="radio-button">
           {{ radio.tag }} {{ radio.choice_label }}
@@ -22,15 +29,15 @@
       {% endfor %}
     </div>
     <div class="goal-selection-group mt-3">
-      <h3>Body Type</h3>
+      <h3><span class="icon-inline">🧍</span>Body Type</h3>
       {% for radio in form.body_type %}
         <label class="radio-button">
           {{ radio.tag }} {{ radio.choice_label }}
         </label>
       {% endfor %}
     </div>
-    <button class="btn btn-primary" type="submit">Save Goal</button>
-    <a class="btn btn-secondary" href="{% url 'profile' %}">Cancel</a>
+    <button class="btn btn-primary" type="submit"><span class="icon-inline">💾</span>Save Goal</button>
+    <a class="btn btn-secondary" href="{% url 'profile' %}"><span class="icon-inline">⬅</span>Cancel</a>
   </form>
 </section>
 {% endblock %}

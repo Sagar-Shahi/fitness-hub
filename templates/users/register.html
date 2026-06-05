@@ -1,53 +1,93 @@
 {% extends 'layout/base.html' %}
 {% block content %}
-<section class="auth-page container">
-    <div class="auth-card">
-        <h1>Create your Fitness Hub account</h1>
-        {% if messages %}
-            <div class="alert alert-info">
-                {% for message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-        <form method="post" novalidate>
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="id_username">Username</label>
-                {{ form.username }}
-            </div>
-            <div class="form-group">
-                <label for="id_password1">Password</label>
-                {{ form.password1 }}
-            </div>
-            <div class="form-group">
-                <label for="id_password2">Confirm Password</label>
-                {{ form.password2 }}
-            </div>
-            <div class="form-group">
-                <label for="id_age">Age</label>
-                {{ form.age }}
-            </div>
-            <div class="form-group">
-                <label for="id_height_cm">Height (cm)</label>
-                {{ form.height_cm }}
-            </div>
-            <div class="form-group">
-                <label for="id_weight_kg">Weight (kg)</label>
-                {{ form.weight_kg }}
-            </div>
-            <div class="profile-actions">
-                <button class="button button-primary" type="submit">Sign Up</button>
-                <a class="button button-secondary" href="{% url 'login' %}">Login</a>
-            </div>
-            {% if form.errors %}
-            <div class="alert alert-danger mt-3">
-                {{ form.errors }}
-            </div>
-            {% endif %}
-        </form>
-        <p class="auth-help">Already have an account? <a href="{% url 'login' %}">Login</a>.</p>
-    </div>
-</section>
+<section class="auth-page">
+  <aside class="auth-side">
+    <div class="auth-side-inner">
+      <a class="brand" href="{% url 'home' %}" style="margin-bottom:0.5rem;">
+        <span class="brand-mark">F</span>
+        <span class="brand-text">Fitness <strong>Hub</strong></span>
+      </a>
+      <span class="eyebrow">Create your account</span>
+      <h1>Two minutes now, better training forever.</h1>
+      <p>Set up a profile, pick a goal, and the portal will tune itself to what you're trying to do.</p>
 
+      <div class="auth-side-stats">
+        <div class="auth-side-stat">
+          <div class="auth-side-stat-num">Free</div>
+          <div class="auth-side-stat-label">Personal use</div>
+        </div>
+        <div class="auth-side-stat">
+          <div class="auth-side-stat-num">2 min</div>
+          <div class="auth-side-stat-label">To set up</div>
+        </div>
+        <div class="auth-side-stat">
+          <div class="auth-side-stat-num">6</div>
+          <div class="auth-side-stat-label">Goal types</div>
+        </div>
+      </div>
+
+      <div class="auth-side-quote">
+        “The pain you feel today is the strength you feel tomorrow.”
+        <span class="auth-side-quote-author">— Arnold Schwarzenegger</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="auth-form-side">
+    <div class="auth-form-inner">
+      <h2>Create your account</h2>
+      <p class="auth-sub">Username, password, and a few quick stats so we can tailor the portal to you.</p>
+
+      {% if form.errors %}
+        <div class="alert alert-error">Please correct the fields below.</div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="id_username">Username</label>
+          {{ form.username }}
+          {% if form.username.help_text %}<p class="help-text">{{ form.username.help_text }}</p>{% endif %}
+          {{ form.username.errors }}
+        </div>
+        <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label for="id_password1">Password</label>
+            {{ form.password1 }}
+            {% if form.password1.help_text %}<p class="help-text">{{ form.password1.help_text|safe }}</p>{% endif %}
+            {{ form.password1.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_password2">Confirm</label>
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+          </div>
+        </div>
+        <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label for="id_age">Age</label>
+            {{ form.age }}
+            {{ form.age.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_height_ft">Height (ft)</label>
+            {{ form.height_ft }}
+            {% if form.height_ft.help_text %}<small class="form-help">{{ form.height_ft.help_text }}</small>{% endif %}
+            {{ form.height_ft.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_weight_kg">Weight (kg)</label>
+            {{ form.weight_kg }}
+            {{ form.weight_kg.errors }}
+          </div>
+        </div>
+        <button class="button button-primary button-block button-lg" type="submit">Create account</button>
+      </form>
+
+      <div class="form-divider">or</div>
+
+      <p class="auth-help">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+    </div>
+  </div>
+</section>
 {% endblock %}

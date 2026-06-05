@@ -6,14 +6,17 @@
 {% block content %}
 <section class="store-page">
   <div class="page-head">
-    <div>
-      <nav class="breadcrumbs">
-        <a href="{% url 'order-history' %}">My Orders</a>
-        <span class="sep">/</span>
-        <span>{{ order.order_number }}</span>
-      </nav>
-      <h1>Order {{ order.order_number }}</h1>
-      <p class="lead">Placed on {{ order.created_at|date:"F j, Y \a\t g:i A" }}</p>
+    <div class="page-head-text">
+      <span class="icon-badge is-violet">📦</span>
+      <div>
+        <nav class="breadcrumbs">
+          <a href="{% url 'order-history' %}">My Orders</a>
+          <span class="sep">/</span>
+          <span>{{ order.order_number }}</span>
+        </nav>
+        <h1>Order {{ order.order_number }}</h1>
+        <p class="lead">Placed on {{ order.created_at|date:"F j, Y \a\t g:i A" }}</p>
+      </div>
     </div>
     <div class="page-head-actions">
       <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
@@ -33,7 +36,7 @@
         {% endfor %}
       </div>
 
-      <h2>Items in this Order</h2>
+      <h2><span class="icon-inline">🛍</span>Items in this Order</h2>
       <div class="order-items">
         {% for item in order.items.all %}
         <div class="order-item">
@@ -49,23 +52,21 @@
             {% if item.product %}
               <p class="item-brand">{{ item.product.brand|default:item.product.category.name }}</p>
             {% endif %}
-            <p class="item-qty">Quantity: {{ item.quantity }} × ${{ item.product_price }}</p>
-          </div>
-          <div class="order-item-total">${{ item.line_total }}</div>
+            <p class="item-qty">Quantity: {{ item.quantity }} × NRS {{ item.product_price }}</p>
+
+          <div class="order-item-total">NRS {{ item.line_total }}</div>
         </div>
-        {% endfor %}
-      </div>
+      {% endfor %}
     </div>
 
-    <aside class="order-detail-summary">
-      <h2>Order Summary</h2>
-      <div class="order-summary-row"><span class="label">Subtotal</span><span class="value">${{ order.subtotal }}</span></div>
-      <div class="order-summary-row"><span class="label">Shipping</span><span class="value">${{ order.shipping_cost }}</span></div>
-      <div class="order-summary-row"><span class="label">Tax</span><span class="value">${{ order.tax }}</span></div>
+    <aside class="order-summary">
+      <div class="order-summary-row"><span class="label">Subtotal</span><span class="value">NRS {{ order.subtotal }}</span></div>
+      <div class="order-summary-row"><span class="label"><span class="icon-inline">🚚</span>Shipping</span><span class="value">NRS {{ order.shipping_cost }}</span></div>
+      <div class="order-summary-row"><span class="label"><span class="icon-inline">🏛</span>Tax</span><span class="value">NRS {{ order.tax }}</span></div>
       <div class="order-summary-divider"></div>
-      <div class="order-summary-total"><span class="label">Total</span><span class="value">${{ order.total }}</span></div>
+      <div class="order-summary-total"><span class="label">Total</span><span class="value">NRS {{ order.total }}</span></div>
 
-      <h3 style="margin-top: 2rem;">Shipping Address</h3>
+      <h3 style="margin-top: 2rem;"><span class="icon-inline">🏠</span>Shipping Address</h3>
       <div class="address-card">
         <strong>{{ order.full_name }}</strong>
         <p>{{ order.address }}<br>
@@ -77,11 +78,11 @@
         </p>
       </div>
 
-      <h3 style="margin-top: 1.5rem;">Payment</h3>
+      <h3 style="margin-top: 1.5rem;"><span class="icon-inline">💳</span>Payment</h3>
       <p style="color: var(--store-text-dim); font-size: 0.9rem;">{{ order.get_payment_method_display }}</p>
 
       {% if order.notes %}
-      <h3 style="margin-top: 1.5rem;">Notes</h3>
+      <h3 style="margin-top: 1.5rem;"><span class="icon-inline">📝</span>Notes</h3>
       <p style="color: var(--store-text-dim); font-size: 0.9rem;">{{ order.notes }}</p>
       {% endif %}
     </aside>

@@ -6,12 +6,15 @@
 {% block content %}
 <section class="store-page">
   <div class="page-head">
-    <div>
-      <h1>Checkout</h1>
-      <p class="lead">Complete your order below.</p>
+    <div class="page-head-text">
+      <span class="icon-badge is-cyan">💳</span>
+      <div>
+        <h1>Checkout</h1>
+        <p class="lead">Complete your order below.</p>
+      </div>
     </div>
     <div class="page-head-actions">
-      <a class="btn btn-secondary" href="{% url 'view-cart' %}">← Back to Cart</a>
+      <a class="btn btn-secondary" href="{% url 'view-cart' %}"><span class="icon-inline">⬅</span>Back to Cart</a>
     </div>
   </div>
 
@@ -19,7 +22,7 @@
     {% csrf_token %}
     <div class="checkout-main">
       <section class="checkout-section">
-        <h2><span class="step-num">1</span> Contact Information</h2>
+        <h2><span class="step-num is-emoji">📇</span> Contact Information</h2>
         <div class="form-grid">
           <div class="form-field form-field-full">
             <label for="{{ form.full_name.id_for_label }}">Full Name *</label>
@@ -39,7 +42,7 @@
       </section>
 
       <section class="checkout-section">
-        <h2><span class="step-num">2</span> Shipping Address</h2>
+        <h2><span class="step-num is-emoji">🏠</span> Shipping Address</h2>
         <div class="form-grid">
           <div class="form-field form-field-full">
             <label for="{{ form.address.id_for_label }}">Street Address *</label>
@@ -70,7 +73,7 @@
       </section>
 
       <section class="checkout-section">
-        <h2><span class="step-num">3</span> Payment Method</h2>
+        <h2><span class="step-num is-emoji">💳</span> Payment Method</h2>
         <div class="form-field">
           <label for="{{ form.payment_method.id_for_label }}">Choose payment method</label>
           {{ form.payment_method }}
@@ -83,39 +86,39 @@
     </div>
 
     <aside class="checkout-summary">
-      <h2>Order Summary</h2>
+      <h2><span class="icon-inline">🧾</span>Order Summary</h2>
       <div class="checkout-items">
         {% for item in cart.items.all %}
         <div class="checkout-item">
           <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="checkout-item-img">
           <div class="checkout-item-info">
             <h4>{{ item.product.name }}</h4>
-            <p>Qty: {{ item.quantity }} × ${{ item.product.price }}</p>
+            <p>Qty: {{ item.quantity }} × NRS {{ item.product.price }}</p>
           </div>
-          <div class="checkout-item-total">${{ item.line_total }}</div>
+          <div class="checkout-item-total">NRS {{ item.line_total }}</div>
         </div>
         {% endfor %}
       </div>
       <div class="order-summary-divider"></div>
       <div class="order-summary-row">
         <span class="label">Subtotal</span>
-        <span class="value">${{ cart.subtotal }}</span>
+        <span class="value">NRS {{ cart.subtotal }}</span>
       </div>
       <div class="order-summary-row">
-        <span class="label">Shipping</span>
-        <span class="value">{% if cart.shipping == 0 %}<span class="ship-free">FREE</span>{% else %}${{ cart.shipping }}{% endif %}</span>
+        <span class="label"><span class="icon-inline">🚚</span>Shipping</span>
+        <span class="value">{% if cart.shipping == 0 %}<span class="ship-free">FREE</span>{% else %}NRS {{ cart.shipping }}{% endif %}</span>
       </div>
       <div class="order-summary-row">
-        <span class="label">Tax</span>
-        <span class="value">${{ cart.tax }}</span>
+        <span class="label"><span class="icon-inline">🏛</span>Tax</span>
+        <span class="value">NRS {{ cart.tax }}</span>
       </div>
       <div class="order-summary-divider"></div>
       <div class="order-summary-total">
         <span class="label">Total</span>
-        <span class="value">${{ cart.total }}</span>
+        <span class="value">NRS {{ cart.total }}</span>
       </div>
       <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;">
-        Place Order — ${{ cart.total }}
+        <span class="icon-inline">🔒</span>Place Order — NRS {{ cart.total }}
       </button>
       <p class="summary-note">By placing this order you agree to our terms and conditions.</p>
     </aside>

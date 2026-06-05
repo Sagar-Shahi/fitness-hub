@@ -37,11 +37,11 @@
 
       <div class="detail-price">
         {% if product.is_on_sale %}
-          <span class="price-current-lg">${{ product.price }}</span>
-          <span class="price-compare-lg">${{ product.compare_at_price }}</span>
-          <span class="price-save">Save ${{ product.compare_at_price|add:"-"|add:product.price }}</span>
+          <span class="price-compare-lg">NRS {{ product.compare_at_price }}</span>
+          <span class="price-save">Save NRS {{ product.compare_at_price|add:"-"|add:product.price }}</span>
+          <span class="price-current-lg">NRS {{ product.price }}</span>
         {% else %}
-          <span class="price-current-lg">${{ product.price }}</span>
+          <span class="price-current-lg">NRS {{ product.price }}</span>
         {% endif %}
       </div>
 
@@ -69,12 +69,12 @@
           </div>
         </div>
         <button type="submit" class="btn btn-primary btn-lg btn-block" {% if not product.in_stock %}disabled{% endif %}>
-          {% if product.in_stock %}Add to Cart — ${{ product.price }}{% else %}Sold Out{% endif %}
+          {% if product.in_stock %}Add to Cart — NRS {{ product.price }}{% else %}Sold Out{% endif %}
         </button>
       </form>
 
       <div class="detail-perks">
-        <div class="perk"><span>🚚</span><span>Free shipping over $50</span></div>
+        <div class="perk"><span>🚚</span><span>Free shipping over NRS 5000</span></div>
         <div class="perk"><span>↩️</span><span>30-day returns</span></div>
         <div class="perk"><span>🔒</span><span>Secure checkout</span></div>
       </div>
@@ -84,7 +84,7 @@
   {% if related %}
   <div class="store-section">
     <div class="section-head">
-      <h2>You may also like</h2>
+      <h2><span class="icon-inline">💡</span>You may also like</h2>
     </div>
     <div class="product-grid">
       {% for product in related %}

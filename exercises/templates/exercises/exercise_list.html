@@ -1,51 +1,98 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'exercises/css/exercises.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1>Workouts</h1>
-      <p class="text-muted">Browse available workouts and view details for each move.</p>
+<section class="exercises-page container">
+  <div class="exercises-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-mint">🏋️</span>
+      <div>
+        <h1 class="exercises-title"><span class="icon-inline">🏋️</span>Workout Library</h1>
+        <p class="exercises-subtitle">
+          {% if selected_goal == 'my_plan' %}
+            Browse the full library of {{ total_count }} exercises.
+          {% elif selected_goal %}
+            Showing <strong>{{ recommended_count }}</strong> exercises recommended for
+            <span class="goal-pill">{{ selected_goal|title }}</span>
+            out of {{ total_count }} total.
+          {% else %}
+            Browse {{ total_count }} exercises. <a href="{% url 'select-goal' %}" class="head-link">Set a goal</a> to see personalized recommendations.
+          {% endif %}
+        </p>
+      </div>
     </div>
-    <div>
-      {% if selected_goal == 'my_plan' %}
-        <span class="badge bg-info">My Plan: Showing all exercises</span>
-      {% elif selected_goal %}
-        <span class="badge bg-success">Recommended for {{ selected_goal|title }}</span>
-      {% endif %}
-    </div>
+    {% if user.is_authenticated %}
+      <div class="exercises-actions">
+        <a class="btn btn-outline-light btn-sm" href="{% url 'exercise-records' %}"><span class="icon-inline">📋</span>My Workout Records</a>
+        <a class="btn btn-outline-light btn-sm" href="{% url 'progress' %}"><span class="icon-inline">📈</span>Progress</a>
+      </div>
+    {% endif %}
   </div>
 
   {% if exercises %}
-    <div class="row gy-4">
+    <div class="exercises-grid">
       {% for exercise in exercises %}
-        <div class="col-md-6">
-          <div class="card h-100 shadow-sm">
-            {% if exercise.image_url %}
-              <img src="{{ exercise.image_url }}" class="card-img-top" alt="{{ exercise.name }}">
-            {% endif %}
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">{{ exercise.name }}</h5>
-              <p class="card-text text-muted mb-2">{{ exercise.description }}</p>
-              {% if exercise.recommended %}
-                <span class="badge bg-primary mb-2">Recommended</span>
-              {% endif %}
-              <ul class="list-inline small text-muted mb-3">
-                {% if exercise.duration %}
-                  <li class="list-inline-item">Duration: {{ exercise.duration }}</li>
-                {% endif %}
-                <li class="list-inline-item">Sets: {{ exercise.sets }}</li>
-                <li class="list-inline-item">Reps: {{ exercise.reps }}</li>
-              </ul>
-              <div class="mt-auto">
-                <a href="{% url 'exercise-detail' exercise.slug %}" class="btn btn-outline-primary btn-sm">View Details</a>
+        <article class="exercise-card {% if exercise.recommended %}is-recommended{% endif %}">
+          <div class="exercise-card-head">
+            <div class="exercise-card-icon">
+              {% if exercise.category_slug == 'chest' %}🏋️
+              {% elif exercise.category_slug == 'back' %}🧗
+              {% elif exercise.category_slug == 'shoulders' %}💪
+              {% elif exercise.category_slug == 'arms' %}💪
+              {% elif exercise.category_slug == 'legs' %}🦵
+              {% elif exercise.category_slug == 'core' %}🧘
+              {% elif exercise.category_slug == 'cardio' %}🏃
+              {% else %}🏋️{% endif %}
+            </div>
+            <div class="exercise-card-meta">
+              <h3 class="exercise-card-title">{{ exercise.name }}</h3>
+              <div class="exercise-card-tags">
+                <span class="tag tag-category">{{ exercise.category }}</span>
+                <span class="tag tag-difficulty">{{ exercise.difficulty }}</span>
               </div>
             </div>
+            {% if exercise.recommended %}
+              <div class="rec-badge" title="Recommended for your goal">
+                <span class="rec-icon">★</span>
+                <span class="rec-text">Recommended</span>
+              </div>
+            {% endif %}
           </div>
-        </div>
+
+          <p class="exercise-card-desc">{{ exercise.description }}</p>
+
+          <ul class="exercise-stats">
+            <li>
+              <span class="stat-label">Sets</span>
+              <span class="stat-value">{{ exercise.sets }}</span>
+            </li>
+            <li>
+              <span class="stat-label">Reps</span>
+              <span class="stat-value">{{ exercise.reps }}</span>
+            </li>
+            <li>
+              <span class="stat-label">Duration</span>
+              <span class="stat-value">{{ exercise.duration_min }} min</span>
+            </li>
+            <li>
+              <span class="stat-label">Equipment</span>
+              <span class="stat-value">{{ exercise.equipment }}</span>
+            </li>
+          </ul>
+
+          <div class="exercise-card-actions">
+            <a class="btn btn-primary btn-sm" href="{% url 'exercise-detail' exercise.slug %}">View Details</a>
+          </div>
+        </article>
       {% endfor %}
     </div>
   {% else %}
-    <p>No exercises available at this time. Please check back later.</p>
+    <div class="exercises-empty">
+      <h3>No exercises available</h3>
+      <p>The exercise library is empty. Run <code>python manage.py seed_exercises</code> to populate it.</p>
+    </div>
   {% endif %}
 </section>
 {% endblock %}

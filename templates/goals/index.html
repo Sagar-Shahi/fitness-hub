@@ -8,11 +8,14 @@
 <section class="container py-5 goal-page">
   <div class="page-head">
     <div class="page-head-text">
-      <h1>Your Goals</h1>
-      <p>Track, manage, and crush every fitness goal</p>
+      <span class="icon-badge is-amber">🎯</span>
+      <div>
+        <h1>Your Goals</h1>
+        <p>Track, manage, and crush every fitness goal</p>
+      </div>
     </div>
     <a class="btn btn-primary" href="{% url 'create-goal' %}">
-      <span>+</span> New Goal
+      <span class="icon-inline">➕</span> New Goal
     </a>
   </div>
 
@@ -102,10 +105,10 @@
         <circle class="dot" cx="50" cy="50" r="6"/>
       </svg>
     </div>
-    <h2>No goals yet</h2>
+    <h2><span class="icon-inline">🎯</span>No goals yet</h2>
     <p>Set your first fitness objective to start tracking progress and unlock personalized exercise recommendations.</p>
     <a class="btn" href="{% url 'create-goal' %}">
-      <span>+</span> Create Your First Goal
+      <span class="icon-inline">➕</span> Create Your First Goal
     </a>
   </div>
   {% endif %}

@@ -650,6 +650,456 @@
   color: var(--diet-accent);
 }
 
+/* ---------- Foods / Budget Meals Pages ---------- */
+.foods-summary,
+.budget-summary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0 2.5rem;
+}
+
+@media (max-width: 900px) {
+  .foods-summary,
+  .budget-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.summary-stat {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--diet-accent);
+}
+
+.summary-stat.protein::before { background: var(--diet-protein); }
+.summary-stat.carbs::before { background: var(--diet-carbs); }
+.summary-stat.fats::before { background: var(--diet-fats); }
+.summary-stat.calories::before { background: var(--diet-calories); }
+.summary-stat.cost::before { background: var(--diet-accent); }
+.summary-stat.weekly::before { background: var(--diet-calories); }
+
+.summary-stat .stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--diet-text-dim);
+  font-weight: 600;
+}
+
+.summary-stat .stat-value {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--diet-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-stat .stat-unit {
+  font-size: 0.85rem;
+  color: var(--diet-text-dim);
+  font-weight: 500;
+  margin-left: 0.15rem;
+}
+
+/* ---------- Food Cards ---------- */
+.foods-category {
+  margin-top: 2.5rem;
+}
+
+.foods-category-title {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--diet-text-dim);
+  font-weight: 700;
+  margin: 0 0 1rem;
+}
+
+.foods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.food-card {
+  text-align: left;
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  color: inherit;
+  width: 100%;
+}
+
+.food-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--diet-accent);
+  background: var(--diet-card-elev);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.15);
+}
+
+.food-card:active {
+  transform: translateY(0);
+}
+
+.food-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.food-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--diet-text);
+}
+
+.food-cost {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--diet-accent);
+  background: var(--diet-accent-soft);
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.food-serving {
+  font-size: 0.8rem;
+  color: var(--diet-text-dim);
+}
+
+.food-macros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.macro-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+.macro-pill.protein { background: var(--diet-protein-soft); color: var(--diet-protein); }
+.macro-pill.carbs { background: var(--diet-carbs-soft); color: var(--diet-carbs); }
+.macro-pill.fats { background: var(--diet-fats-soft); color: var(--diet-fats); }
+.macro-pill.cal { background: var(--diet-calories-soft); color: var(--diet-calories); }
+
+/* ---------- Logged Foods ---------- */
+.logged-foods {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--diet-border);
+}
+
+.logged-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.logged-head h2 {
+  margin: 0;
+}
+
+.food-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.log-empty {
+  background: var(--diet-card);
+  border: 1px dashed var(--diet-border);
+  border-radius: var(--diet-radius-sm);
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--diet-text-dim);
+}
+
+.log-entry {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius-sm);
+  padding: 0.85rem 1.25rem;
+}
+
+.log-name {
+  font-weight: 600;
+  color: var(--diet-text);
+}
+
+.log-macros {
+  font-size: 0.85rem;
+  color: var(--diet-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-icon.danger {
+  background: transparent;
+  border: 1px solid var(--diet-border);
+  color: var(--diet-text-dim);
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.btn-icon.danger:hover {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ---------- Budget Meals ---------- */
+.budget-meals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.budget-meal-card {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.18s ease;
+}
+
+.budget-meal-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--diet-border);
+  box-shadow: var(--diet-shadow);
+}
+
+.meal-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--diet-border);
+}
+
+.meal-card-head h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--diet-text);
+}
+
+.meal-cost-pill {
+  background: var(--diet-accent-soft);
+  color: var(--diet-accent);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+}
+
+.meal-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.meal-items li {
+  background: var(--diet-card-elev);
+  border: 1px solid var(--diet-border);
+  color: var(--diet-text-dim);
+  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+}
+
+.meal-macros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--diet-border);
+}
+
+.meal-macro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.meal-macro .label {
+  color: var(--diet-text-dim);
+}
+
+.meal-macro .value {
+  font-weight: 700;
+  color: var(--diet-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tips-card {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 2rem;
+  margin-top: 2.5rem;
+}
+
+.tips-card h2 {
+  font-size: 1.2rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  border: none;
+}
+
+.tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.75rem 1.5rem;
+}
+
+.tips-list li {
+  font-size: 0.9rem;
+  color: var(--diet-text-dim);
+  line-height: 1.5;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.tips-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--diet-accent);
+  font-weight: 700;
+}
+
+.tips-list li strong {
+  color: var(--diet-text);
+  font-weight: 600;
+}
+
+/* ---------- Diet Tools Grid (Index) ---------- */
+.diet-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin: 2.5rem 0 0;
+}
+
+@media (max-width: 800px) {
+  .diet-tools-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tool-card {
+  background: var(--diet-card);
+  border: 1px solid var(--diet-border);
+  border-radius: var(--diet-radius);
+  padding: 1.75rem;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, var(--diet-accent-soft) 0%, transparent 70%);
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.tool-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--diet-accent);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+}
+
+.tool-card:hover::before {
+  opacity: 0.8;
+}
+
+.tool-icon {
+  font-size: 1.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.tool-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--diet-text);
+  position: relative;
+  z-index: 1;
+}
+
+.tool-card p {
+  font-size: 0.88rem;
+  color: var(--diet-text-dim);
+  margin: 0;
+  line-height: 1.5;
+  position: relative;
+  z-index: 1;
+}
+
 .copy-block {
   background: var(--diet-bg);
   border: 1px solid var(--diet-border);

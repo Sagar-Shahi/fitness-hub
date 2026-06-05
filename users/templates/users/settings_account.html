@@ -1,0 +1,56 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'users/css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="settings-form-page">
+  <div class="container">
+    <header class="settings-form-head">
+      <div>
+        <p class="settings-eyebrow">Settings · Account</p>
+        <h1><span class="icon-inline">@</span>Account details</h1>
+        <p>Update your username, name, and email. Your email is used to recover a forgotten password.</p>
+      </div>
+      <a class="settings-back" href="{% url 'settings-hub' %}">&larr; Back to settings</a>
+    </header>
+
+    {% if messages %}
+    <div class="settings-messages">
+      {% for message in messages %}
+      <div class="settings-message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="settings-form-grid">
+      <form method="post" class="settings-form settings-panel" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-row {% if field.errors %}field-error{% endif %}">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<p class="help-text">{{ field.help_text|safe }}</p>{% endif %}
+          {% if field.errors %}{{ field.errors }}{% endif %}
+        </div>
+        {% endfor %}
+        <div class="settings-submit-row">
+          <p class="help-text" style="margin:0;">Changes take effect immediately after you save.</p>
+          <button type="submit" class="settings-btn settings-btn-primary">Save changes</button>
+        </div>
+      </form>
+
+      <aside class="settings-info">
+        <h3>Why we ask</h3>
+        <p>Your username is what you sign in with. Your email is the only way to reset a forgotten password.</p>
+        <ul>
+          <li>Usernames must be unique across the platform.</li>
+          <li>Email changes are not auto-verified &mdash; keep it current.</li>
+          <li>Your name is shown on the profile page and used in dashboard greetings.</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}

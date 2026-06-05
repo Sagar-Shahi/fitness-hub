@@ -7,8 +7,11 @@
 <section class="container py-5 progress-page">
   <div class="page-head">
     <div class="page-head-text">
-      <h1>Workout Log</h1>
-      <p>Your completed exercises are automatically recorded here.</p>
+      <span class="icon-badge is-cyan">📈</span>
+      <div>
+        <h1>Workout Log</h1>
+        <p>Your completed exercises are automatically recorded here.</p>
+      </div>
     </div>
   </div>
 
@@ -79,7 +82,7 @@
 
   {% if assigned_exercises %}
   <div class="pr-section-title">
-    <h2>Assigned Workouts</h2>
+    <h2><span class="icon-inline">🎯</span>Assigned Workouts</h2>
     <span class="badge-count">{{ assigned_exercises|length }}</span>
   </div>
   <div class="exercise-grid">
@@ -99,7 +102,7 @@
   {% endif %}
 
   <div class="pr-section-title">
-    <h2>Recent Activity</h2>
+    <h2><span class="icon-inline">⏱</span>Recent Activity</h2>
     {% if completions %}<span class="badge-count">{{ completions|length }}</span>{% endif %}
   </div>
 
@@ -127,6 +130,7 @@
   </div>
   {% else %}
   <div class="pr-empty">
+    <span class="icon-badge is-cyan size-xl">⏱</span>
     <h3>No exercises logged yet</h3>
     <p>Start by logging an exercise from your assigned list above, or explore the exercise library.</p>
   </div>

@@ -6,33 +6,36 @@ from django.contrib import messages
 from .forms import NutritionRecordForm
 from .models import NutritionRecord
 from .nutrition_calc import generate_nutrition_plan
+from .food_data import AFFORDABLE_FOODS, BUDGET_MEALS, daily_totals
+
+
+def _plan_for(request):
+    profile = getattr(request.user, 'profile', None)
+    return generate_nutrition_plan(profile) if profile else None
 
 
 @login_required
 def index(request):
     records = NutritionRecord.objects.filter(user=request.user).order_by('-date')
-    profile = getattr(request.user, 'profile', None)
-    plan = None
-    if profile:
-        plan = generate_nutrition_plan(profile)
-    return render(request, 'diet/index.html', {'records': records, 'plan': plan})
+    return render(request, 'diet/index.html', {
+        'records': records,
+        'plan': _plan_for(request),
+    })
 
 
 @login_required
 def create_record(request):
+    plan = _plan_for(request)
     initial = {}
-    profile = getattr(request.user, 'profile', None)
-    if profile:
-        plan = generate_nutrition_plan(profile)
-        if plan.get('ready'):
-            initial = {
-                'date': date.today().isoformat(),
-                'calories': plan['calories'],
-                'protein': plan['protein'],
-                'carbs': plan['carbs'],
-                'fats': plan['fats'],
-                'notes': plan['notes'],
-            }
+    if plan and plan.get('ready'):
+        initial = {
+            'date': date.today().isoformat(),
+            'calories': plan['calories'],
+            'protein': plan['protein'],
+            'carbs': plan['carbs'],
+            'fats': plan['fats'],
+            'notes': plan['notes'],
+        }
     if request.method == 'POST':
         form = NutritionRecordForm(request.POST)
         if form.is_valid():
@@ -43,10 +46,7 @@ def create_record(request):
             return redirect('diet')
     else:
         form = NutritionRecordForm(initial=initial)
-    return render(request, 'diet/create.html', {
-        'form': form,
-        'plan': generate_nutrition_plan(profile) if profile else None,
-    })
+    return render(request, 'diet/create.html', {'form': form, 'plan': plan})
 
 
 @login_required
@@ -75,6 +75,17 @@ def delete_record(request, pk):
 
 @login_required
 def suggest(request):
-    profile = getattr(request.user, 'profile', None)
-    plan = generate_nutrition_plan(profile) if profile else None
-    return render(request, 'diet/suggest.html', {'plan': plan})
+    return render(request, 'diet/suggest.html', {'plan': _plan_for(request)})
+
+
+@login_required
+def foods(request):
+    return render(request, 'diet/foods.html', {'foods': AFFORDABLE_FOODS})
+
+
+@login_required
+def budget_meals(request):
+    return render(request, 'diet/budget_meals.html', {
+        'meals': BUDGET_MEALS,
+        'totals': daily_totals(BUDGET_MEALS),
+    })

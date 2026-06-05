@@ -1,0 +1,79 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'diet/css/diet.css' %}">
+{% endblock %}
+{% block content %}
+<section class="diet-page">
+  <div class="page-head">
+    <div>
+      <nav class="breadcrumbs">
+        <a href="{% url 'diet' %}">Diet</a>
+        <span class="sep">/</span>
+        <span>Budget Meals</span>
+      </nav>
+      <h1>Budget Meal Plans</h1>
+      <p class="lead">Complete daily meal suggestions using affordable, nutritious foods.</p>
+    </div>
+    <div class="page-head-actions">
+      <a class="btn btn-secondary" href="{% url 'diet' %}">Back to Diet</a>
+      <a class="btn btn-primary" href="{% url 'diet-foods' %}">Food Tracker</a>
+    </div>
+  </div>
+
+  <div class="budget-summary">
+    <div class="summary-stat cost">
+      <span class="stat-label">Daily Cost</span>
+      <span class="stat-value">NRS {{ totals.total_cost|floatformat:2 }}</span>
+    </div>
+    <div class="summary-stat calories">
+      <span class="stat-label">Total Calories</span>
+      <span class="stat-value">{{ totals.total_calories }}</span>
+    </div>
+    <div class="summary-stat protein">
+      <span class="stat-label">Total Protein</span>
+      <span class="stat-value">{{ totals.total_protein|floatformat:0 }}<span class="stat-unit">g</span></span>
+    </div>
+    <div class="summary-stat weekly">
+      <span class="stat-label">Weekly Cost</span>
+      <span class="stat-value">NRS {{ totals.total_cost|add:totals.total_cost|add:totals.total_cost|add:totals.total_cost|add:totals.total_cost|add:totals.total_cost|add:totals.total_cost|floatformat:2 }}</span>
+    </div>
+  </div>
+
+  <div class="budget-meals-grid">
+    {% for meal in meals %}
+    <article class="budget-meal-card">
+      <div class="meal-card-head">
+        <h3>{{ meal.name }}</h3>
+        <span class="meal-cost-pill">NRS {{ meal.total_cost|floatformat:2 }}</span>
+      </div>
+      <ul class="meal-items">
+        {% for item in meal.items %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+      <div class="meal-macros">
+        <div class="meal-macro"><span class="label">Protein</span><span class="value">{{ meal.total_protein|floatformat:0 }}g</span></div>
+        <div class="meal-macro"><span class="label">Carbs</span><span class="value">{{ meal.total_carbs|floatformat:0 }}g</span></div>
+        <div class="meal-macro"><span class="label">Fats</span><span class="value">{{ meal.total_fats|floatformat:0 }}g</span></div>
+        <div class="meal-macro"><span class="label">Calories</span><span class="value">{{ meal.total_calories }}</span></div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <div class="tips-card">
+    <h2>Money-Saving Nutrition Tips</h2>
+    <ul class="tips-list">
+      <li><strong>Buy in bulk:</strong> Purchase rice, oats, and lentils in large quantities</li>
+      <li><strong>Shop sales:</strong> Eggs and chicken breast often go on sale</li>
+      <li><strong>Use canned:</strong> Canned tuna and beans are cheaper than fresh</li>
+      <li><strong>Meal prep:</strong> Cook large batches on weekends to save time and money</li>
+      <li><strong>Seasonal produce:</strong> Buy vegetables that are in season for lower prices</li>
+      <li><strong>Store brands:</strong> Generic/store brands are usually 20-30% cheaper</li>
+      <li><strong>Skip supplements:</strong> Real food is cheaper and more nutritious</li>
+      <li><strong>Grow herbs:</strong> Fresh herbs at home cost pennies</li>
+    </ul>
+  </div>
+</section>
+{% endblock %}

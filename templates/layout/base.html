@@ -4,48 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness Hub</title>
+    <title>{% block title %}Fitness Hub — Train smarter, eat better, feel your best{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'chatbot/css/chat.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     {% block extra_head %}{% endblock %}
     <script defer src="{% static 'js/script.js' %}"></script>
 </head>
 <body>
-    <header class="site-header">
+    <header class="site-header" id="siteHeader">
         <div class="container nav-wrapper">
-            <a class="brand" href="{% url 'home' %}">Fitness Hub</a>
-            <nav class="main-nav" id="mainNav">
+            <a class="brand" href="{% url 'home' %}">
+                <span class="brand-mark">F</span>
+                <span class="brand-text">Fitness <strong>Hub</strong></span>
+            </a>
+            <nav class="main-nav" id="mainNav" aria-label="Primary">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'goals' %}">Goals</a>
-                    <a href="{% url 'exercise-list' %}">Workouts</a>
-                    <a href="{% url 'progress' %}">Progress</a>
-                    <a href="{% url 'diet' %}">Diet</a>
-                    <a href="{% url 'store-home' %}">Store</a>
-                    <a href="{% url 'view-cart' %}" class="nav-cart">Cart <span class="nav-cart-badge">{{ cart_count|default:0 }}</span></a>
-                    <a href="{% url 'inspiration-feed' %}">Inspiration</a>
-                    <a href="{% url 'profile' %}">Profile</a>
-                    <form action="{% url 'logout' %}" method="post" class="nav-form" style="display: inline;">
+                    <a href="{% url 'goals' %}" class="{% if request.resolver_match.url_name == 'goals' or request.resolver_match.url_name == 'create-goal' or request.resolver_match.url_name == 'edit-goal' or request.resolver_match.url_name == 'delete-goal' %}is-active{% endif %}">Goals</a>
+                    <a href="{% url 'exercise-list' %}" class="{% if 'exercise' in request.resolver_match.url_name %}is-active{% endif %}">Workouts</a>
+                    <a href="{% url 'exercise-records' %}" class="{% if request.resolver_match.url_name == 'exercise-records' %}is-active{% endif %}">Records</a>
+                    <a href="{% url 'progress' %}" class="{% if 'progress' in request.resolver_match.url_name %}is-active{% endif %}">Progress</a>
+                    <a href="{% url 'diet' %}" class="{% if 'diet' in request.resolver_match.url_name %}is-active{% endif %}">Diet</a>
+                    <a href="{% url 'store-home' %}" class="{% if 'store' in request.resolver_match.url_name or 'product' in request.resolver_match.url_name or 'order' in request.resolver_match.url_name or 'cart' in request.resolver_match.url_name or 'checkout' in request.resolver_match.url_name %}is-active{% endif %}">Store</a>
+                    <a href="{% url 'view-cart' %}" class="nav-cart {% if request.resolver_match.url_name == 'view-cart' or request.resolver_match.url_name == 'checkout' %}is-active{% endif %}">Cart <span class="nav-cart-badge">{{ cart_count|default:0 }}</span></a>
+                    <a href="{% url 'inspiration-feed' %}" class="{% if 'inspiration' in request.resolver_match.url_name %}is-active{% endif %}">Inspiration</a>
+                    <a href="{% url 'profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}is-active{% endif %}">Profile</a>
+                    <a href="{% url 'settings-hub' %}" class="{% if 'settings' in request.resolver_match.url_name %}is-active{% endif %}">Settings</a>
+                    <form action="{% url 'logout' %}" method="post" class="nav-form">
                         {% csrf_token %}
                         <button type="submit" class="nav-link-button">Logout</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'home' %}">Home</a>
-                    <a href="{% url 'about' %}">About Us</a>
+                    <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}is-active{% endif %}">Home</a>
+                    <a href="{% url 'about' %}">About</a>
                     <a href="{% url 'login' %}">Login</a>
-                    <a href="{% url 'register' %}">Sign Up</a>
+                    <a href="{% url 'register' %}" class="nav-cta">Sign Up</a>
                 {% endif %}
             </nav>
-            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">Menu</button>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false">Menu</button>
         </div>
     </header>
 
     <main>
+        {% if messages %}
+        <div class="container" style="padding-top:1.25rem;">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% block content %}{% endblock %}
     </main>
 
     <footer class="site-footer">
         <div class="container">
-            <p>Fitness Hub © {% now 'Y' %} — Build strength, stay motivated, and move better every day.</p>
+            <div class="footer-brand-row">
+                <span class="brand-mark">F</span>
+                <span class="brand-text">Fitness <strong>Hub</strong></span>
+            </div>
+            <p>Fitness Hub &copy; {% now 'Y' %} &mdash; Build strength, stay motivated, and move better every day.</p>
+            <p class="footer-contact">
+                For more info contact
+                <a href="mailto:sagarshahi865@gmail.com">sagarshahi865@gmail.com</a>
+                /
+                <a href="mailto:suwalunish123@gmail.com">suwalunish123@gmail.com</a>
+            </p>
         </div>
     </footer>
+
+    <script>
+    // Scroll-aware header is handled by /static/js/script.js
+    </script>
+    <script defer src="{% static 'chatbot/js/chat.js' %}"></script>
 </body>
 </html>

@@ -1,36 +1,116 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'exercises/css/exercises.css' %}">
+{% endblock %}
 {% block content %}
-<section class="container py-5">
-  <div class="row">
-    <div class="col-md-8">
-      <h1>{{ exercise.name }}</h1>
-      <p class="text-muted">Category: {{ exercise.get_category_display }} — Difficulty: {{ exercise.get_difficulty_display }}</p>
-      <img src="{{ exercise.image_url }}" alt="{{ exercise.name }}" class="img-fluid mb-3"/>
-      <h4>Description</h4>
-      <p>{{ exercise.description }}</p>
-      <h4>Steps</h4>
-      <p>{{ exercise.steps }}</p>
-      <h4>Form Tips</h4>
-      <p>{{ exercise.form_tips }}</p>
-    </div>
-    <div class="col-md-4">
-      <div class="card p-3">
-        <h5>Details</h5>
-        <ul class="list-unstyled">
-          <li><strong>Target Muscles:</strong> {{ exercise.target_muscles }}</li>
-          <li><strong>Equipment:</strong> {{ exercise.equipment }}</li>
-          <li><strong>Breathing:</strong> {{ exercise.breathing }}</li>
-        </ul>
-        {% if exercise.video_url %}
-        <div class="mt-3">
-          <a href="{{ exercise.video_url }}" target="_blank" class="btn btn-outline-primary">Watch Tutorial</a>
-        </div>
-        {% endif %}
-        <div class="mt-3">
-          <a href="{% url 'log-exercise' exercise.slug %}" class="btn btn-success btn-block">Log This Exercise</a>
-        </div>
+<section class="exercises-page container">
+  <div class="exercise-detail">
+    <div class="exercise-detail-main">
+      <a class="back-link" href="{% url 'exercise-list' %}">&larr; Back to library</a>
+      <h1 class="exercises-title">{{ exercise.name }}</h1>
+      <div class="exercise-detail-tags">
+        <span class="tag tag-category">{{ exercise.get_category_display }}</span>
+        <span class="tag tag-difficulty">{{ exercise.get_difficulty_display }}</span>
+        <span class="tag tag-goal">{{ exercise.get_goal_display }}</span>
       </div>
+
+      <p class="exercise-detail-desc">{{ exercise.description }}</p>
+
+      {% if setup_steps %}
+      <div class="detail-block">
+        <h3>Setup</h3>
+        <ol class="step-list">
+          {% for step in setup_steps %}<li>{{ step }}</li>{% endfor %}
+        </ol>
+      </div>
+      {% endif %}
+
+      {% if movement_steps %}
+      <div class="detail-block">
+        <h3>Movement</h3>
+        <ol class="step-list">
+          {% for step in movement_steps %}<li>{{ step }}</li>{% endfor %}
+        </ol>
+      </div>
+      {% endif %}
+
+      {% if exercise.form_tips %}
+      <div class="detail-block detail-block--accent">
+        <h3>Form Tips</h3>
+        <p>{{ exercise.form_tips }}</p>
+      </div>
+      {% endif %}
+
+      {% if exercise.common_mistakes %}
+      <div class="detail-block">
+        <h3>Common Mistakes</h3>
+        <p>{{ exercise.common_mistakes }}</p>
+      </div>
+      {% endif %}
+
+      {% if exercise.safety and exercise.safety != exercise.form_tips %}
+      <div class="detail-block detail-block--warn">
+        <h3>Safety</h3>
+        <p>{{ exercise.safety }}</p>
+      </div>
+      {% endif %}
+
+      {% if exercise.breathing %}
+      <div class="detail-block">
+        <h3>Breathing</h3>
+        <p>{{ exercise.breathing }}</p>
+      </div>
+      {% endif %}
     </div>
+
+    <aside class="exercise-detail-aside">
+      <div class="aside-card">
+        <h3 class="aside-title"><span class="icon-inline">📊</span>Quick Stats</h3>
+        <ul class="aside-stats">
+          <li><span><span class="icon-inline">🔁</span>Sets</span><strong>{{ sets }}</strong></li>
+          <li><span><span class="icon-inline">🔢</span>Reps / Time</span><strong>{{ reps }}</strong></li>
+          <li><span><span class="icon-inline">⏱</span>Duration</span><strong>{{ exercise.duration_min }} min</strong></li>
+          <li><span><span class="icon-inline">🛠</span>Equipment</span><strong>{{ exercise.equipment|default:"Bodyweight" }}</strong></li>
+          <li><span><span class="icon-inline">💪</span>Target Muscles</span><strong>{{ exercise.target_muscles }}</strong></li>
+        </ul>
+      </div>
+
+      <div class="aside-card aside-card--primary">
+        <h3 class="aside-title"><span class="icon-inline">📝</span>Record This Workout</h3>
+        {% if user.is_authenticated %}
+          {% if is_completed_today %}
+            <p class="aside-note aside-note--ok">✓ Logged today. Nice work!</p>
+          {% endif %}
+
+          <form method="post" action="{% url 'exercise-complete' exercise.slug %}" class="quick-complete-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'exercise-records' %}">
+            <button type="submit" class="btn btn-primary btn-block">
+              {% if is_completed_today %}<span class="icon-inline">➕</span>Log Another Set{% else %}<span class="icon-inline">✓</span>Mark Complete &amp; Log{% endif %}
+            </button>
+          </form>
+
+          <div class="aside-divider"></div>
+
+          <a class="btn btn-outline-light btn-block" href="{% url 'log-exercise' exercise.slug %}">
+            <span class="icon-inline">📋</span>Log With Details
+          </a>
+
+          {% if completion_count > 0 %}
+            <p class="aside-meta">You've completed this exercise <strong>{{ completion_count }}</strong> time{{ completion_count|pluralize }}.</p>
+          {% endif %}
+        {% else %}
+          <p class="aside-note"><a href="{% url 'login' %}">Sign in</a> to log your workouts and track progress.</p>
+        {% endif %}
+      </div>
+
+      {% if exercise.video_url %}
+      <div class="aside-card">
+        <a class="btn btn-outline-light btn-block" href="{{ exercise.video_url }}" target="_blank" rel="noopener"><span class="icon-inline">▶</span>Watch Tutorial</a>
+      </div>
+      {% endif %}
+    </aside>
   </div>
 </section>
 {% endblock %}

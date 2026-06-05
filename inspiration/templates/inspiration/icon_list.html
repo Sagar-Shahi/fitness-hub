@@ -1,0 +1,47 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'inspiration/css/inspiration.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="insp-page">
+  <div class="container">
+    <header class="insp-page-head">
+      <div>
+        <p class="insp-eyebrow">Inspiration</p>
+        <h1 class="insp-title">{% if active_category %}{{ active_category.icon }} {{ active_category.name }}{% else %}All fitness icons{% endif %}</h1>
+        <p class="insp-subtitle">{% if active_category %}{{ active_category.description }}{% else %}Every icon in the library, filterable by category.{% endif %}</p>
+      </div>
+    </header>
+
+    <nav class="insp-filter-bar" aria-label="Filter by category">
+      <a class="insp-chip {% if not active_category %}is-active{% endif %}" href="{% url 'inspiration-icons' %}">All</a>
+      {% for cat in categories %}
+      <a class="insp-chip insp-accent-{{ cat.accent }} {% if active_category and active_category.slug == cat.slug %}is-active{% endif %}"
+         href="{% url 'inspiration-icons' %}?category={{ cat.slug }}">{{ cat.icon }} {{ cat.name }}</a>
+      {% endfor %}
+    </nav>
+
+    {% if icons %}
+    <div class="insp-icon-grid">
+      {% for icon in icons %}
+      <a class="insp-icon-card insp-accent-{{ icon.category.accent }}" href="{% url 'inspiration-icon-detail' icon.slug %}">
+        <div class="insp-icon-image" style="background-image: url('{{ icon.image_url }}');">
+          <span class="insp-icon-cat">{{ icon.category.name }}</span>
+        </div>
+        <div class="insp-icon-body">
+          <h3>{{ icon.name }}</h3>
+          {% if icon.nickname %}<p class="insp-icon-nick">&ldquo;{{ icon.nickname }}&rdquo;</p>{% endif %}
+          <p class="insp-icon-short">{{ icon.short_bio }}</p>
+          <p class="insp-icon-discipline">{{ icon.discipline }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="insp-empty">No icons in this category yet.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

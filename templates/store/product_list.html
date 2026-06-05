@@ -6,21 +6,24 @@
 {% block content %}
 <section class="store-page">
   <div class="page-head">
-    <div>
-      <nav class="breadcrumbs">
-        <a href="{% url 'store-home' %}">Store</a>
-        {% if category %}
-          <span class="sep">/</span>
-          <span>{{ category.name }}</span>
-        {% else %}
-          <span class="sep">/</span>
-          <span>All Products</span>
-        {% endif %}
-      </nav>
-      <h1>{% if category %}{{ category.name }}{% else %}All Products{% endif %}</h1>
-      <p class="lead">
-        {% if category %}{{ category.description }}{% else %}Browse our full catalog of fitness essentials.{% endif %}
-      </p>
+    <div class="page-head-text">
+      <span class="icon-badge is-cyan">🛒</span>
+      <div>
+        <nav class="breadcrumbs">
+          <a href="{% url 'store-home' %}">Store</a>
+          {% if category %}
+            <span class="sep">/</span>
+            <span>{{ category.name }}</span>
+          {% else %}
+            <span class="sep">/</span>
+            <span>All Products</span>
+          {% endif %}
+        </nav>
+        <h1>{% if category %}{{ category.name }}{% else %}All Products{% endif %}</h1>
+        <p class="lead">
+          {% if category %}{{ category.description }}{% else %}Browse our full catalog of fitness essentials.{% endif %}
+        </p>
+      </div>
     </div>
     <div class="page-head-actions">
       <span class="result-count">{{ page_obj.paginator.count }} product{{ page_obj.paginator.count|pluralize }}</span>
@@ -33,7 +36,7 @@
         {% if search %}<input type="hidden" name="q" value="{{ search }}">{% endif %}
 
         <div class="filter-block">
-          <h4>Categories</h4>
+          <h4><span class="icon-inline">🗂</span>Categories</h4>
           <ul class="filter-list">
             <li>
               <a href="{% url 'store-product-list' %}" class="{% if not category %}active{% endif %}">All Products</a>
@@ -49,7 +52,7 @@
         </div>
 
         <div class="filter-block">
-          <h4>Sort By</h4>
+          <h4><span class="icon-inline">🔃</span>Sort By</h4>
           <select name="sort" class="form-select" onchange="this.form.submit()">
             <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
             <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
@@ -60,7 +63,7 @@
         </div>
 
         <div class="filter-block">
-          <h4>Price Range</h4>
+          <h4><span class="icon-inline">💲</span>Price Range</h4>
           <div class="price-inputs">
             <input type="number" name="min_price" placeholder="Min" value="{{ min_price }}" class="form-input" step="0.01" min="0">
             <span>—</span>
@@ -78,7 +81,7 @@
     <div class="product-results">
       {% if search %}
         <div class="search-banner">
-          <span>Results for <strong>"{{ search }}"</strong></span>
+          <span><span class="icon-inline">🔍</span>Results for <strong>"{{ search }}"</strong></span>
           <a href="{% if category %}{% url 'store-category' category.slug %}{% else %}{% url 'store-product-list' %}{% endif %}">Clear</a>
         </div>
       {% endif %}
@@ -103,7 +106,7 @@
         {% endif %}
       {% else %}
         <div class="empty-state">
-          <div class="empty-icon">🔍</div>
+          <span class="icon-badge is-cyan size-xl">🔍</span>
           <h2>No products found</h2>
           <p>Try a different search or clear the filters to see more options.</p>
           <a href="{% url 'store-product-list' %}" class="btn btn-primary">Browse All</a>

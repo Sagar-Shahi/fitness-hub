@@ -1,0 +1,78 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'users/css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="settings-page">
+  <div class="container">
+    <header class="settings-hero">
+      <div>
+        <p class="settings-eyebrow">Account</p>
+        <h1><span class="icon-inline">⚙️</span>Settings</h1>
+        <p>Manage how you sign in, keep your account secure, and update the details behind your fitness profile.</p>
+      </div>
+      <div class="settings-user-chip">
+        <span class="settings-avatar">{{ user_obj.username|slice:":1"|upper }}</span>
+        <div class="settings-user-meta">
+          <span class="settings-user-name">{% if user_obj.get_full_name %}{{ user_obj.get_full_name }}{% else %}{{ user_obj.username }}{% endif %}</span>
+          <span class="settings-user-email">{{ user_obj.email|default:"No email on file" }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="settings-grid">
+      <a class="settings-card" href="{% url 'settings-account' %}">
+        <div class="settings-card-head">
+          <span class="settings-card-icon">@</span>
+          <h2>Account details</h2>
+        </div>
+        <p>Change your username, display name, and email address. Email is required for password recovery.</p>
+        <div class="settings-card-meta">
+          <span class="settings-pill">@{{ user_obj.username }}</span>
+          {% if has_full_name %}<span class="settings-pill is-ok">Name on file</span>{% else %}<span class="settings-pill is-warn">No name set</span>{% endif %}
+          {% if has_email %}<span class="settings-pill is-ok">Email verified</span>{% else %}<span class="settings-pill is-warn">Email missing</span>{% endif %}
+        </div>
+        <span class="settings-card-cta">Edit account</span>
+      </a>
+
+      <a class="settings-card is-warn" href="{% url 'settings-password' %}">
+        <div class="settings-card-head">
+          <span class="settings-card-icon">⚿</span>
+          <h2>Password &amp; security</h2>
+        </div>
+        <p>Update your password. A strong password keeps your training data and order history private.</p>
+        <div class="settings-card-meta">
+          <span class="settings-pill is-warn">Last set: this account</span>
+        </div>
+        <span class="settings-card-cta">Change password</span>
+      </a>
+
+      <a class="settings-card is-info" href="{% url 'edit-profile' %}">
+        <div class="settings-card-head">
+          <span class="settings-card-icon">⚖</span>
+          <h2>Fitness profile</h2>
+        </div>
+        <p>Update age, height, weight, body type, and the goal that drives your recommendations.</p>
+        <div class="settings-card-meta">
+          {% if profile_obj %}<span class="settings-pill is-ok">Goal: {{ profile_obj.get_selected_goal_display }}</span>{% endif %}
+        </div>
+        <span class="settings-card-cta">Edit fitness profile</span>
+      </a>
+
+      <a class="settings-card is-info" href="{% url 'select-goal' %}">
+        <div class="settings-card-head">
+          <span class="settings-card-icon">◎</span>
+          <h2>Goal selection</h2>
+        </div>
+        <p>Switch your primary goal in one step. Your workouts and meal suggestions update with it.</p>
+        <div class="settings-card-meta">
+          {% if profile_obj %}<span class="settings-pill">Focus: {{ profile_obj.get_goal_focus_display }}</span>{% endif %}
+        </div>
+        <span class="settings-card-cta">Change goal</span>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

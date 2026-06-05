@@ -1,0 +1,74 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Coach — Fitness Hub{% endblock %}
+
+{% block extra_head %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'chatbot/css/chat.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="chat-page">
+    <header class="page-head">
+        <span class="icon-badge icon-badge--violet icon-badge--lg" aria-hidden="true">🤖</span>
+        <div class="page-head__body">
+            <h1 class="page-head__title">Fitness Coach</h1>
+            <p class="page-head__sub">Rule-based assistant for exercises, app help, and general nutrition. No sign-in required.</p>
+        </div>
+    </header>
+
+    <section class="chat-card" aria-label="Chat">
+        <div class="chat-card__bar">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span class="chat-card__status">Online · scoped to fitness, nutrition, and app help</span>
+        </div>
+
+        <div id="chat-log" class="chat-log" role="log" aria-live="polite">
+            {% for m in recent %}
+                <div class="chat-msg chat-msg--{{ m.role }}">
+                    <div class="chat-msg__bubble">{{ m.content|linebreaksbr }}</div>
+                </div>
+            {% empty %}
+                <div class="chat-msg chat-msg--bot">
+                    <div class="chat-msg__bubble">
+                        Hey 👋 — ask me for an exercise recommendation, how to do a move, or how to use any part of the app.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div id="quick-replies" class="quick-replies" aria-label="Quick replies">
+            <button type="button" class="chip" data-msg="Recommend an exercise for me">🎯 Recommend an exercise</button>
+            <button type="button" class="chip" data-msg="How do I change my password?">🔒 Change password</button>
+            <button type="button" class="chip" data-msg="How much protein do I need?">🥩 Protein intake</button>
+            <button type="button" class="chip" data-msg="Show me chest exercises">💪 Chest exercises</button>
+        </div>
+
+        <form id="chat-form" class="chat-form" autocomplete="off">
+            <input
+                id="chat-input"
+                name="message"
+                type="text"
+                placeholder="Type your question…"
+                maxlength="600"
+                required
+            >
+            <button type="submit" class="btn btn--primary chat-form__send" aria-label="Send">
+                <span aria-hidden="true">➤</span>
+            </button>
+        </form>
+
+        <p class="chat-foot">
+            🛡️ {{ safety_disclaimer|default:"This coach is informational only. Talk to a doctor before changing your diet, training, or supplements." }}
+        </p>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'chatbot/js/chat.js' %}"></script>
+{% endblock %}

@@ -1,25 +1,92 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'exercises/css/exercises.css' %}">
+<link rel="stylesheet" href="{% static 'store/css/store.css' %}">
+{% endblock %}
 {% block content %}
-<section class="records-page container">
-    <div class="store-hero">
+<section class="container py-5 records-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-cyan">📋</span>
+      <div>
         <h1>Workout Records</h1>
-        <p>Review your recent workouts and keep track of your progress.</p>
+        <p>Every exercise you mark complete is automatically logged here.</p>
+      </div>
     </div>
+  </div>
+
+  {% if summary %}
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="icon-badge is-mint">📅</span>
+      <div class="stat-card-body">
+        <span class="stat-card-value">{{ summary.total_sessions }}</span>
+        <span class="stat-card-label">Sessions</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="icon-badge is-cyan">✓</span>
+      <div class="stat-card-body">
+        <span class="stat-card-value">{{ summary.total_completions }}</span>
+        <span class="stat-card-label">Completions</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="icon-badge is-violet">🔁</span>
+      <div class="stat-card-body">
+        <span class="stat-card-value">{{ summary.total_reps }}</span>
+        <span class="stat-card-label">Total Reps</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="icon-badge is-amber">⏱</span>
+      <div class="stat-card-body">
+        <span class="stat-card-value">{{ summary.total_minutes }}</span>
+        <span class="stat-card-label">Minutes</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="icon-badge is-rose">🔥</span>
+      <div class="stat-card-body">
+        <span class="stat-card-value">{{ summary.total_calories }}</span>
+        <span class="stat-card-label">Calories</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if has_records %}
     <div class="record-table">
-        <div class="record-row header">
-            <span>Date</span>
-            <span>Workout</span>
-            <span>Duration</span>
-            <span>Calories</span>
-        </div>
-        {% for record in records %}
+      <div class="record-row header">
+        <span><span class="icon-inline">📅</span>Date</span>
+        <span><span class="icon-inline">🏋️</span>Workouts</span>
+        <span><span class="icon-inline">⏱</span>Duration</span>
+        <span><span class="icon-inline">🔥</span>Calories</span>
+      </div>
+      {% for record in records %}
         <div class="record-row">
-            <span>{{ record.date }}</span>
-            <span>{{ record.workout }}</span>
-            <span>{{ record.duration }}</span>
-            <span>{{ record.calories }}</span>
+          <span>
+            <strong>{{ record.date|date:"M j, Y" }}</strong>
+            <small class="text-muted d-block">{{ record.date|date:"l" }}</small>
+          </span>
+          <span>
+            {% for ex in record.exercises %}
+              <a class="rec-link" href="{% url 'exercise-detail' ex.slug %}">{{ ex.name }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            <small class="text-muted d-block">{{ record.total_reps }} reps logged</small>
+          </span>
+          <span>{{ record.total_minutes }} min</span>
+          <span>{{ record.total_calories }} kcal</span>
         </div>
-        {% endfor %}
+      {% endfor %}
     </div>
+  {% else %}
+    <div class="exercises-empty">
+      <span class="icon-badge is-cyan size-xl">📋</span>
+      <h3>No workouts logged yet</h3>
+      <p>Head to the <a class="head-link" href="{% url 'exercise-list' %}">Workout Library</a> and mark a few exercises complete to see them here.</p>
+    </div>
+  {% endif %}
 </section>
 {% endblock %}

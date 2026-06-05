@@ -13,6 +13,7 @@ urlpatterns = [
     path('store/', include('store.urls')),
     path('diet/', include('diet.urls')),
     path('inspiration/', include('inspiration.urls')),
+    path('chatbot/', include('chatbot.urls')),
 ]
 
 # Serve media files during development

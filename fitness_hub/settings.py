@@ -26,8 +26,9 @@ INSTALLED_APPS = [
     'store',
     'inspiration',
     'diet',
+    'chatbot',
     # Third Party
-    
+
 ]
 
 

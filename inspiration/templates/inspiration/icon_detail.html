@@ -1,0 +1,118 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'inspiration/css/inspiration.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="insp-page">
+  <div class="container">
+    <p class="insp-breadcrumb">
+      <a href="{% url 'inspiration-feed' %}">Inspiration</a>
+      &rsaquo;
+      <a href="{% url 'inspiration-icons' %}?category={{ icon.category.slug }}">{{ icon.category.name }}</a>
+      &rsaquo;
+      <span>{{ icon.name }}</span>
+    </p>
+
+    <article class="insp-detail insp-accent-{{ icon.category.accent }}">
+      <div class="insp-detail-hero">
+        <div class="insp-detail-image" style="background-image: url('{{ icon.image_url }}');">
+          <span class="insp-icon-cat">{{ icon.category.name }}</span>
+        </div>
+        <div class="insp-detail-meta">
+          <h1 class="insp-title">{{ icon.name }}</h1>
+          {% if icon.nickname %}<p class="insp-detail-nick">&ldquo;{{ icon.nickname }}&rdquo;</p>{% endif %}
+          <p class="insp-detail-short">{{ icon.short_bio }}</p>
+          <dl class="insp-detail-facts">
+            {% if icon.nationality %}<dt>From</dt><dd>{{ icon.nationality }}</dd>{% endif %}
+            {% if icon.born %}<dt>Born</dt><dd>{{ icon.born }}</dd>{% endif %}
+            {% if icon.discipline %}<dt>Discipline</dt><dd>{{ icon.discipline }}</dd>{% endif %}
+          </dl>
+          {% if icon.instagram_url %}
+          <a class="insp-btn insp-btn-ghost" href="{{ icon.instagram_url }}" target="_blank" rel="noopener">Instagram &rarr;</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="insp-detail-body">
+        <section class="insp-panel">
+          <h2>Biography</h2>
+          <p>{{ icon.bio|linebreaksbr }}</p>
+        </section>
+
+        {% if icon.achievement_list %}
+        <section class="insp-panel">
+          <h2>Achievements</h2>
+          <ul class="insp-bullet-list">
+            {% for item in icon.achievement_list %}<li>{{ item }}</li>{% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+
+        {% if icon.tip_list %}
+        <section class="insp-panel">
+          <h2>Training principles</h2>
+          <ul class="insp-tip-list">
+            {% for tip in icon.tip_list %}<li>{{ tip }}</li>{% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+
+        {% if icon.signature_quote %}
+        <section class="insp-panel insp-signature">
+          <span class="insp-eyebrow">Signature quote</span>
+          <blockquote>&ldquo;{{ icon.signature_quote }}&rdquo;</blockquote>
+        </section>
+        {% endif %}
+
+        {% if icon.youtube_embed_url %}
+        <section class="insp-panel insp-video-panel">
+          <h2>Watch{% if icon.video_title %}: {{ icon.video_title }}{% endif %}</h2>
+          <div class="insp-video-frame">
+            <iframe src="{{ icon.youtube_embed_url }}" title="{{ icon.video_title|default:icon.name }}" allowfullscreen loading="lazy"></iframe>
+          </div>
+        </section>
+        {% endif %}
+
+        {% if icon_quotes %}
+        <section class="insp-panel">
+          <h2>More from {{ icon.name }}</h2>
+          <div class="insp-quote-grid">
+            {% for q in icon_quotes %}
+            <article class="insp-quote-card">
+              <blockquote>&ldquo;{{ q.text }}&rdquo;</blockquote>
+              <p class="insp-quote-author">&mdash; {{ q.author }}</p>
+            </article>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+      </div>
+    </article>
+
+    {% if related_icons %}
+    <section class="insp-section">
+      <header class="insp-section-head">
+        <h2>More from {{ icon.category.name }}</h2>
+        <a class="insp-section-link" href="{% url 'inspiration-icons' %}?category={{ icon.category.slug }}">See category &rarr;</a>
+      </header>
+      <div class="insp-icon-grid">
+        {% for r in related_icons %}
+        <a class="insp-icon-card insp-accent-{{ r.category.accent }}" href="{% url 'inspiration-icon-detail' r.slug %}">
+          <div class="insp-icon-image" style="background-image: url('{{ r.image_url }}');">
+            <span class="insp-icon-cat">{{ r.category.name }}</span>
+          </div>
+          <div class="insp-icon-body">
+            <h3>{{ r.name }}</h3>
+            {% if r.nickname %}<p class="insp-icon-nick">&ldquo;{{ r.nickname }}&rdquo;</p>{% endif %}
+            <p class="insp-icon-short">{{ r.short_bio }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

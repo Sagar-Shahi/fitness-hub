@@ -1,0 +1,46 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'inspiration/css/inspiration.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="insp-page">
+  <div class="container">
+    <header class="insp-page-head">
+      <div>
+        <p class="insp-eyebrow">Inspiration</p>
+        <h1 class="insp-title">{% if active_category %}{{ active_category.icon }} {{ active_category.name }} quotes{% else %}The quote wall{% endif %}</h1>
+        <p class="insp-subtitle">{% if active_category %}{{ active_category.description }}{% else %}Short lines you can keep in your head on a hard set.{% endif %}</p>
+      </div>
+    </header>
+
+    <nav class="insp-filter-bar" aria-label="Filter quotes by category">
+      <a class="insp-chip {% if not active_category %}is-active{% endif %}" href="{% url 'inspiration-quotes' %}">All</a>
+      {% for cat in categories %}
+      <a class="insp-chip insp-accent-{{ cat.accent }} {% if active_category and active_category.slug == cat.slug %}is-active{% endif %}"
+         href="{% url 'inspiration-quotes' %}?category={{ cat.slug }}">{{ cat.icon }} {{ cat.name }}</a>
+      {% endfor %}
+    </nav>
+
+    {% if quotes %}
+    <div class="insp-quote-grid insp-quote-grid-wide">
+      {% for quote in quotes %}
+      <article class="insp-quote-card insp-accent-{{ quote.category.accent|default:'emerald' }}">
+        <blockquote>&ldquo;{{ quote.text }}&rdquo;</blockquote>
+        <p class="insp-quote-author">&mdash; {{ quote.author }}</p>
+        {% if quote.icon %}
+        <a class="insp-quote-source" href="{% url 'inspiration-icon-detail' quote.icon.slug %}">More from {{ quote.icon.name }} &rarr;</a>
+        {% endif %}
+        {% if quote.category %}
+        <span class="insp-quote-cat">{{ quote.category.icon }} {{ quote.category.name }}</span>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="insp-empty">No quotes here yet — try another category.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

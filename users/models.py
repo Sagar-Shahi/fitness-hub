@@ -17,7 +17,7 @@ class Profile(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
 	age = models.PositiveIntegerField(null=True, blank=True)
 	gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True)
-	height_cm = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+	height_ft = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True, verbose_name='Height (ft)')
 	weight_kg = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
 	activity_level = models.CharField(max_length=20, choices=ACTIVITY_LEVELS, blank=True)
 	bio = models.TextField(blank=True)

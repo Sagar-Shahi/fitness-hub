@@ -6,13 +6,18 @@
 {% block content %}
 <section class="diet-page">
   <div class="page-head">
-    <div>
-      <h1>Diet Planner</h1>
-      <p class="lead">Personalized clinical nutrition targets and daily records.</p>
+    <div class="page-head-text">
+      <span class="icon-badge is-mint">🥗</span>
+      <div>
+        <h1>Diet Planner</h1>
+        <p class="lead">Personalized clinical nutrition targets and daily records.</p>
+      </div>
     </div>
     <div class="page-head-actions">
-      <a class="btn btn-secondary" href="{% url 'diet-suggest' %}">Get Nutrition Plan</a>
-      <a class="btn btn-primary" href="{% url 'create-record' %}">+ Add Record</a>
+      <a class="btn btn-secondary" href="{% url 'diet-suggest' %}"><span class="icon-inline">📊</span>Plan</a>
+      <a class="btn btn-secondary" href="{% url 'diet-foods' %}"><span class="icon-inline">🥗</span>Foods</a>
+      <a class="btn btn-secondary" href="{% url 'diet-budget-meals' %}"><span class="icon-inline">💰</span>Budget</a>
+      <a class="btn btn-primary" href="{% url 'create-record' %}"><span class="icon-inline">➕</span>Add Record</a>
     </div>
   </div>
 
@@ -80,8 +85,26 @@
   </div>
   {% endif %}
 
+  <div class="diet-tools-grid">
+    <a class="tool-card" href="{% url 'diet-suggest' %}">
+      <span class="tool-icon">📊</span>
+      <h3>Nutrition Plan</h3>
+      <p>View your calculated BMR, TDEE, and target macros.</p>
+    </a>
+    <a class="tool-card" href="{% url 'diet-foods' %}">
+      <span class="tool-icon">🥗</span>
+      <h3>Food Tracker</h3>
+      <p>Click foods to build a meal and see live macro totals.</p>
+    </a>
+    <a class="tool-card" href="{% url 'diet-budget-meals' %}">
+      <span class="tool-icon">💰</span>
+      <h3>Budget Meals</h3>
+      <p>Pre-planned affordable meals with full macro breakdowns.</p>
+    </a>
+  </div>
+
   <div class="section-header">
-    <h2>Recent Records</h2>
+    <h2><span class="icon-inline">📋</span>Recent Records</h2>
     <span class="section-sub">{{ records|length }} entr{{ records|length|pluralize:"y,ies" }}</span>
   </div>
 
@@ -121,10 +144,10 @@
   {% else %}
   <div class="diet-records">
     <div class="diet-records-empty">
-      <div class="empty-icon">📋</div>
+      <span class="icon-badge is-mint size-xl">📋</span>
       <h3>No records yet</h3>
       <p>Start tracking your daily nutrition to see your progress here.</p>
-      <a class="btn btn-primary" href="{% url 'create-record' %}" style="margin-top: 1rem;">+ Add First Record</a>
+      <a class="btn btn-primary" href="{% url 'create-record' %}" style="margin-top: 1rem;"><span class="icon-inline">➕</span>Add First Record</a>
     </div>
   </div>
   {% endif %}

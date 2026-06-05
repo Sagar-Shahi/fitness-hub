@@ -7,7 +7,7 @@
 <section class="store-page">
   <div class="store-hero">
     <div class="store-hero-content">
-      <p class="eyebrow">Fitness Hub Store</p>
+      <p class="eyebrow"><span class="icon-inline">🛒</span> Fitness Hub Store</p>
       <h1>Gear up. Fuel up. Perform.</h1>
       <p class="hero-text">Curated apparel, equipment, and supplements chosen by coaches to support every stage of your training.</p>
       <form class="store-search" method="get" action="{% url 'store-product-list' %}">
@@ -22,7 +22,7 @@
 
   <div class="store-section">
     <div class="section-head">
-      <h2>Shop by Category</h2>
+      <h2><span class="icon-inline">🗂</span> Shop by Category</h2>
       <p>Explore our hand-picked collections.</p>
     </div>
     <div class="category-grid">
@@ -43,7 +43,7 @@
   {% if featured %}
   <div class="store-section">
     <div class="section-head">
-      <h2>Featured Products</h2>
+      <h2><span class="icon-inline">⭐</span> Featured Products</h2>
       <a class="section-link" href="{% url 'store-product-list' %}">View all →</a>
     </div>
     <div class="product-grid">
@@ -57,7 +57,7 @@
   {% if top_rated %}
   <div class="store-section">
     <div class="section-head">
-      <h2>Top Rated</h2>
+      <h2><span class="icon-inline">🏅</span> Top Rated</h2>
       <a class="section-link" href="{% url 'store-product-list' %}?sort=rating">See more →</a>
     </div>
     <div class="product-grid product-grid-4">
@@ -70,7 +70,7 @@
 
   <div class="store-section">
     <div class="section-head">
-      <h2>Latest Arrivals</h2>
+      <h2><span class="icon-inline">🆕</span> Latest Arrivals</h2>
       <a class="section-link" href="{% url 'store-product-list' %}?sort=newest">View all →</a>
     </div>
     <div class="product-grid">
@@ -84,7 +84,7 @@
     <div class="store-banner">
       <div class="banner-content">
         <h3>Free Shipping</h3>
-        <p>On every order over $50</p>
+        <p>On every order over NRS 5000</p>
       </div>
       <span class="banner-icon">🚚</span>
     </div>

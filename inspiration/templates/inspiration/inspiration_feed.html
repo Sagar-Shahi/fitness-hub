@@ -1,0 +1,101 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'inspiration/css/inspiration.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="insp-page">
+  <div class="container">
+    <header class="insp-hero">
+      <div class="insp-hero-text">
+        <p class="insp-eyebrow">Inspiration hub</p>
+        <h1 class="insp-title">Train like the people you want to become.</h1>
+        <p class="insp-subtitle">
+          A curated library of {{ total_icons }} elite athletes, coaches, and competitors —
+          with their stories, training principles, and a daily quote to keep you honest.
+        </p>
+        <div class="insp-hero-actions">
+          <a class="insp-btn insp-btn-primary" href="{% url 'inspiration-icons' %}">Browse all icons</a>
+          <a class="insp-btn insp-btn-ghost" href="{% url 'inspiration-quotes' %}">Quote wall</a>
+        </div>
+      </div>
+      {% if daily_quote %}
+      <aside class="insp-daily insp-accent-emerald">
+        <span class="insp-daily-label">Quote of the day</span>
+        <blockquote class="insp-daily-text">&ldquo;{{ daily_quote.text }}&rdquo;</blockquote>
+        <p class="insp-daily-author">
+          &mdash; {{ daily_quote.author }}
+          {% if daily_quote.icon %}
+            <a class="insp-daily-link" href="{% url 'inspiration-icon-detail' daily_quote.icon.slug %}">{{ daily_quote.icon.name }}</a>
+          {% endif %}
+        </p>
+      </aside>
+      {% endif %}
+    </header>
+
+    <section class="insp-section">
+      <header class="insp-section-head">
+        <h2>Categories</h2>
+        <p>Pick a discipline. Every category is anchored by a real icon worth studying.</p>
+      </header>
+      <div class="insp-cat-grid">
+        {% for cat in categories %}
+        <a class="insp-cat-card insp-accent-{{ cat.accent }}" href="{% url 'inspiration-icons' %}?category={{ cat.slug }}">
+          <span class="insp-cat-emoji">{{ cat.icon }}</span>
+          <span class="insp-cat-name">{{ cat.name }}</span>
+          <span class="insp-cat-count">{{ cat.icons.count }} icon{{ cat.icons.count|pluralize }}</span>
+          <p class="insp-cat-desc">{{ cat.description }}</p>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% if featured_icons %}
+    <section class="insp-section">
+      <header class="insp-section-head">
+        <h2>Featured icons</h2>
+        <a class="insp-section-link" href="{% url 'inspiration-icons' %}">See all &rarr;</a>
+      </header>
+      <div class="insp-icon-grid">
+        {% for icon in featured_icons %}
+        <a class="insp-icon-card insp-accent-{{ icon.category.accent }}" href="{% url 'inspiration-icon-detail' icon.slug %}">
+          <div class="insp-icon-image" style="background-image: url('{{ icon.image_url }}');">
+            <span class="insp-icon-cat">{{ icon.category.name }}</span>
+          </div>
+          <div class="insp-icon-body">
+            <h3>{{ icon.name }}</h3>
+            {% if icon.nickname %}<p class="insp-icon-nick">&ldquo;{{ icon.nickname }}&rdquo;</p>{% endif %}
+            <p class="insp-icon-short">{{ icon.short_bio }}</p>
+            <p class="insp-icon-discipline">{{ icon.discipline }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if recent_quotes %}
+    <section class="insp-section">
+      <header class="insp-section-head">
+        <h2>Featured quotes</h2>
+        <a class="insp-section-link" href="{% url 'inspiration-quotes' %}">Quote wall &rarr;</a>
+      </header>
+      <div class="insp-quote-grid">
+        {% for quote in recent_quotes %}
+        <article class="insp-quote-card">
+          <blockquote>&ldquo;{{ quote.text }}&rdquo;</blockquote>
+          <p class="insp-quote-author">&mdash; {{ quote.author }}</p>
+          {% if quote.icon %}
+          <a class="insp-quote-source" href="{% url 'inspiration-icon-detail' quote.icon.slug %}">More from {{ quote.icon.name }}</a>
+          {% endif %}
+        </article>
+        {% empty %}
+        <p class="insp-empty">No featured quotes yet — check back soon.</p>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

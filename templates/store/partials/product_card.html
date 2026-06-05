@@ -25,10 +25,10 @@
     {% endif %}
     <div class="product-card-price">
       {% if product.is_on_sale %}
-        <span class="price-current">${{ product.price }}</span>
-        <span class="price-compare">${{ product.compare_at_price }}</span>
+        <span class="price-current">NRS {{ product.price }}</span>
+        <span class="price-compare">NRS {{ product.compare_at_price }}</span>
       {% else %}
-        <span class="price-current">${{ product.price }}</span>
+        <span class="price-current">NRS {{ product.price }}</span>
       {% endif %}
     </div>
     <form method="post" action="{% url 'add-to-cart' product.slug %}" class="product-card-action">
