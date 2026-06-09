@@ -5,38 +5,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Fitness Hub — Train smarter, eat better, feel your best{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'chatbot/css/chat.css' %}">
+    {% if user.is_authenticated %}
+    <link rel="stylesheet" href="{% static 'gamification/css/gamification.css' %}">
+    {% endif %}
     <meta name="csrf-token" content="{{ csrf_token }}">
     {% block extra_head %}{% endblock %}
     <script defer src="{% static 'js/script.js' %}"></script>
 </head>
-<body>
+<body {% block body_attrs %}{% endblock %}>
     <header class="site-header" id="siteHeader">
         <div class="container nav-wrapper">
             <a class="brand" href="{% url 'home' %}">
-                <span class="brand-mark">F</span>
+                <img src="{% static 'logo.png' %}" alt="Fitness Hub" class="brand-logo">
                 <span class="brand-text">Fitness <strong>Hub</strong></span>
             </a>
             <nav class="main-nav" id="mainNav" aria-label="Primary">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'goals' %}" class="{% if request.resolver_match.url_name == 'goals' or request.resolver_match.url_name == 'create-goal' or request.resolver_match.url_name == 'edit-goal' or request.resolver_match.url_name == 'delete-goal' %}is-active{% endif %}">Goals</a>
-                    <a href="{% url 'exercise-list' %}" class="{% if 'exercise' in request.resolver_match.url_name %}is-active{% endif %}">Workouts</a>
-                    <a href="{% url 'exercise-records' %}" class="{% if request.resolver_match.url_name == 'exercise-records' %}is-active{% endif %}">Records</a>
                     <a href="{% url 'progress' %}" class="{% if 'progress' in request.resolver_match.url_name %}is-active{% endif %}">Progress</a>
-                    <a href="{% url 'diet' %}" class="{% if 'diet' in request.resolver_match.url_name %}is-active{% endif %}">Diet</a>
-                    <a href="{% url 'store-home' %}" class="{% if 'store' in request.resolver_match.url_name or 'product' in request.resolver_match.url_name or 'order' in request.resolver_match.url_name or 'cart' in request.resolver_match.url_name or 'checkout' in request.resolver_match.url_name %}is-active{% endif %}">Store</a>
-                    <a href="{% url 'view-cart' %}" class="nav-cart {% if request.resolver_match.url_name == 'view-cart' or request.resolver_match.url_name == 'checkout' %}is-active{% endif %}">Cart <span class="nav-cart-badge">{{ cart_count|default:0 }}</span></a>
-                    <a href="{% url 'inspiration-feed' %}" class="{% if 'inspiration' in request.resolver_match.url_name %}is-active{% endif %}">Inspiration</a>
-                    <a href="{% url 'profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}is-active{% endif %}">Profile</a>
-                    <a href="{% url 'settings-hub' %}" class="{% if 'settings' in request.resolver_match.url_name %}is-active{% endif %}">Settings</a>
-                    <form action="{% url 'logout' %}" method="post" class="nav-form">
-                        {% csrf_token %}
-                        <button type="submit" class="nav-link-button">Logout</button>
-                    </form>
+                    <a href="{% url 'store-home' %}" class="{% if 'store' in request.resolver_match.url_name or 'product' in request.resolver_match.url_name or 'order' in request.resolver_match.url_name or 'cart' in request.resolver_match.url_name or 'checkout' in request.resolver_match.url_name %}is-active{% endif %}">Store <span class="nav-cart-badge">{{ cart_count|default:0 }}</span></a>
+                    <a href="{% url 'gamification:index' %}" class="{% if 'gamification' in request.resolver_match.app_name %}is-active{% endif %}">Play</a>
+                    <div class="nav-right">
+                        {% if player_summary %}
+                        <a href="{% url 'gamification:index' %}" class="nav-xp-pill" title="{{ player_summary.title }} — {{ player_summary.xp }} XP">
+                            <span class="lvl">{{ player_summary.level }}</span>
+                            <span class="xp-text">{{ player_summary.title }}</span>
+                            <span class="xp-bar"><span class="xp-bar-fill" style="width: {{ player_summary.level_progress_percent }}%"></span></span>
+                            <span class="xp-text">⚡{{ player_summary.xp }}</span>
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'profile' %}" class="nav-icon-link" title="Profile">👤<span class="nav-icon-label">Profile</span></a>
+                    </div>
                 {% else %}
                     <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}is-active{% endif %}">Home</a>
                     <a href="{% url 'about' %}">About</a>
@@ -62,7 +68,7 @@
     <footer class="site-footer">
         <div class="container">
             <div class="footer-brand-row">
-                <span class="brand-mark">F</span>
+                <img src="{% static 'logo.png' %}" alt="Fitness Hub" class="brand-logo">
                 <span class="brand-text">Fitness <strong>Hub</strong></span>
             </div>
             <p>Fitness Hub &copy; {% now 'Y' %} &mdash; Build strength, stay motivated, and move better every day.</p>
@@ -75,9 +81,38 @@
         </div>
     </footer>
 
-    <script>
-    // Scroll-aware header is handled by /static/js/script.js
-    </script>
+    {% if user.is_authenticated %}
+    <script defer src="{% static 'gamification/js/gamification.js' %}"></script>
+    {% endif %}
     <script defer src="{% static 'chatbot/js/chat.js' %}"></script>
+
+    <!-- Background video -->
+    <div class="bg-video" aria-hidden="true">
+        <video autoplay loop muted playsinline id="bgVideo"></video>
+        <div class="bg-video-overlay"></div>
+    </div>
+    <script>
+    (function() {
+        var videos = [
+            'https://assets.mixkit.co/videos/52101/52101-720.mp4',
+            'https://assets.mixkit.co/videos/44431/44431-720.mp4',
+            'https://assets.mixkit.co/videos/44412/44412-720.mp4',
+            'https://assets.mixkit.co/active_storage/video_items/100532/1725383994/100532-video-720.mp4',
+            'https://assets.mixkit.co/active_storage/video_items/100521/1725382949/100521-video-720.mp4',
+        ];
+        var v = document.getElementById('bgVideo');
+        var idx = 0;
+        function next() {
+            v.src = videos[idx];
+            v.load();
+            v.play().catch(function(){});
+            idx = (idx + 1) % videos.length;
+        }
+        v.addEventListener('ended', next);
+        // Pick a random start
+        idx = Math.floor(Math.random() * videos.length);
+        next();
+    })();
+    </script>
 </body>
 </html>

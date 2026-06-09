@@ -1,10 +1,11 @@
 {% extends 'layout/base.html' %}
+{% load static %}
 {% block content %}
 <section class="auth-page">
   <aside class="auth-side">
     <div class="auth-side-inner">
       <a class="brand" href="{% url 'home' %}" style="margin-bottom:0.5rem;">
-        <span class="brand-mark">F</span>
+        <img src="{% static 'logo.png' %}" alt="Fitness Hub" class="brand-logo">
         <span class="brand-text">Fitness <strong>Hub</strong></span>
       </a>
       <span class="eyebrow">Create your account</span>
@@ -44,17 +45,23 @@
 
       <form method="post" novalidate>
         {% csrf_token %}
-        <div class="form-group">
-          <label for="id_username">Username</label>
-          {{ form.username }}
-          {% if form.username.help_text %}<p class="help-text">{{ form.username.help_text }}</p>{% endif %}
-          {{ form.username.errors }}
+        <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label for="id_username">Username</label>
+            {{ form.username }}
+            {% if form.username.help_text %}<p class="help-text">{{ form.username.help_text }}</p>{% endif %}
+            {{ form.username.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_email">Email</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+          </div>
         </div>
         <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
           <div class="form-group">
             <label for="id_password1">Password</label>
             {{ form.password1 }}
-            {% if form.password1.help_text %}<p class="help-text">{{ form.password1.help_text|safe }}</p>{% endif %}
             {{ form.password1.errors }}
           </div>
           <div class="form-group">
@@ -70,13 +77,26 @@
             {{ form.age.errors }}
           </div>
           <div class="form-group">
-            <label for="id_height_ft">Height (ft)</label>
+            <label for="id_gender"><span class="icon-inline">⚧</span>Gender</label>
+            {{ form.gender }}
+            {{ form.gender.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_body_type"><span class="icon-inline">🧍</span>Body Type</label>
+            {{ form.body_type }}
+            {% if form.body_type.help_text %}<small class="form-help">{{ form.body_type.help_text }}</small>{% endif %}
+            {{ form.body_type.errors }}
+          </div>
+        </div>
+        <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label for="id_height_ft"><span class="icon-inline">📏</span>Height (ft)</label>
             {{ form.height_ft }}
             {% if form.height_ft.help_text %}<small class="form-help">{{ form.height_ft.help_text }}</small>{% endif %}
             {{ form.height_ft.errors }}
           </div>
           <div class="form-group">
-            <label for="id_weight_kg">Weight (kg)</label>
+            <label for="id_weight_kg"><span class="icon-inline">⚖️</span>Weight (kg)</label>
             {{ form.weight_kg }}
             {{ form.weight_kg.errors }}
           </div>

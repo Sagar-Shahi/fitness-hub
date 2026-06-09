@@ -15,6 +15,9 @@
     </div>
     <div class="page-head-actions">
       <a class="btn btn-secondary" href="{% url 'store-home' %}"><span class="icon-inline">⬅</span>Continue Shopping</a>
+      {% if user.is_authenticated %}
+        <a class="btn btn-secondary" href="{% url 'order-history' %}"><span class="icon-inline">📦</span>My Orders</a>
+      {% endif %}
     </div>
   </div>
 

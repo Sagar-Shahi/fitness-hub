@@ -1,0 +1,54 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'gamification/css/gamification.css' %}">
+{% endblock %}
+{% block content %}
+<section class="container play-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-mint">🏆</span>
+      <div>
+        <h1>Leaderboard</h1>
+        <p>Where do you rank? Climb the XP ladder by training, logging meals, and crushing quests.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="margin: 1.4rem 0 0.6rem; font-size: 1.05rem; color: #f1f5f9;">⚡ Top by XP</h2>
+  {% if my_rank_xp %}<p style="color:#86efac; font-weight:600; margin-bottom:0.5rem;">Your rank: #{{ my_rank_xp }} ({{ my_xp }} XP)</p>{% endif %}
+  <div class="leaderboard-list">
+    {% for u in top_xp %}
+      <div class="leader-row {% if forloop.counter == 1 %}top-1{% elif forloop.counter == 2 %}top-2{% elif forloop.counter == 3 %}top-3{% endif %} {% if u == request.user %}is-me{% endif %}">
+        <div class="leader-rank">#{{ forloop.counter }}</div>
+        <div>
+          <div class="leader-name">{{ u.username }}{% if u == request.user %} <span style="color:#86efac; font-size:0.78rem;">(you)</span>{% endif %}</div>
+          <div class="leader-stats">Lv {{ u.player_stats.level }} · {{ u.player_stats.title }} · {{ u.player_stats.coins }} 🪙</div>
+        </div>
+        <div class="leader-value">{{ u.player_stats.xp }} XP</div>
+      </div>
+    {% empty %}
+      <div class="empty-state"><div class="icon">📊</div><p>No XP earned yet. Be the first.</p></div>
+    {% endfor %}
+  </div>
+
+  <h2 style="margin: 2rem 0 0.6rem; font-size: 1.05rem; color: #f1f5f9;">🔥 Top by Current Streak</h2>
+  <div class="leaderboard-list">
+    {% for u in top_streak %}
+      <div class="leader-row {% if forloop.counter == 1 %}top-1{% elif forloop.counter == 2 %}top-2{% elif forloop.counter == 3 %}top-3{% endif %} {% if u == request.user %}is-me{% endif %}">
+        <div class="leader-rank">#{{ forloop.counter }}</div>
+        <div>
+          <div class="leader-name">{{ u.username }}{% if u == request.user %} <span style="color:#86efac; font-size:0.78rem;">(you)</span>{% endif %}</div>
+          <div class="leader-stats">Longest: {{ u.workout_stats.longest_streak }} days · Total: {{ u.workout_stats.total_workouts }}</div>
+        </div>
+        <div class="leader-value"><span class="streak-flame">🔥</span> {{ u.workout_stats.current_streak }} days</div>
+      </div>
+    {% empty %}
+      <div class="empty-state"><div class="icon">🔥</div><p>No streaks yet. Log a workout to start one.</p></div>
+    {% endfor %}
+  </div>
+</section>
+
+{% include 'gamification/partials/modals.html' %}
+<script defer src="{% static 'gamification/js/gamification.js' %}"></script>
+{% endblock %}

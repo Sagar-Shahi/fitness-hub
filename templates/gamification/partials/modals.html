@@ -1,0 +1,23 @@
+{# Reusable modal templates (level-up + achievement toast) for cloning via JS. #}
+<template id="levelupTmpl">
+  <div class="levelup-modal-backdrop" role="dialog" aria-modal="true">
+    <div class="levelup-modal">
+      <h2>Level Up!</h2>
+      <div class="level-big"></div>
+      <div class="new-title"></div>
+      <div class="levels-gained"></div>
+      <button class="levelup-close" type="button">Keep crushing</button>
+    </div>
+  </div>
+</template>
+
+<template id="achievementTmpl">
+  <div class="achievement-toast" role="status" aria-live="polite">
+    <div class="a-icon">🏅</div>
+    <div class="a-text">
+      <small>Badge unlocked</small>
+      <strong></strong>
+      <span></span>
+    </div>
+  </div>
+</template>

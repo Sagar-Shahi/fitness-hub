@@ -79,7 +79,43 @@
       </div>
 
       <h3 style="margin-top: 1.5rem;"><span class="icon-inline">💳</span>Payment</h3>
-      <p style="color: var(--store-text-dim); font-size: 0.9rem;">{{ order.get_payment_method_display }}</p>
+      <div class="payment-card">
+        <div class="payment-row">
+          <span class="label">Method</span>
+          <span class="value">
+            {% if order.payment_method == 'card' %}<span class="icon-inline">💳</span>{% else %}<span class="icon-inline">💵</span>{% endif %}
+            {{ order.get_payment_method_display }}
+          </span>
+        </div>
+        <div class="payment-row">
+          <span class="label">Amount</span>
+          <span class="value"><strong>NRS {{ order.total }}</strong></span>
+        </div>
+        <div class="payment-row">
+          <span class="label">Status</span>
+          <span class="value">
+            {% if order.status == 'cancelled' %}
+              <span class="payment-badge payment-cancelled">✕ Refunded / Cancelled</span>
+            {% elif order.status == 'delivered' %}
+              <span class="payment-badge payment-paid">✓ Paid</span>
+            {% elif order.status == 'shipped' %}
+              <span class="payment-badge payment-paid">✓ Paid</span>
+            {% elif order.status == 'processing' %}
+              <span class="payment-badge payment-pending">⏳ Awaiting fulfilment</span>
+            {% else %}
+              <span class="payment-badge payment-pending">⏳ Pending</span>
+            {% endif %}
+          </span>
+        </div>
+        <div class="payment-row">
+          <span class="label">Order ID</span>
+          <span class="value"><code>{{ order.order_number }}</code></span>
+        </div>
+        <div class="payment-row">
+          <span class="label">Placed</span>
+          <span class="value">{{ order.created_at|date:"M j, Y · g:i A" }}</span>
+        </div>
+      </div>
 
       {% if order.notes %}
       <h3 style="margin-top: 1.5rem;"><span class="icon-inline">📝</span>Notes</h3>

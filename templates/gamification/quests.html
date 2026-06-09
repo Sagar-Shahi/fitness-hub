@@ -1,0 +1,95 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'gamification/css/gamification.css' %}">
+{% endblock %}
+{% block content %}
+<section class="container play-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-mint">📜</span>
+      <div>
+        <h1>Quest Board</h1>
+        <p>Complete quests to earn XP, coins, and unlock new badges.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="quest-tabs">
+    <a href="#daily" class="quest-tab is-active" data-tab="daily">Daily</a>
+    <a href="#weekly" class="quest-tab" data-tab="weekly">Weekly</a>
+    <form method="post" action="{% url 'gamification:refresh-quests' %}" style="margin-left:auto; display:inline;">
+      {% csrf_token %}
+      <button class="btn" type="submit" style="padding:0.4rem 0.8rem; font-size:0.78rem;">🎲 Re-roll</button>
+    </form>
+  </div>
+
+  <div id="tab-daily" class="quest-pane">
+    <h2 style="margin: 0.6rem 0 0.8rem; font-size: 1.05rem; color: #f1f5f9;">Daily Quests</h2>
+    {% if daily %}
+      <div class="quest-board">
+        {% for uq in daily %}
+          {% include 'gamification/partials/quest_card.html' with uq=uq %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="icon">📜</div>
+        <p>No daily quests. Re-roll to get a fresh set.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div id="tab-weekly" class="quest-pane" style="display:none;">
+    <h2 style="margin: 0.6rem 0 0.8rem; font-size: 1.05rem; color: #f1f5f9;">Weekly Quests</h2>
+    {% if weekly %}
+      <div class="quest-board">
+        {% for uq in weekly %}
+          {% include 'gamification/partials/quest_card.html' with uq=uq %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="icon">🗓️</div>
+        <p>No weekly quests yet. Check back soon!</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% include 'gamification/partials/modals.html' %}
+<script defer src="{% static 'gamification/js/gamification.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('.quest-tab');
+    const panes = {
+        daily: document.getElementById('tab-daily'),
+        weekly: document.getElementById('tab-weekly'),
+    };
+    tabs.forEach(function (t) {
+        t.addEventListener('click', function (e) {
+            e.preventDefault();
+            tabs.forEach(function (x) { x.classList.remove('is-active'); });
+            t.classList.add('is-active');
+            Object.values(panes).forEach(function (p) {
+                if (p) p.style.display = 'none';
+            });
+            const target = panes[t.dataset.tab];
+            if (target) target.style.display = '';
+            if (history.replaceState) {
+                history.replaceState(null, '', '#' + t.dataset.tab);
+            }
+        });
+    });
+    // Open tab from hash.
+    const hash = (location.hash || '').replace('#', '');
+    if (hash && panes[hash]) {
+        tabs.forEach(function (x) { x.classList.remove('is-active'); });
+        const match = document.querySelector('.quest-tab[data-tab="' + hash + '"]');
+        if (match) match.classList.add('is-active');
+        Object.values(panes).forEach(function (p) { if (p) p.style.display = 'none'; });
+        panes[hash].style.display = '';
+    }
+});
+</script>
+{% endblock %}

@@ -193,6 +193,47 @@
   text-align: center;
 }
 
+.chat-coach-rules {
+  margin: 0;
+  padding: 0.6rem 1.1rem 0.9rem;
+  background: rgba(124, 92, 255, 0.05);
+  border-top: 1px solid var(--chat-border);
+  font-size: 0.78rem;
+  color: var(--chat-mute);
+}
+.chat-coach-rules summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--chat-text);
+  padding: 0.25rem 0;
+  list-style: none;
+  user-select: none;
+}
+.chat-coach-rules summary::-webkit-details-marker { display: none; }
+.chat-coach-rules summary::before {
+  content: "▶";
+  display: inline-block;
+  margin-right: 0.4rem;
+  font-size: 0.65rem;
+  transition: transform 0.2s ease;
+  color: var(--chat-accent);
+}
+.chat-coach-rules[open] summary::before {
+  transform: rotate(90deg);
+}
+.chat-coach-rules__body {
+  margin-top: 0.5rem;
+  line-height: 1.55;
+}
+.chat-coach-rules__body p { margin: 0.4rem 0; }
+.chat-coach-rules__body ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+.chat-coach-rules__body li { margin: 0.2rem 0; }
+.chat-coach-rules__body em { color: var(--chat-accent); font-style: normal; }
+
 /* ===========================================================
    Floating widget
    =========================================================== */

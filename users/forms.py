@@ -67,6 +67,7 @@ class StyledPasswordChangeForm(PasswordChangeForm):
 
 
 class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True, label='Email')
     age = forms.IntegerField(required=True, min_value=1, label='Age')
     height_ft = forms.DecimalField(
         required=True,
@@ -78,10 +79,31 @@ class UserRegistrationForm(UserCreationForm):
         help_text='Enter your height in feet, e.g. 5.83 = 5 ft 10 in.',
     )
     weight_kg = forms.DecimalField(required=True, max_digits=6, decimal_places=2, label='Weight (kg)')
+    gender = forms.ChoiceField(
+        required=True,
+        label='Gender',
+        choices=Profile.GENDER_CHOICES,
+        widget=forms.Select,
+    )
+    body_type = forms.ChoiceField(
+        required=True,
+        label='Body Type',
+        choices=Profile.BODY_TYPES,
+        widget=forms.Select,
+        help_text='Pick the one closest to your build.',
+    )
 
     class Meta:
         model = User
-        fields = ('username', 'password1', 'password2')
+        fields = ('username', 'email', 'password1', 'password2')
+
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip().lower()
+        if not email:
+            raise forms.ValidationError('Email is required.')
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('That email is already registered.')
+        return email
 
 
 class UserUpdateForm(forms.ModelForm):

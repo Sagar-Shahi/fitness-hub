@@ -2,6 +2,7 @@
   'use strict';
 
   const API_URL = '/chatbot/api/';
+  const CONTEXT_URL = '/chatbot/context/';
 
   // ------------- DOM helpers -------------
   function el(tag, attrs, children) {
@@ -124,7 +125,8 @@
       })
       .catch((err) => {
         if (typing.parentNode) typing.parentNode.removeChild(typing);
-        appendMessage(log, '⚠️ Network error — please try again.', 'bot');
+        console.error('Chat fetch failed:', err);
+        appendMessage(log, '⚠️ Connection error — check that the server is running and try again.', 'bot');
       })
       .finally(() => {
         if (sendBtn) sendBtn.disabled = false;
@@ -175,25 +177,25 @@
     const fab = el('button', {
       type: 'button',
       className: 'chat-fab',
-      'aria-label': 'Open fitness coach',
-      title: 'Ask the coach',
+      'aria-label': 'Open Fitness Hub bot',
+      title: 'Chat with the Fitness Hub bot',
     }, '🤖');
     fab.addEventListener('click', toggleWidget);
 
-    const panel = el('div', { className: 'chat-panel', role: 'dialog', 'aria-label': 'Fitness coach' });
+    const panel = el('div', { className: 'chat-panel', role: 'dialog', 'aria-label': 'Fitness Hub bot' });
     panel.innerHTML = `
       <div class="chat-panel__head">
-        <span class="chat-panel__title"><span class="status-dot" aria-hidden="true"></span> Fitness Coach</span>
+        <span class="chat-panel__title"><span class="status-dot" aria-hidden="true"></span> Fitness Hub</span>
         <button type="button" class="chat-panel__close" aria-label="Close">×</button>
       </div>
       <div class="chat-log" role="log" aria-live="polite">
         <div class="chat-msg chat-msg--bot">
-          <div class="chat-msg__bubble">Hey 👋 — ask me for exercises, app help, or nutrition basics.</div>
+          <div class="chat-msg__bubble" data-greeting>Hey! I'm the Fitness Hub bot. I can help with exercises, the app, and general fitness stuff. What's up?</div>
         </div>
       </div>
       <div class="quick-replies"></div>
       <form class="chat-form" autocomplete="off">
-        <input class="chat-input" type="text" placeholder="Type your question…" maxlength="600" required>
+        <input class="chat-input" type="text" placeholder="Ask me anything…" maxlength="600" required>
         <button type="submit" class="btn chat-form__send" aria-label="Send">➤</button>
       </form>
       <p class="chat-foot">🛡️ Informational only — not medical advice.</p>
@@ -222,6 +224,28 @@
     p.classList.add('is-open');
     const i = p.querySelector('.chat-input');
     if (i) setTimeout(() => i.focus(), 50);
+    // Lazy-load the personalized greeting
+    loadPersonalizedGreeting(p);
+  }
+
+  // ------------- Personalized greeting loader -------------
+  function loadPersonalizedGreeting(panel) {
+    if (!panel) return;
+    const target = panel.querySelector('[data-greeting]');
+    if (!target) return;
+    if (target.dataset.set === '1') return;
+    target.dataset.set = '1';
+    fetch(CONTEXT_URL, { credentials: 'same-origin' })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data && data.greeting) {
+          target.innerHTML = escapeHtml(data.greeting)
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
+        }
+      })
+      .catch(() => { /* leave default greeting */ });
   }
   function closeWidget() {
     const p = document.querySelector('.chat-panel');

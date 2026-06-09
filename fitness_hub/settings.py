@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'inspiration',
     'diet',
     'chatbot',
+    'gamification',
     # Third Party
 
 ]
@@ -56,6 +57,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'store.cart_utils.cart_context',
+                'gamification.context_processors.player_summary',
             ],
         },
     },

@@ -61,6 +61,22 @@
   </div>
   {% endif %}
 
+  {% if player_summary %}
+  <a href="{% url 'gamification:index' %}" class="mini-xp-card">
+    <div class="mini-xp-left">
+      <div class="mini-xp-lvl">Lv {{ player_summary.level }}</div>
+      <div class="mini-xp-title">{{ player_summary.title }}</div>
+    </div>
+    <div class="mini-xp-bar">
+      <div class="mini-xp-bar-fill" style="width: {{ player_summary.level_progress_percent }}%"></div>
+    </div>
+    <div class="mini-xp-right">
+      <span class="mini-xp-value">⚡ {{ player_summary.xp }} XP</span>
+      <span class="mini-xp-progress">{{ player_summary.xp_into_level }} / {{ player_summary.xp_to_next_level }} to Lv {{ player_summary.level|add:1 }}</span>
+    </div>
+  </a>
+  {% endif %}
+
   <div class="dash-grid">
     <div class="dash-card">
       <div class="dash-card-header">

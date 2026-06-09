@@ -211,3 +211,48 @@ class SettingsViewTests(TestCase):
         resp = self.client.get(reverse('settings-hub'))
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Email verified')
+
+
+class LoginTests(TestCase):
+    """Cover the case-insensitive LoginView."""
+
+    def setUp(self):
+        self.user = User.objects.create_user('CaptainHook', email='c@x.com', password='GoodPass!23')
+
+    def _login(self, username, password):
+        c = self.client_class()
+        r = c.get(reverse('login'))
+        csrf = c.cookies['csrftoken'].value
+        return c.post(reverse('login'), data={
+            'username': username, 'password': password, 'csrfmiddlewaretoken': csrf,
+        }, follow=True)
+
+    def test_login_with_exact_username(self):
+        r = self._login('CaptainHook', 'GoodPass!23')
+        self.assertTrue(r.wsgi_request.user.is_authenticated)
+
+    def test_login_with_lowercase_username(self):
+        r = self._login('captainhook', 'GoodPass!23')
+        self.assertTrue(r.wsgi_request.user.is_authenticated)
+
+    def test_login_with_mixed_case_username(self):
+        r = self._login('CAPTAINHOOK', 'GoodPass!23')
+        self.assertTrue(r.wsgi_request.user.is_authenticated)
+
+    def test_login_with_leading_trailing_whitespace(self):
+        r = self._login('  CaptainHook  ', 'GoodPass!23')
+        self.assertTrue(r.wsgi_request.user.is_authenticated)
+
+    def test_login_with_wrong_password_fails(self):
+        r = self._login('CaptainHook', 'wrong')
+        self.assertFalse(r.wsgi_request.user.is_authenticated)
+        self.assertContains(r, "didn't match")
+
+    def test_login_with_nonexistent_user_fails(self):
+        r = self._login('nope', 'whatever')
+        self.assertFalse(r.wsgi_request.user.is_authenticated)
+
+    def test_login_page_shows_tips_block(self):
+        r = self.client.get(reverse('login'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'Trouble signing in')

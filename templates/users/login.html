@@ -1,12 +1,13 @@
 {% extends 'layout/base.html' %}
+{% load static %}
 {% block content %}
 <section class="auth-page">
   <aside class="auth-side">
     <div class="auth-side-inner">
-      <a class="brand" href="{% url 'home' %}" style="margin-bottom:0.5rem;">
-        <span class="brand-mark">F</span>
-        <span class="brand-text">Fitness <strong>Hub</strong></span>
-      </a>
+            <a class="brand" href="{% url 'home' %}" style="margin-bottom:0.5rem;">
+                <img src="{% static 'logo.png' %}" alt="Fitness Hub" class="brand-logo">
+                <span class="brand-text">Fitness <strong>Hub</strong></span>
+            </a>
       <span class="eyebrow">Welcome back</span>
       <h1>Sign in and pick up where you left off.</h1>
       <p>Your goals, records, meals, cart, and daily quote are all waiting for you on the other side.</p>
@@ -39,7 +40,15 @@
       <p class="auth-sub">Enter your username and password to continue.</p>
 
       {% if form.errors %}
-        <div class="alert alert-error">That username and password didn't match. Try again.</div>
+        <div class="alert alert-error">
+          <strong>That username and password didn't match.</strong>
+          Please double-check both fields and try again.
+        </div>
+      {% endif %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-error">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
       {% endif %}
 
       <form method="post" novalidate>
@@ -59,6 +68,15 @@
 
       <p class="auth-help">Don't have an account? <a href="{% url 'register' %}">Create one</a></p>
       <p class="auth-help"><a href="{% url 'home' %}">&larr; Back to home</a></p>
+
+      <div class="auth-tips">
+        <strong>Trouble signing in?</strong>
+        <ul>
+          <li>Usernames are case-insensitive on this site, so capitalization doesn't matter.</li>
+          <li>Passwords are case-sensitive — check that Caps Lock is off.</li>
+          <li>If you forgot your password, create a new account or contact us at the email below.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>

@@ -1,0 +1,37 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'gamification/css/gamification.css' %}">
+{% endblock %}
+{% block content %}
+<section class="container play-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-mint">🏅</span>
+      <div>
+        <h1>Badge Collection</h1>
+        <p>Unlocked <strong>{{ unlocked_count }}</strong> of {{ total_count }} badges. Keep training to earn them all.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="badge-grid">
+    {% for row in badge_rows %}
+      <div class="badge-tile {% if row.unlocked %}is-unlocked badge-tier-{{ row.badge.tier }}{% else %}is-locked badge-tier-{{ row.badge.tier }}{% endif %}">
+        <span class="tier-pill">{{ row.badge.get_tier_display }}</span>
+        <div class="badge-icon">{{ row.badge.icon }}</div>
+        <h4>{{ row.badge.name }}</h4>
+        <p>{{ row.badge.description }}</p>
+        {% if row.unlocked %}
+          <div style="margin-top:0.5rem; font-size:0.7rem; color:#86efac;">Unlocked {{ row.unlocked_at|date:"M j" }}</div>
+        {% else %}
+          <div style="margin-top:0.5rem; font-size:0.7rem; color:#94a3b8;">🔒 Locked</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% include 'gamification/partials/modals.html' %}
+<script defer src="{% static 'gamification/js/gamification.js' %}"></script>
+{% endblock %}

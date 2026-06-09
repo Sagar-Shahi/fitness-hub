@@ -1,0 +1,32 @@
+{# Reusable quest card. Expects `uq` (UserQuest). #}
+<div class="quest-card {% if uq.status == 'completed' %}is-complete{% elif uq.status == 'claimed' %}is-claimed{% endif %}">
+  <div class="quest-icon">{{ uq.quest.icon }}</div>
+  <div class="quest-meta">
+    <h3>{{ uq.quest.name }}</h3>
+    <p>{{ uq.quest.description }}</p>
+    <div class="quest-progress">
+      <div class="quest-progress-fill" style="width: {{ uq.percent }}%"></div>
+    </div>
+    <div class="quest-progress-label">
+      <span>{{ uq.progress }} / {{ uq.target }}</span>
+      <span>{% if uq.status == 'claimed' %}Claimed{% elif uq.status == 'completed' %}Ready to claim{% else %}In progress{% endif %}</span>
+    </div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+    <div class="quest-reward">
+      <span class="xp">+{{ uq.quest.xp_reward }}</span>
+      <span class="label">XP</span>
+    </div>
+    {% if uq.status == 'completed' %}
+      <form method="post" action="{% url 'gamification:claim-quest' uq.id %}" class="quest-claim">
+        {% csrf_token %}
+        <button class="quest-claim-btn" type="submit">Claim</button>
+      </form>
+    {% elif uq.status == 'claimed' %}
+      <span class="quest-claimed-pill">✓ Claimed</span>
+    {% endif %}
+    {% if uq.quest.coin_reward %}
+      <span style="font-size:0.72rem; color:#fbbf24; font-weight:700;">+{{ uq.quest.coin_reward }} 🪙</span>
+    {% endif %}
+  </div>
+</div>

@@ -1,6 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 
 from core.utils import sync_goal_from_profile
@@ -14,6 +17,40 @@ from .forms import (
     UserUpdateForm,
 )
 from .models import Profile
+
+
+class _CaseInsensitiveAuthenticationForm(AuthenticationForm):
+    """Same as Django's AuthenticationForm but looks up the username
+    case-insensitively, then authenticates with the real stored username.
+    """
+
+    def clean(self):
+        username = (self.cleaned_data.get('username') or '').strip()
+        password = self.cleaned_data.get('password')
+        if username and password:
+            # Find the real (correctly-cased) username in the DB.
+            real = (
+                User.objects
+                .filter(**{User.USERNAME_FIELD + '__iexact': username})
+                .first()
+            )
+            if real is not None:
+                # Replace with the real username so authenticate() works.
+                self.cleaned_data['username'] = getattr(real, User.USERNAME_FIELD)
+        return super().clean()
+
+
+class CaseInsensitiveLoginView(LoginView):
+    """LoginView that does a case-insensitive username lookup.
+
+    Django's default LoginView is case-sensitive on the username field, so a
+    user who registered as 'JohnDoe' cannot log in as 'johndoe'. We subclass
+    the AuthenticationForm used by LoginView to do an `iexact` lookup and
+    replace the input with the real username before authentication runs.
+    """
+
+    def get_form_class(self):
+        return _CaseInsensitiveAuthenticationForm
 
 
 @login_required
@@ -159,11 +196,15 @@ def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            user.email = form.cleaned_data.get('email')
+            user.save()
             profile, _ = Profile.objects.get_or_create(user=user)
             profile.age = form.cleaned_data.get('age')
             profile.height_ft = form.cleaned_data.get('height_ft')
             profile.weight_kg = form.cleaned_data.get('weight_kg')
+            profile.gender = form.cleaned_data.get('gender')
+            profile.body_type = form.cleaned_data.get('body_type')
             profile.save()
             login(request, user)
             messages.success(request, 'Your account has been created successfully.')

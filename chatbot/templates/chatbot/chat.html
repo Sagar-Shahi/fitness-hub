@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 {% load static %}
 
-{% block title %}Coach — Fitness Hub{% endblock %}
+{% block title %}Fitness Hub Bot — Fitness Hub{% endblock %}
 
 {% block extra_head %}
 <meta name="csrf-token" content="{{ csrf_token }}">
@@ -16,15 +16,15 @@
     <header class="page-head">
         <span class="icon-badge icon-badge--violet icon-badge--lg" aria-hidden="true">🤖</span>
         <div class="page-head__body">
-            <h1 class="page-head__title">Fitness Coach</h1>
-            <p class="page-head__sub">Rule-based assistant for exercises, app help, and general nutrition. No sign-in required.</p>
+            <h1 class="page-head__title">Fitness Hub Bot</h1>
+            <p class="page-head__sub">Your friendly fitness companion. I know every page, every feature, and every exercise in Fitness Hub.</p>
         </div>
     </header>
 
     <section class="chat-card" aria-label="Chat">
         <div class="chat-card__bar">
             <span class="status-dot" aria-hidden="true"></span>
-            <span class="chat-card__status">Online · scoped to fitness, nutrition, and app help</span>
+            <span class="chat-card__status">Scoped to fitness, nutrition, and app help</span>
         </div>
 
         <div id="chat-log" class="chat-log" role="log" aria-live="polite">
@@ -34,18 +34,21 @@
                 </div>
             {% empty %}
                 <div class="chat-msg chat-msg--bot">
-                    <div class="chat-msg__bubble">
-                        Hey 👋 — ask me for an exercise recommendation, how to do a move, or how to use any part of the app.
+                    <div class="chat-msg__bubble" id="bot-greeting">
+                        {{ greeting|default:"Hey! I'm the Fitness Hub bot. I can help with exercises, the app, and general fitness stuff. What's up?" }}
                     </div>
                 </div>
             {% endfor %}
         </div>
 
         <div id="quick-replies" class="quick-replies" aria-label="Quick replies">
-            <button type="button" class="chip" data-msg="Recommend an exercise for me">🎯 Recommend an exercise</button>
-            <button type="button" class="chip" data-msg="How do I change my password?">🔒 Change password</button>
+            <button type="button" class="chip" data-msg="Motivate me">🔥 Motivate me</button>
+            <button type="button" class="chip" data-msg="What should I do next?">🎯 What should I do next?</button>
+            <button type="button" class="chip" data-msg="Who are you?">🤖 Who are you?</button>
+            <button type="button" class="chip" data-msg="How do I log a workout?">📋 Log a workout</button>
             <button type="button" class="chip" data-msg="How much protein do I need?">🥩 Protein intake</button>
             <button type="button" class="chip" data-msg="Show me chest exercises">💪 Chest exercises</button>
+            <button type="button" class="chip" data-msg="How do I change my password?">🔒 Change password</button>
         </div>
 
         <form id="chat-form" class="chat-form" autocomplete="off">
@@ -53,7 +56,7 @@
                 id="chat-input"
                 name="message"
                 type="text"
-                placeholder="Type your question…"
+                placeholder="Ask me anything…"
                 maxlength="600"
                 required
             >
@@ -62,8 +65,27 @@
             </button>
         </form>
 
+        <details class="chat-bot-rules">
+            <summary>🤖 How I work · the rules I follow</summary>
+            <div class="chat-bot-rules__body">
+                <p><strong>What I am:</strong> a rule-based fitness bot built into Fitness Hub. I can read your profile, streak, and goal to give personalized tips, but I <em>never</em> modify your account data.</p>
+                <p><strong>What I can help with:</strong> exercise technique, programming, warm-up, recovery, general nutrition, and how to use every page of the app.</p>
+                <p><strong>Hard limits I follow:</strong></p>
+                <ul>
+                    <li>I never claim to be a real person, doctor, or dietitian.</li>
+                    <li>I never give a medical diagnosis or prescribe anything.</li>
+                    <li>I never recommend steroids, SARMs, or any prohibited substance.</li>
+                    <li>I never expose another user's data or pretend to browse the live web.</li>
+                    <li>I never promise specific results (no "you will lose 10kg").</li>
+                    <li>I never shame your body, weight, or identity — even in sarcasm.</li>
+                    <li>I always include a medical disclaimer for health and nutrition answers.</li>
+                    <li>I always stay in scope: fitness, nutrition, and Fitness Hub.</li>
+                </ul>
+            </div>
+        </details>
+
         <p class="chat-foot">
-            🛡️ {{ safety_disclaimer|default:"This coach is informational only. Talk to a doctor before changing your diet, training, or supplements." }}
+            🛡️ Informational only. Talk to a doctor before changing your diet, training, or supplements.
         </p>
     </section>
 </div>

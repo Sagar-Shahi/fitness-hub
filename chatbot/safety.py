@@ -129,6 +129,8 @@ def sanitize_output(text: str) -> str:
     """Final sanity check on a bot response before it reaches the user.
 
     Strips anything that smells like a medical diagnosis or dangerous advice.
+    Also delegates to guidelines.enforce_reply so persona rules are applied
+    here as a final defense-in-depth pass.
     """
     if not text:
         return text
@@ -146,6 +148,15 @@ def sanitize_output(text: str) -> str:
             # case-insensitive replace
             idx = cleaned.lower().find(bad)
             cleaned = cleaned[:idx] + good + cleaned[idx + len(bad):]
+
+    # Delegate to guidelines module for persona enforcement.
+    # This is a defense-in-depth pass; responder already calls it.
+    try:
+        from . import guidelines
+        cleaned = guidelines.enforce_reply(cleaned)
+    except Exception:
+        pass
+
     return cleaned
 
 

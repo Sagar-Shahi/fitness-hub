@@ -306,6 +306,34 @@
   pointer-events: none;
 }
 
+.store-hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 46rem;
+}
+.store-hero-actions .store-search { flex: 1; min-width: 16rem; }
+.store-hero-actions .btn-cart-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.4rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.store-hero-actions .btn-cart-hero:hover {
+  background: rgba(34,197,94,0.15);
+  border-color: #22c55e;
+}
 .store-hero-content {
   position: relative;
   z-index: 1;
@@ -1769,6 +1797,95 @@
 .address-card p {
   margin: 0;
   color: var(--store-text-dim);
+}
+
+/* ---------- My Orders CTA (store home) ---------- */
+.my-orders-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 2.5rem 0 0;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(124, 92, 255, 0.12), rgba(0, 229, 160, 0.08));
+  border: 1px solid rgba(124, 92, 255, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+}
+.my-orders-cta-text {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.my-orders-cta-text h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+  color: #fff;
+}
+.my-orders-cta-text p {
+  margin: 0;
+  color: var(--store-text-dim);
+  font-size: 0.92rem;
+}
+
+/* ---------- Payment card (order detail) ---------- */
+.payment-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem 1.1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+  color: var(--store-text-dim);
+  gap: 1rem;
+}
+.payment-row .label {
+  color: var(--store-text-dim);
+  font-weight: 500;
+}
+.payment-row .value {
+  color: #fff;
+  font-weight: 500;
+  text-align: right;
+}
+.payment-row .value code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.85em;
+  letter-spacing: 0.5px;
+}
+.payment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.payment-paid {
+  background: rgba(0, 229, 160, 0.15);
+  color: #00e5a0;
+  border: 1px solid rgba(0, 229, 160, 0.35);
+}
+.payment-pending {
+  background: rgba(255, 193, 7, 0.12);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+.payment-cancelled {
+  background: rgba(255, 90, 95, 0.12);
+  color: #ff5a5f;
+  border: 1px solid rgba(255, 90, 95, 0.3);
 }
 
 /* ---------- Pagination ---------- */

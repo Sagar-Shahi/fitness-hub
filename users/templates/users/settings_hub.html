@@ -72,6 +72,21 @@
         </div>
         <span class="settings-card-cta">Change goal</span>
       </a>
+
+      <div class="settings-card is-danger">
+        <div class="settings-card-head">
+          <span class="settings-card-icon">↩</span>
+          <h2>Sign out</h2>
+        </div>
+        <p>End your session securely. You'll need to sign in again to access your profile, progress, and store.</p>
+        <div class="settings-card-meta" style="margin-top:0.75rem">
+          <span class="settings-pill">Signed in as {{ user_obj.username }}</span>
+        </div>
+        <form action="{% url 'logout' %}" method="post" style="margin-top:0.75rem">
+          {% csrf_token %}
+          <button type="submit" class="settings-btn settings-btn-danger">Sign out</button>
+        </form>
+      </div>
     </div>
   </div>
 </section>

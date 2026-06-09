@@ -1,0 +1,92 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'gamification/css/gamification.css' %}">
+{% endblock %}
+{% block body_attrs %}
+{% if levelup_payload %}data-levelup='{{ levelup_payload|safe }}'{% endif %}
+{% if badge_toasts %}data-badges='{{ badge_toasts|safe }}'{% endif %}
+{% endblock %}
+{% block content %}
+<section class="container play-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-mint">🎮</span>
+      <div>
+        <h1>Your Player Hub</h1>
+        <p>Train, level up, unlock badges, and crush quests.</p>
+      </div>
+    </div>
+  </div>
+
+  {% if summary %}
+  <div class="player-card">
+    <div class="player-card-inner">
+      <div class="player-avatar" data-lvl="Lv {{ summary.level }}">{{ user.username|slice:":1"|upper }}</div>
+      <div class="player-info">
+        <h2>{{ user.username }}</h2>
+        <div class="player-title">{{ summary.title }}</div>
+        <div class="player-xp-bar">
+          <div class="player-xp-bar-fill" style="width: {{ summary.level_progress_percent }}%"></div>
+        </div>
+        <div class="player-xp-label">
+          <span>{{ summary.xp }} XP</span>
+          <span>{{ summary.xp_into_level }} / {{ summary.xp_to_next_level }} to Lv {{ summary.level|add:1 }}</span>
+        </div>
+      </div>
+      <div class="player-stats-mini">
+        <span class="player-stat-chip coin">🪙 {{ summary.coins }} coins</span>
+        <span class="player-stat-chip shield">🛡️ {{ summary.streak_shields }} shields</span>
+        <span class="player-stat-chip badge">🏅 {{ summary.recent_badges|length }} recent</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="play-grid">
+    <div>
+      <h2 style="margin: 1.5rem 0 0.6rem; font-size: 1.1rem; color: #f1f5f9;">Today's Quests</h2>
+      {% if summary.daily_quests %}
+        <div class="quest-board">
+          {% for uq in summary.daily_quests %}
+            {% include 'gamification/partials/quest_card.html' with uq=uq %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="icon">🎯</div>
+          <p>No daily quests yet. Open the <a href="{% url 'gamification:quests' %}" style="color:#86efac;">Quest Board</a> to generate some.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div>
+      <h2 style="margin: 1.5rem 0 0.6rem; font-size: 1.1rem; color: #f1f5f9;">Recent Badges</h2>
+      <div class="badge-grid">
+        {% for ub in summary.recent_badges %}
+          <div class="badge-tile is-unlocked badge-tier-{{ ub.badge.tier }}">
+            <span class="tier-pill">{{ ub.badge.get_tier_display }}</span>
+            <div class="badge-icon">{{ ub.badge.icon }}</div>
+            <h4>{{ ub.badge.name }}</h4>
+            <p>{{ ub.badge.description }}</p>
+          </div>
+        {% empty %}
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="icon">🔒</div>
+            <p>No badges yet. Log a workout or set a goal to start unlocking.</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+        <a href="{% url 'gamification:badges' %}" class="btn" style="flex:1; text-align:center;">All Badges</a>
+        <a href="{% url 'gamification:quests' %}" class="btn" style="flex:1; text-align:center;">Quest Board</a>
+        <a href="{% url 'gamification:leaderboard' %}" class="btn" style="flex:1; text-align:center;">Leaderboard</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% include 'gamification/partials/modals.html' %}
+<script defer src="{% static 'gamification/js/gamification.js' %}"></script>
+{% endblock %}

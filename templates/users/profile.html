@@ -22,7 +22,7 @@
     {% if request.user.profile %}
     <div class="record-row">
       <span><span class="icon-inline">🎂</span><strong>Age:</strong> {{ request.user.profile.age }}</span>
-      <span><span class="icon-inline">⚧</span><strong>Gender:</strong> {{ request.user.profile.gender }}</span>
+      <span><span class="icon-inline">⚧</span><strong>Gender:</strong> {{ request.user.profile.get_gender_display }}</span>
     </div>
 
     <div class="record-row">
@@ -38,18 +38,6 @@
       <span><span class="icon-inline">🔍</span><strong>Focus Area:</strong> {{ request.user.profile.get_goal_focus_display }}</span>
     </div>
     {% endif %}
-
-    <hr>
-
-    <div class="profile-actions">
-      <a class="button button-secondary" href="{% url 'settings-hub' %}"><span class="icon-inline">⚙️</span>Settings</a>
-      <a class="button button-secondary" href="{% url 'edit-profile' %}"><span class="icon-inline">✏️</span>Edit Profile</a>
-      <a class="button button-secondary" href="{% url 'select-goal' %}"><span class="icon-inline">🎯</span>Change Goal</a>
-      <form action="{% url 'logout' %}" method="post" class="logout-form-inline" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="button button-secondary"><span class="icon-inline">🚪</span>Logout</button>
-      </form>
-    </div>
 
   </div>
 </section>

@@ -129,6 +129,8 @@
 }
 .settings-card.is-warn::before { background: var(--set-warn); }
 .settings-card.is-info::before { background: var(--set-accent-2); }
+.settings-card.is-danger::before { background: var(--set-danger); }
+.settings-card.is-danger .settings-card-icon { color: var(--set-danger); }
 
 .settings-card-head {
   display: flex;
@@ -381,6 +383,15 @@
   border-color: var(--set-border);
 }
 .settings-btn-ghost:hover { border-color: var(--set-accent); color: var(--set-accent); }
+.settings-btn-danger {
+  background: var(--set-danger);
+  color: #0a0e16;
+  border-color: transparent;
+}
+.settings-btn-danger:hover {
+  background: #fca5a5;
+  box-shadow: 0 4px 14px rgba(248, 113, 113, 0.35);
+}
 
 /* Side info card */
 .settings-info {
