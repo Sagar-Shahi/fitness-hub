@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import (
     PlayerStats, Badge, UserBadge, Quest, UserQuest, XPEvent, StreakShieldUse,
+    SocialConnection,
 )
 
 
@@ -69,3 +70,11 @@ class StreakShieldUseAdmin(admin.ModelAdmin):
     list_display = ('user', 'used_on', 'reason', 'created_at')
     search_fields = ('user__username', 'reason')
     date_hierarchy = 'used_on'
+
+
+@admin.register(SocialConnection)
+class SocialConnectionAdmin(admin.ModelAdmin):
+    list_display = ('from_user', 'to_user', 'connection_type', 'status', 'created_at')
+    list_filter = ('connection_type', 'status')
+    search_fields = ('from_user__username', 'to_user__username')
+    date_hierarchy = 'created_at'

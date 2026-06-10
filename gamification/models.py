@@ -305,3 +305,42 @@ class StreakShieldUse(models.Model):
 
     def __str__(self):
         return f"{self.user.username} used shield on {self.used_on}"
+
+
+# ---------------------------------------------------------------------------
+# Social connections — friend, rival, partner
+# ---------------------------------------------------------------------------
+
+class SocialConnection(models.Model):
+    TYPE_CHOICES = [
+        ('friend', 'Friend'),
+        ('rival', 'Rival'),
+        ('partner', 'Partner'),
+    ]
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+    ]
+
+    from_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='sent_connections',
+    )
+    to_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='received_connections',
+    )
+    connection_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('from_user', 'to_user', 'connection_type')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.from_user.username} → {self.to_user.username} ({self.connection_type}, {self.status})"

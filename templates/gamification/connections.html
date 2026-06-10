@@ -1,0 +1,182 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'gamification/css/gamification.css' %}">
+<style>
+.conn-section { margin-top: 1.5rem; }
+.conn-section h2 { font-size: 1.05rem; color: #f1f5f9; margin: 0 0 0.8rem; }
+.conn-list { display: grid; gap: 0.6rem; }
+.conn-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 0.7rem;
+}
+.conn-row .avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem; color: #0f172a;
+  flex-shrink: 0;
+}
+.conn-row .info { flex: 1; }
+.conn-row .info strong { display: block; color: #f1f5f9; font-size: 0.92rem; }
+.conn-row .info span { color: #94a3b8; font-size: 0.78rem; }
+.conn-type-pill {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.conn-type-pill.rival { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+.conn-type-pill.friend { background: rgba(59, 130, 246, 0.12); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3); }
+.conn-row .actions { display: flex; gap: 0.4rem; }
+.btn-sm {
+  font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.7rem;
+  border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.04); color: #cbd5e1;
+  cursor: pointer; transition: all 0.15s ease;
+}
+.btn-sm.accept { color: #86efac; border-color: rgba(34, 197, 94, 0.4); }
+.btn-sm.accept:hover { background: rgba(34, 197, 94, 0.15); }
+.btn-sm.decline { color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+.btn-sm.decline:hover { background: rgba(239, 68, 68, 0.12); }
+</style>
+{% endblock %}
+{% block content %}
+<section class="container play-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-mint">🔗</span>
+      <div>
+        <h1>Connections</h1>
+        <p>Your friends, rivals, and training partners.</p>
+      </div>
+    </div>
+    <a href="{% url 'gamification:players' %}" class="btn btn-sm" style="margin-top: 0.6rem;">Browse Players</a>
+  </div>
+
+  {% if received %}
+  <div class="conn-section">
+    <h2>📩 Pending Requests</h2>
+    <div class="conn-list">
+      {% for c in received %}
+      <div class="conn-row" data-conn-id="{{ c.id }}">
+        <div class="avatar">{{ c.from_user.username|first|upper }}</div>
+        <div class="info">
+          <strong>{{ c.from_user.username }}</strong>
+          <span>Lv {{ c.from_user.player_stats.level }} · {{ c.from_user.player_stats.title }}</span>
+        </div>
+        <span class="conn-type-pill {{ c.connection_type }}">{{ c.get_connection_type_display }}</span>
+        <div class="actions">
+          <button class="btn-sm accept" data-action="accept">Accept</button>
+          <button class="btn-sm decline" data-action="decline">Decline</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="conn-section">
+    <h2>🤝 Active Connections</h2>
+    <div class="conn-list">
+      {% for c in sent %}
+        {% if c.status == 'accepted' %}
+        <div class="conn-row">
+          <div class="avatar">{{ c.to_user.username|first|upper }}</div>
+          <div class="info">
+            <strong>{{ c.to_user.username }}</strong>
+            <span>Lv {{ c.to_user.player_stats.level }} · {{ c.to_user.player_stats.title }}</span>
+          </div>
+          <span class="conn-type-pill {{ c.connection_type }}">{{ c.get_connection_type_display }}</span>
+        </div>
+        {% endif %}
+      {% endfor %}
+      {% for c in received %}
+        {% if c.status == 'accepted' %}
+        <div class="conn-row">
+          <div class="avatar">{{ c.from_user.username|first|upper }}</div>
+          <div class="info">
+            <strong>{{ c.from_user.username }}</strong>
+            <span>Lv {{ c.from_user.player_stats.level }} · {{ c.from_user.player_stats.title }}</span>
+          </div>
+          <span class="conn-type-pill {{ c.connection_type }}">{{ c.get_connection_type_display }}</span>
+        </div>
+        {% endif %}
+      {% empty %}
+        {% if not received %}
+        <div class="empty-state"><div class="icon">👥</div><p>No connections yet. Browse players to add friends, rivals, or training partners.</p></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="conn-section">
+    <h2>📤 Sent Requests</h2>
+    <div class="conn-list">
+      {% for c in sent %}
+        {% if c.status == 'pending' %}
+        <div class="conn-row">
+          <div class="avatar">{{ c.to_user.username|first|upper }}</div>
+          <div class="info">
+            <strong>{{ c.to_user.username }}</strong>
+            <span>Lv {{ c.to_user.player_stats.level }} · {{ c.to_user.player_stats.title }}</span>
+          </div>
+          <span class="conn-type-pill {{ c.connection_type }}">{{ c.get_connection_type_display }}</span>
+          <span style="color:#fbbf24; font-size:0.72rem; font-weight:600;">Pending</span>
+        </div>
+        {% endif %}
+      {% empty %}
+        {% if not sent %}
+          {# No sent requests; already handled by active connections empty state #}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  function getCSRFToken() {
+    var meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+  }
+
+  document.querySelectorAll('.conn-row .accept, .conn-row .decline').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var row = this.closest('.conn-row');
+      var connId = row.dataset.connId;
+      var action = this.dataset.action;
+
+      fetch('{% url "gamification:respond-request" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify({ connection_id: parseInt(connId), action: action }),
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.status === 'accept' || data.status === 'decline') {
+          row.style.transition = 'opacity 0.3s ease';
+          row.style.opacity = '0';
+          setTimeout(function() { row.remove(); }, 300);
+        }
+      })
+      .catch(function() {});
+    });
+  });
+})();
+</script>
+{% endblock %}

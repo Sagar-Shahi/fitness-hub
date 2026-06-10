@@ -32,6 +32,7 @@
                     <a href="{% url 'progress' %}" class="{% if 'progress' in request.resolver_match.url_name %}is-active{% endif %}">Progress</a>
                     <a href="{% url 'store-home' %}" class="{% if 'store' in request.resolver_match.url_name or 'product' in request.resolver_match.url_name or 'order' in request.resolver_match.url_name or 'cart' in request.resolver_match.url_name or 'checkout' in request.resolver_match.url_name %}is-active{% endif %}">Store <span class="nav-cart-badge">{{ cart_count|default:0 }}</span></a>
                     <a href="{% url 'gamification:index' %}" class="{% if 'gamification' in request.resolver_match.app_name %}is-active{% endif %}">Play</a>
+                    <a href="{% url 'gamification:players' %}" class="{% if 'players' in request.resolver_match.url_name %}is-active{% endif %}">Players</a>
                     <div class="nav-right">
                         {% if player_summary %}
                         <a href="{% url 'gamification:index' %}" class="nav-xp-pill" title="{{ player_summary.title }} — {{ player_summary.xp }} XP">

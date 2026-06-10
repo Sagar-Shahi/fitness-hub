@@ -1,0 +1,214 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'gamification/css/gamification.css' %}">
+<style>
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.player-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.9rem;
+  padding: 1.25rem;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.player-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+.player-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+.player-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #0f172a;
+  flex-shrink: 0;
+}
+.player-card-info h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+.player-card-info .title {
+  font-size: 0.78rem;
+  color: #86efac;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.player-card-info .xp {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+.player-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+.btn-conn {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.btn-conn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(148, 163, 184, 0.5);
+}
+.btn-conn.is-connected {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #86efac;
+  pointer-events: auto;
+}
+.btn-conn.is-connected:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+.btn-conn.is-pending {
+  background: rgba(234, 179, 8, 0.12);
+  border-color: rgba(234, 179, 8, 0.35);
+  color: #fbbf24;
+  pointer-events: none;
+}
+.btn-conn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.search-box {
+  max-width: 320px;
+  margin: 0 0 0.5rem;
+}
+.search-box input {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.6);
+  color: #f1f5f9;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.search-box input:focus {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+.search-box input::placeholder {
+  color: #64748b;
+}
+</style>
+{% endblock %}
+{% block content %}
+<section class="container play-page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <span class="icon-badge is-mint">👥</span>
+      <div>
+        <h1>Players</h1>
+        <p>Find other fitness enthusiasts. Add them as a <strong>friend</strong>, <strong>rival</strong>, or <strong>partner</strong> to stay motivated.</p>
+      </div>
+    </div>
+    <a href="{% url 'gamification:connections' %}" class="btn btn-sm" style="margin-top: 0.6rem;">My Connections</a>
+  </div>
+
+  <form method="GET" autocomplete="off" class="search-box">
+    <input type="text" name="q" placeholder="Search by username…" value="{{ query }}" aria-label="Search players">
+  </form>
+
+  <div class="players-grid">
+    {% for p in players %}
+    <div class="player-card" data-user-id="{{ p.user.id }}">
+      <div class="player-card-header">
+        <div class="player-avatar">{{ p.user.username|first|upper }}</div>
+        <div class="player-card-info">
+          <h3>{{ p.user.username }}</h3>
+          <div class="title">Lv {{ p.level }} · {{ p.title }}</div>
+          <div class="xp">{{ p.xp }} XP</div>
+        </div>
+      </div>
+      <div class="player-actions">
+        <button class="btn-conn {% if p.connection_friend == 'accepted' %}is-connected{% elif p.connection_friend == 'pending' %}is-pending{% endif %}" data-type="friend" data-user-id="{{ p.user.id }}">
+          {% if p.connection_friend == 'accepted' %}✓ Friend{% elif p.connection_friend == 'pending' %}⋯ Pending{% else %}+ Friend{% endif %}
+        </button>
+        <button class="btn-conn {% if p.connection_rival == 'accepted' %}is-connected{% elif p.connection_rival == 'pending' %}is-pending{% endif %}" data-type="rival" data-user-id="{{ p.user.id }}">
+          {% if p.connection_rival == 'accepted' %}⚔ Rival{% elif p.connection_rival == 'pending' %}⋯ Pending{% else %}⚔ Rival{% endif %}
+        </button>
+        <button class="btn-conn {% if p.connection_partner == 'accepted' %}is-connected{% elif p.connection_partner == 'pending' %}is-pending{% endif %}" data-type="partner" data-user-id="{{ p.user.id }}">
+          {% if p.connection_partner == 'accepted' %}✓ Partner{% elif p.connection_partner == 'pending' %}⋯ Pending{% else %}+ Partner{% endif %}
+        </button>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state" style="grid-column: 1 / -1;">
+      <div class="icon">🔍</div>
+      <p>No players found.</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+(function() {
+  function getCSRFToken() {
+    var meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+  }
+
+  document.querySelectorAll('.btn-conn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var type = this.dataset.type;
+      var userId = this.dataset.userId;
+      var self = this;
+
+      fetch('{% url "gamification:send-request" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify({ to_user_id: parseInt(userId), type: type }),
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.status === 'pending') {
+          // Mark just this button as pending
+          self.className = 'btn-conn is-pending';
+          self.textContent = '⋯ Pending';
+        } else if (data.status === 'removed') {
+          self.className = 'btn-conn';
+          if (type === 'friend') self.textContent = '+ Friend';
+          else if (type === 'rival') self.textContent = '⚔ Rival';
+          else self.textContent = '+ Partner';
+        }
+      })
+      .catch(function() {});
+    });
+  });
+})();
+</script>
+{% endblock %}

@@ -20,7 +20,7 @@ from django.views.decorators.http import require_POST
 import json
 
 from . import services as svc
-from .models import Badge, Quest, UserBadge, UserQuest, XPEvent
+from .models import Badge, Quest, SocialConnection, UserBadge, UserQuest, XPEvent
 
 
 @login_required
@@ -208,4 +208,130 @@ def api_award_debug(request):
         'title': result['new_title'],
         'leveled_up': result['leveled_up'],
         'new_badges': [ub.badge.name for ub in new_badges],
+    })
+
+
+# ---------------------------------------------------------------------------
+# Social — players directory, friend/rival/partner connections
+# ---------------------------------------------------------------------------
+
+@login_required
+def players(request):
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    query = request.GET.get('q', '').strip()
+
+    all_users = User.objects.filter(is_active=True).exclude(id=request.user.id)
+    if query:
+        all_users = all_users.filter(username__icontains=query)
+    all_users = list(
+        all_users.select_related('player_stats').order_by('username')
+    )
+
+    # Gather existing connections for the current user
+    sent = SocialConnection.objects.filter(from_user=request.user)
+    received = SocialConnection.objects.filter(to_user=request.user)
+    conn_map = {}
+    for c in sent:
+        conn_map[(c.to_user_id, c.connection_type)] = c.status
+    for c in received:
+        if (c.from_user_id, c.connection_type) not in conn_map:
+            conn_map[(c.from_user_id, c.connection_type)] = c.status
+
+    enriched = []
+    for u in all_users:
+        stats = getattr(u, 'player_stats', None)
+        enriched.append({
+            'user': u,
+            'level': stats.level if stats else 1,
+            'title': stats.title if stats else 'Rookie',
+            'xp': stats.xp if stats else 0,
+            'connection_friend': conn_map.get((u.id, 'friend')),
+            'connection_rival': conn_map.get((u.id, 'rival')),
+            'connection_partner': conn_map.get((u.id, 'partner')),
+        })
+
+    return render(request, 'gamification/players.html', {
+        'players': enriched,
+        'query': query,
+    })
+
+
+@login_required
+@require_POST
+def send_request(request):
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    from pprint import pformat
+    import json
+    try:
+        data = json.loads(request.body)
+        to_user_id = data.get('to_user_id')
+        conn_type = data.get('type')
+    except (json.JSONDecodeError, TypeError):
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    if conn_type not in ('friend', 'rival', 'partner'):
+        return JsonResponse({'error': 'Invalid type'}, status=400)
+
+    target = get_object_or_404(User, pk=to_user_id, is_active=True)
+    if target == request.user:
+        return JsonResponse({'error': 'Cannot connect with yourself'}, status=400)
+
+    conn, created = SocialConnection.objects.get_or_create(
+        from_user=request.user,
+        to_user=target,
+        connection_type=conn_type,
+        defaults={'status': 'pending'},
+    )
+    if not created:
+        if conn.status == 'accepted':
+            conn.delete()
+            return JsonResponse({'status': 'removed'})
+        return JsonResponse({'error': 'Request already sent'}, status=400)
+
+    return JsonResponse({'status': 'pending'})
+
+
+@login_required
+@require_POST
+def respond_request(request):
+    import json
+    try:
+        data = json.loads(request.body)
+        conn_id = data.get('connection_id')
+        action = data.get('action')
+    except (json.JSONDecodeError, TypeError):
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    if action not in ('accept', 'decline'):
+        return JsonResponse({'error': 'Invalid action'}, status=400)
+
+    conn = get_object_or_404(
+        SocialConnection, pk=conn_id, to_user=request.user, status='pending'
+    )
+    if action == 'accept':
+        conn.status = 'accepted'
+        conn.save()
+    else:
+        conn.delete()
+
+    return JsonResponse({'status': action})
+
+
+@login_required
+def connections(request):
+    sent = list(
+        SocialConnection.objects.filter(from_user=request.user)
+        .select_related('to_user__player_stats')
+        .order_by('-created_at')
+    )
+    received = list(
+        SocialConnection.objects.filter(to_user=request.user)
+        .select_related('from_user__player_stats')
+        .order_by('-created_at')
+    )
+    return render(request, 'gamification/connections.html', {
+        'sent': sent,
+        'received': received,
     })
