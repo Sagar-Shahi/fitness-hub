@@ -90,7 +90,11 @@
       <div class="checkout-items">
         {% for item in cart.items.all %}
         <div class="checkout-item">
-          <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="checkout-item-img">
+          {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="checkout-item-img" onerror="this.onerror=null; this.outerHTML='<div class=\'checkout-item-img\' style=\'display:flex;align-items:center;justify-content:center;background:var(--store-bg);font-size:1.5rem;\'>📦</div>'">
+          {% else %}
+            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="checkout-item-img" onerror="this.onerror=null; this.outerHTML='<div class=\'checkout-item-img\' style=\'display:flex;align-items:center;justify-content:center;background:var(--store-bg);font-size:1.5rem;\'>📦</div>'">
+          {% endif %}
           <div class="checkout-item-info">
             <h4>{{ item.product.name }}</h4>
             <p>Qty: {{ item.quantity }} × NRS {{ item.product.price }}</p>

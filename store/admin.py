@@ -15,6 +15,15 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductInline]
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'description', 'icon', 'display_order', 'is_active'),
+        }),
+        ('Image', {
+            'fields': ('image', 'image_url'),
+            'description': 'Upload an image or provide an external URL.',
+        }),
+    )
 
 
 @admin.register(Product)
@@ -28,6 +37,17 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ('price', 'stock', 'is_featured', 'is_active')
     readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'category', 'short_description', 'description',
+                       'price', 'compare_at_price', 'brand', 'sku', 'stock',
+                       'rating', 'review_count', 'is_featured', 'is_active'),
+        }),
+        ('Image', {
+            'fields': ('image', 'image_url'),
+            'description': 'Upload an image or provide an external URL. Uploaded image takes priority.',
+        }),
+    )
 
 
 class CartItemInline(admin.TabularInline):

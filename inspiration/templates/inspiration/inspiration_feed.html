@@ -60,7 +60,7 @@
       <div class="insp-icon-grid">
         {% for icon in featured_icons %}
         <a class="insp-icon-card insp-accent-{{ icon.category.accent }}" href="{% url 'inspiration-icon-detail' icon.slug %}">
-          <div class="insp-icon-image" style="background-image: url('{{ icon.image_url }}');">
+          <div class="insp-icon-image" style="background-image: url('{% if icon.image %}{{ icon.image.url }}{% else %}{{ icon.image_url }}{% endif %}');">
             <span class="insp-icon-cat">{{ icon.category.name }}</span>
           </div>
           <div class="insp-icon-body">

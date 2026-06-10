@@ -42,7 +42,11 @@
         <div class="order-item">
           <div class="order-item-img">
             {% if item.product %}
-              <img src="{{ item.product.image_url }}" alt="{{ item.product_name }}">
+              {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product_name }}" onerror="this.onerror=null; this.outerHTML='<div class=\'img-placeholder\'>📦</div>'">
+              {% else %}
+                <img src="{{ item.product.image_url }}" alt="{{ item.product_name }}" onerror="this.onerror=null; this.outerHTML='<div class=\'img-placeholder\'>📦</div>'">
+              {% endif %}
             {% else %}
               <div class="img-placeholder">📦</div>
             {% endif %}

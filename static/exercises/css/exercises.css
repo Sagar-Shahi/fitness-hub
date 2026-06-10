@@ -256,6 +256,15 @@
   margin: 0.75rem 0 1.25rem 0;
 }
 
+.exercise-detail-img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: var(--ex-radius);
+  margin-bottom: 1.25rem;
+  background: var(--ex-bg-2);
+}
+
 .exercise-detail-desc {
   color: var(--ex-text-dim);
   font-size: 1.05rem;

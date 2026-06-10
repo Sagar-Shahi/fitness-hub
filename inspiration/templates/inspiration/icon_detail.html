@@ -17,7 +17,7 @@
 
     <article class="insp-detail insp-accent-{{ icon.category.accent }}">
       <div class="insp-detail-hero">
-        <div class="insp-detail-image" style="background-image: url('{{ icon.image_url }}');">
+        <div class="insp-detail-image" style="background-image: url('{% if icon.image %}{{ icon.image.url }}{% else %}{{ icon.image_url }}{% endif %}');">
           <span class="insp-icon-cat">{{ icon.category.name }}</span>
         </div>
         <div class="insp-detail-meta">
@@ -100,7 +100,7 @@
       <div class="insp-icon-grid">
         {% for r in related_icons %}
         <a class="insp-icon-card insp-accent-{{ r.category.accent }}" href="{% url 'inspiration-icon-detail' r.slug %}">
-          <div class="insp-icon-image" style="background-image: url('{{ r.image_url }}');">
+          <div class="insp-icon-image" style="background-image: url('{% if r.image %}{{ r.image.url }}{% else %}{{ r.image_url }}{% endif %}');">
             <span class="insp-icon-cat">{{ r.category.name }}</span>
           </div>
           <div class="insp-icon-body">

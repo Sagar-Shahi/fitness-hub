@@ -9,8 +9,17 @@ python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 python manage.py migrate
+python manage.py seed_store
+python manage.py seed_exercises
+python manage.py seed_gamification
+python manage.py seed_inspiration
+python manage.py seed_groups
 python manage.py runserver
 ```
+
+This creates a "Staff (no user management)" group. Keep your account as superuser
+(to manage users), and add other team members to this group as staff (not superuser).
+They'll have access to everything except user/group/permission management.
 
 Features implemented:
 - User Profile with edit

@@ -17,6 +17,21 @@ class FitnessIconAdmin(admin.ModelAdmin):
     search_fields = ('name', 'nickname', 'bio')
     prepopulated_fields = {'slug': ('name',)}
     ordering = ('display_order', 'name')
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'nickname', 'category',
+                       'short_bio', 'bio', 'nationality', 'born',
+                       'discipline', 'achievements', 'training_tips',
+                       'signature_quote', 'is_featured', 'display_order'),
+        }),
+        ('Images', {
+            'fields': ('image', 'image_url', 'portrait', 'portrait_url'),
+            'description': 'Upload images or provide external URLs. Uploaded images take priority.',
+        }),
+        ('Social & Video', {
+            'fields': ('instagram_url', 'video_url', 'video_title'),
+        }),
+    )
 
 
 @admin.register(MotivationQuote)

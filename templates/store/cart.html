@@ -31,8 +31,10 @@
       {% for item in cart.items.all %}
       <div class="cart-item">
         <a class="cart-item-img" href="{% url 'store-product-detail' item.product.slug %}">
-          {% if item.product.image_url %}
-            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
+          {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" onerror="this.onerror=null; this.outerHTML='<div class=\'img-placeholder\'>📦</div>'">
+          {% elif item.product.image_url %}
+            <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" onerror="this.onerror=null; this.outerHTML='<div class=\'img-placeholder\'>📦</div>'">
           {% else %}
             <div class="img-placeholder">📦</div>
           {% endif %}

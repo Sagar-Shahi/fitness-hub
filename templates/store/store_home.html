@@ -37,7 +37,7 @@
     </div>
     <div class="category-grid">
       {% for cat in categories %}
-      <a class="category-card" href="{% url 'store-category' cat.slug %}" style="--cat-img: url('{{ cat.image_url }}')">
+      <a class="category-card" href="{% url 'store-category' cat.slug %}" {% if cat.image or cat.image_url %}style="--cat-img: url('{% if cat.image %}{{ cat.image.url }}{% else %}{{ cat.image_url }}{% endif %}')"{% endif %}>
         <div class="category-card-bg"></div>
         <div class="category-card-content">
           <span class="category-icon">{{ cat.icon|default:"" }}</span>

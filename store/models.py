@@ -7,7 +7,8 @@ class Category(models.Model):
     name = models.CharField(max_length=80, unique=True)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField(blank=True)
-    image_url = models.URLField(blank=True)
+    image_url = models.URLField(blank=True, help_text='External URL (e.g. Unsplash)')
+    image = models.ImageField(upload_to='categories/', blank=True, help_text='Upload an image')
     icon = models.CharField(max_length=8, default='', blank=True)
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -41,7 +42,8 @@ class Product(models.Model):
     compare_at_price = models.DecimalField(
         max_digits=8, decimal_places=2, null=True, blank=True
     )
-    image_url = models.URLField(blank=True)
+    image_url = models.URLField(blank=True, help_text='External URL (e.g. Unsplash)')
+    image = models.ImageField(upload_to='products/', blank=True, help_text='Upload an image')
     brand = models.CharField(max_length=80, blank=True)
     sku = models.CharField(max_length=40, blank=True)
     stock = models.PositiveIntegerField(default=0)

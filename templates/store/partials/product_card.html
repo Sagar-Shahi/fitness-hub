@@ -1,7 +1,9 @@
 <article class="product-card">
   <a class="product-card-img" href="{% url 'store-product-detail' product.slug %}">
-    {% if product.image_url %}
-      <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+    {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" onerror="this.onerror=null; this.outerHTML='<div class=\'img-placeholder\'>📦</div>'">
+    {% elif product.image_url %}
+      <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy" onerror="this.onerror=null; this.outerHTML='<div class=\'img-placeholder\'>📦</div>'">
     {% else %}
       <div class="img-placeholder">📦</div>
     {% endif %}

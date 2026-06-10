@@ -16,7 +16,7 @@ urlpatterns = [
     path('inspiration/', include('inspiration.urls')),
     path('chatbot/', include('chatbot.urls')),
     path('play/', include('gamification.urls')),
-    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'favicon.ico', permanent=True)),
+    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'favicon/favicon.svg', permanent=True)),
 ]
 
 # Serve media files during development

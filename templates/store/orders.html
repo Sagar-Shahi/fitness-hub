@@ -33,7 +33,13 @@
         <div class="order-items-preview">
           {% for item in order.items.all|slice:":3" %}
             <div class="preview-item">
-              {% if item.product %}<img src="{{ item.product.image_url }}" alt="{{ item.product_name }}">{% endif %}
+              {% if item.product %}
+                {% if item.product.image %}
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product_name }}" onerror="this.onerror=null; this.outerHTML='<span style=\'font-size:1.5rem\'>📦</span>'">
+                {% else %}
+                  <img src="{{ item.product.image_url }}" alt="{{ item.product_name }}" onerror="this.onerror=null; this.outerHTML='<span style=\'font-size:1.5rem\'>📦</span>'">
+                {% endif %}
+              {% endif %}
             </div>
           {% endfor %}
           {% if order.items.count > 3 %}

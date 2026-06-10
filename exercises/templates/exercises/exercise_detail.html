@@ -8,6 +8,11 @@
   <div class="exercise-detail">
     <div class="exercise-detail-main">
       <a class="back-link" href="{% url 'exercise-list' %}">&larr; Back to library</a>
+      {% if exercise.image %}
+        <img src="{{ exercise.image.url }}" alt="{{ exercise.name }}" class="exercise-detail-img" onerror="this.onerror=null; this.style.display='none'">
+      {% elif exercise.image_url %}
+        <img src="{{ exercise.image_url }}" alt="{{ exercise.name }}" class="exercise-detail-img" onerror="this.onerror=null; this.style.display='none'">
+      {% endif %}
       <h1 class="exercises-title">{{ exercise.name }}</h1>
       <div class="exercise-detail-tags">
         <span class="tag tag-category">{{ exercise.get_category_display }}</span>
