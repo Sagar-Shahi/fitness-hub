@@ -972,7 +972,7 @@ main { min-height: calc(100vh - var(--header-h) - 220px); }
 }
 
 /* ============================================================
-   Background video — exercise, products, app lifestyle
+   Background video — premium, subtle, never distracting
    ============================================================ */
 
 .bg-video {
@@ -981,6 +981,7 @@ main { min-height: calc(100vh - var(--header-h) - 220px); }
     z-index: -2;
     overflow: hidden;
     pointer-events: none;
+    background: var(--bg-base);
 }
 
 .bg-video video {
@@ -993,20 +994,15 @@ main { min-height: calc(100vh - var(--header-h) - 220px); }
     height: auto;
     transform: translate(-50%, -50%);
     object-fit: cover;
-    opacity: 0.25;
-    filter: saturate(0.8) brightness(0.7);
+    opacity: 0.08;
+    filter: saturate(0.5) brightness(0.4) blur(3px);
+    transition: opacity 0.6s ease;
 }
 
 .bg-video-overlay {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(180deg, rgba(5, 7, 13, 0.85) 0%, rgba(5, 7, 13, 0.50) 50%, rgba(5, 7, 13, 0.85) 100%);
+        radial-gradient(ellipse 80% 70% at 50% 50%, transparent 25%, rgba(5, 7, 13, 0.75) 100%);
     pointer-events: none;
-}
-
-/* Fallback gradient when video hasn't loaded or is unavailable */
-.bg-video ~ body,
-.bg-video:has(video[src=""]) {
-    background: var(--bg-base);
 }

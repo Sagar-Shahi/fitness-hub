@@ -172,7 +172,7 @@ def _app_help_reply(text: str, user) -> str:
     return '\n'.join(lines)
 
 
-def _deep_app_help_reply(text: str) -> str:
+def _deep_app_help_reply(text: str, user=None) -> str:
     answer = knowledge.find_howto(text)
     if answer:
         return answer
@@ -180,7 +180,7 @@ def _deep_app_help_reply(text: str) -> str:
     key, feat = knowledge.find_app_route_for_query(text)
     if feat:
         return f"**{feat['title']}** — {feat['summary']}\n\n{feat.get('how', '')}\n\nOpen it: {feat['path']}"
-    return _app_help_reply(text, user=None)
+    return _app_help_reply(text, user=user)
 
 
 def _settings_help_reply(text: str) -> str:
@@ -620,7 +620,7 @@ def respond(user_input: str, user=None) -> dict:
     elif intent_name == intent.INTENT_PROGRESS_HELP:
         reply = _progress_help_reply(user, ctx)
     elif intent_name == intent.INTENT_DEEP_APP_HELP:
-        reply = _deep_app_help_reply(text)
+        reply = _deep_app_help_reply(text, user)
     elif intent_name == intent.INTENT_APP_HELP:
         if any(kw in text_l for kw in ('password', 'username', 'email', 'security', 'change password', 'change username', 'change email')):
             reply = _settings_help_reply(text)

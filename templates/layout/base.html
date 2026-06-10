@@ -88,7 +88,7 @@
 
     <!-- Background video -->
     <div class="bg-video" aria-hidden="true">
-        <video autoplay loop muted playsinline id="bgVideo"></video>
+        <video autoplay muted playsinline preload="auto" id="bgVideo"></video>
         <div class="bg-video-overlay"></div>
     </div>
     <script>
@@ -97,17 +97,31 @@
             'https://assets.mixkit.co/videos/52101/52101-720.mp4',
             'https://assets.mixkit.co/videos/44431/44431-720.mp4',
             'https://assets.mixkit.co/videos/44412/44412-720.mp4',
-            'https://assets.mixkit.co/active_storage/video_items/100532/1725383994/100532-video-720.mp4',
-            'https://assets.mixkit.co/active_storage/video_items/100521/1725382949/100521-video-720.mp4',
+            'https://assets.mixkit.co/videos/44435/44435-720.mp4',
+            'https://assets.mixkit.co/videos/38432/38432-720.mp4',
         ];
         var v = document.getElementById('bgVideo');
         var idx = 0;
+        var loading = false;
+
         function next() {
-            v.src = videos[idx];
-            v.load();
-            v.play().catch(function(){});
-            idx = (idx + 1) % videos.length;
+            if (loading) return;
+            loading = true;
+            v.style.opacity = '0';
+            setTimeout(function() {
+                v.src = videos[idx];
+                v.load();
+                v.play().then(function() {
+                    v.style.opacity = '1';
+                    loading = false;
+                }).catch(function() {
+                    loading = false;
+                    v.style.opacity = '1';
+                });
+                idx = (idx + 1) % videos.length;
+            }, 300);
         }
+
         v.addEventListener('ended', next);
         // Pick a random start
         idx = Math.floor(Math.random() * videos.length);

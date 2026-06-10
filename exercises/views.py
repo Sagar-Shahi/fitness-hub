@@ -184,6 +184,12 @@ def exercise_detail(request, slug):
             user=user,
             exercise=exercise,
         ).count()
+        # Track browsing for gamification quests (e.g. "Scout It Out")
+        try:
+            from gamification.services import progress_quest
+            progress_quest(user, 'browse_exercises')
+        except Exception:
+            pass
 
     context = {
         'exercise': exercise,

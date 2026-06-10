@@ -391,42 +391,14 @@ class ResponderTests(TestCase):
 # ---------------------------------------------------------------------------
 
 class PersonalityTests(TestCase):
-    def test_identity_line_mentions_coach(self):
-        self.assertIn('Fitness Hub', personality.identity_line())
-
     def test_scope_line_is_safe(self):
         line = personality.scope_line().lower()
-        # Should not claim to be a doctor/dietitian/trainer
         self.assertNotIn("i'm a doctor", line)
         self.assertNotIn("i am a doctor", line)
         self.assertNotIn("i'm a real person", line)
 
-    def test_soft_sarcasm_is_never_body_shame(self):
-        # Run several times to cover random choices
-        import re
-        for _ in range(20):
-            line = personality.soft_sarcasm(5).lower()
-            self.assertNotIn('fat', line)
-            self.assertFalse(re.search(r'\bloser\b', line))
-            self.assertFalse(re.search(r'\bnoob\b', line))
-            self.assertFalse(re.search(r'\bpathetic\b', line))
-
-    def test_warm_encouragement_is_positive(self):
-        import re
-        for _ in range(20):
-            line = personality.warm_encouragement(3).lower()
-            # Word-boundary check (so "closer" doesn't match "loser")
-            for bad in ['pathetic', 'loser', 'noob', 'terrible', 'worthless']:
-                self.assertFalse(re.search(r'\b' + bad + r'\b', line),
-                                 f"warm_encouragement contains {bad!r}: {line!r}")
-
-    def test_friendly_opener_with_name(self):
-        opener = personality.friendly_opener('Sagar')
-        self.assertIn('Sagar', opener)
-
     def test_friendly_opener_without_name(self):
         opener = personality.friendly_opener('')
-        # No name should mean no "  " (double-space) and no trailing name
         self.assertNotIn('  ', opener)
         self.assertNotIn('Sagar', opener)
 
@@ -776,24 +748,22 @@ class HttpEndpointTests(TestCase):
 
 class PersonalityTests(TestCase):
     def test_soft_sarcasm_lines_are_safe(self):
-        """Sarcasm must never mention body, weight, gender, or identity."""
         for _ in range(50):
             line = personality.soft_sarcasm(0)
-            self.assertFalse(_is_body_attack(line), f"unsafe sarcasm: {line}")
+            self.assertFalse(guidelines._is_body_or_identity_attack(line), f"unsafe sarcasm: {line}")
 
     def test_soft_sarcasm_uses_empathetic_tone(self):
         for _ in range(50):
             line = personality.soft_sarcasm(0)
-            self.assertFalse(_is_body_attack(line), f"unsafe line: {line}")
+            self.assertFalse(guidelines._is_body_or_identity_attack(line), f"unsafe line: {line}")
             self.assertFalse(line.startswith("Oh"), "should not start with sarcastic 'Oh'")
             self.assertFalse(line.startswith("Cool"), "should not start with sarcastic 'Cool'")
-            # Should not contain guilt-tripping phrases
             self.assertFalse("'ll start Monday" in line, f"no guilt-tripping: {line}")
 
     def test_warm_encouragement_is_safe(self):
         for _ in range(50):
             line = personality.warm_encouragement(0)
-            self.assertFalse(_is_body_attack(line), f"unsafe warm line: {line}")
+            self.assertFalse(guidelines._is_body_or_identity_attack(line), f"unsafe warm line: {line}")
 
     def test_friendly_opener_with_name(self):
         opener = personality.friendly_opener('Sagar')
@@ -812,28 +782,6 @@ class PersonalityTests(TestCase):
     def test_identity_line_mentions_fitness_hub(self):
         line = personality.identity_line()
         self.assertIn('Fitness Hub', line)
-
-
-def _is_body_attack(text: str) -> bool:
-    """Local helper mirroring guidelines._is_body_or_identity_attack.
-
-    Uses word-boundary matching for single-word insults so e.g. "closer"
-    doesn't trigger on "loser".
-    """
-    import re
-    bad_phrases = [
-        'you are fat', "you're fat", 'your weight is', 'you look like',
-        'your body is', 'you people', 'your kind', 'for a girl', 'for a boy',
-        'lazy ass', 'are fat', 'are lazy',
-    ]
-    bad_words = ['loser', 'noob', 'pathetic']
-    lowered = text.lower()
-    if any(b in lowered for b in bad_phrases):
-        return True
-    for w in bad_words:
-        if re.search(r'(?<![a-z0-9])' + re.escape(w) + r'(?![a-z0-9])', lowered):
-            return True
-    return False
 
 
 # ---------------------------------------------------------------------------

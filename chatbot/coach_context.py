@@ -7,8 +7,11 @@ motivational replies and relevant app tips.
 This is *read-only*; the bot never modifies any of this data.
 """
 
+import logging
 from datetime import timedelta
 from decimal import Decimal
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -98,14 +101,14 @@ def build_user_context(user) -> dict:
             # Streak: consecutive days with at least one completion
             ctx['streak_days'] = _compute_streak(completions)
     except Exception:
-        pass
+        logger.exception('coach_context: workout-stats lookup failed')
 
     # Order history
     try:
         from store.models import Order
         ctx['has_orders'] = Order.objects.filter(user=user).exists()
     except Exception:
-        pass
+        logger.exception('coach_context: order-history lookup failed')
 
     return ctx
 

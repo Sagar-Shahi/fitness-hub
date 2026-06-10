@@ -4,12 +4,16 @@ Each handler is wrapped in a try/except so a bad signal never breaks the
 underlying flow (logging a workout should never 500 because of gamification).
 """
 
+import logging
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
 from . import services as svc
 from . import models as gm
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender='exercises.ExerciseCompletion')
@@ -26,7 +30,7 @@ def on_workout_completed(sender, instance, created, **kwargs):
         svc.progress_quest(user, 'workout_minutes', instance.exercise.duration_min or 0)
         svc.check_and_unlock_badges(user)
     except Exception:
-        pass
+        logger.exception('gamification: on_workout_completed failed')
 
 
 @receiver(post_save, sender='goals.Goal')
@@ -41,7 +45,7 @@ def on_goal_created(sender, instance, created, **kwargs):
         )
         svc.check_and_unlock_badges(user)
     except Exception:
-        pass
+        logger.exception('gamification: on_goal_created failed')
 
 
 @receiver(post_save, sender='diet.NutritionRecord')
@@ -57,7 +61,7 @@ def on_meal_logged(sender, instance, created, **kwargs):
         svc.progress_quest(user, 'meals_logged', 1)
         svc.check_and_unlock_badges(user)
     except Exception:
-        pass
+        logger.exception('gamification: on_meal_logged failed')
 
 
 @receiver(post_save, sender='store.Order')
@@ -73,4 +77,4 @@ def on_order_placed(sender, instance, created, **kwargs):
         svc.progress_quest(user, 'orders_placed', 1)
         svc.check_and_unlock_badges(user)
     except Exception:
-        pass
+        logger.exception('gamification: on_order_placed failed')

@@ -8,6 +8,10 @@ The safety check runs on both incoming user input (before we even try to
 respond) and outgoing bot output (sanity check on the response string).
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 ILLEGAL_TERMS = [
     'bomb', 'explosive', 'weapon', 'gun', 'shoot', 'kill', 'murder',
@@ -155,7 +159,7 @@ def sanitize_output(text: str) -> str:
         from . import guidelines
         cleaned = guidelines.enforce_reply(cleaned)
     except Exception:
-        pass
+        logger.exception('safety: sanitize_output enforce_reply failed')
 
     return cleaned
 
