@@ -1,4 +1,4 @@
-# Final-Project---Team-Codex
+# Final-Project
 
 Fitness Hub - Django Fitness Platform by Team
 
