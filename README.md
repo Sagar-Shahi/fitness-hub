@@ -1,6 +1,6 @@
 # Final-Project
 
-Fitness Hub - Django Fitness Platform by Team
+Fitness Hub - Django Fitness Platform by Sagar 
 
 Quick start:
 
