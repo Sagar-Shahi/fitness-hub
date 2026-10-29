@@ -81,3 +81,12 @@ python manage.py runserver
 - `docs/update-readme`: Documentation updates (this README section).
 
 PR pages were opened for these branches; visit your repository to create PRs.
+
+## Security notes
+
+- Secrets live in `.env` (never committed). `DJANGO_SECRET_KEY` is required when `DJANGO_DEBUG=False`.
+- With `DJANGO_DEBUG=False` the app forces HTTPS, sends HSTS and marks session/CSRF cookies `Secure`.
+- Set `DJANGO_ADMIN_URL` to move the admin off `/admin/`, and `DJANGO_ALLOWED_HOSTS` / `DJANGO_CSRF_TRUSTED_ORIGINS` to your real domain.
+- Login (per IP and per username), sign-up and the chatbot API are rate limited. The limiter uses Django's cache, so use a shared cache backend (Redis/Memcached) if you run several processes.
+- Passwords use Argon2 (existing PBKDF2 hashes are upgraded on next login). Image uploads in the admin are limited to jpg/png/gif/webp, max 5 MB.
+- Run `pip install pip-audit && pip-audit -r requirements.txt` regularly; Dependabot is enabled via `.github/dependabot.yml`.

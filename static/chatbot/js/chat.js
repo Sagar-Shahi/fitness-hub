@@ -117,8 +117,9 @@
       },
       body: JSON.stringify({ message: text }),
     })
-      .then((r) => r.json())
-      .then((data) => {
+      .then((r) => r.json().catch(() => ({})).then((d) => ({ ok: r.ok, status: r.status, d })))
+      .then(({ ok, status, d }) => {
+        const data = ok ? d : { reply: (d && d.error) || (status === 429 ? 'Too many messages. Please slow down.' : 'Sorry, something went wrong.') };
         if (typing.parentNode) typing.parentNode.removeChild(typing);
         appendMessage(log, data.reply || '(no response)', 'bot');
         if (chipBox) renderSuggestions(chipBox, data.suggestions);

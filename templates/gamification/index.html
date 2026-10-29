@@ -4,8 +4,8 @@
 <link rel="stylesheet" href="{% static 'gamification/css/gamification.css' %}">
 {% endblock %}
 {% block body_attrs %}
-{% if levelup_payload %}data-levelup='{{ levelup_payload|safe }}'{% endif %}
-{% if badge_toasts %}data-badges='{{ badge_toasts|safe }}'{% endif %}
+{% if levelup_payload %}data-levelup="{{ levelup_payload }}"{% endif %}
+{% if badge_toasts %}data-badges="{{ badge_toasts }}"{% endif %}
 {% endblock %}
 {% block content %}
 <section class="container play-page">

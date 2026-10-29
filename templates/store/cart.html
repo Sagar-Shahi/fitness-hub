@@ -57,7 +57,7 @@
         </form>
         <div class="cart-item-total">
           <div class="line-total">NRS {{ item.line_total }}</div>
-          <a class="cart-item-remove" href="{% url 'remove-from-cart' item.id %}" onclick="return confirm('Remove this item?');"><span class="icon-inline">🗑</span>Remove</a>
+          <form method="post" action="{% url 'remove-from-cart' item.id %}" onsubmit="return confirm('Remove this item?');" style="display:inline">{% csrf_token %}<button type="submit" class="cart-item-remove" style="background:none;border:0;padding:0;cursor:pointer;font:inherit;color:inherit"><span class="icon-inline">🗑</span>Remove</button></form>
         </div>
       </div>
       {% endfor %}

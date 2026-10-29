@@ -1,4 +1,5 @@
 from django.contrib import admin
+from core.admin_forms import safe_form_for
 from .models import Category, Product, Cart, CartItem, Order, OrderItem
 
 
@@ -10,6 +11,7 @@ class ProductInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    form = safe_form_for(Category)
     list_display = ('name', 'slug', 'display_order', 'is_active', 'created_at')
     list_filter = ('is_active',)
     search_fields = ('name',)
@@ -28,6 +30,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    form = safe_form_for(Product)
     list_display = (
         'name', 'category', 'price', 'compare_at_price',
         'stock', 'rating', 'is_featured', 'is_active',

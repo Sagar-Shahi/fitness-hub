@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]  # Django 5.0 supports 3.10 to 3.12
+        python-version: ["3.11", "3.12"]  # Django 5.2 supports 3.10 to 3.13
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,6 +23,10 @@ jobs:
         run: pip install -r requirements.txt
       - name: Django system check
         run: python manage.py check
+      - name: Deployment security check
+        run: DJANGO_DEBUG=False DJANGO_SECRET_KEY=$(python -c "import secrets;print(secrets.token_urlsafe(60))") DJANGO_ALLOWED_HOSTS=example.com python manage.py check --deploy --fail-level ERROR
+      - name: Dependency vulnerability scan
+        run: pip install pip-audit && pip-audit -r requirements.txt
       - name: Apply migrations
         run: python manage.py migrate --noinput
       - name: Run tests

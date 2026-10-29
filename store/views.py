@@ -4,11 +4,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Avg, Count
 from django.core.paginator import Paginator
+from django.db import transaction
+from django.views.decorators.http import require_POST
 
 from .models import Category, Product, Order, OrderItem
 from .cart_utils import get_or_create_cart
 from .forms import CheckoutForm
 
+
+MAX_QTY_PER_ITEM = 20
 
 SORT_CHOICES = {
     'newest': '-created_at',
@@ -104,11 +108,12 @@ def product_detail(request, slug):
     })
 
 
+@require_POST
 def add_to_cart(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     cart = get_or_create_cart(request)
     try:
-        quantity = max(1, int(request.POST.get('quantity', 1)))
+        quantity = min(MAX_QTY_PER_ITEM, max(1, int(request.POST.get('quantity', 1))))
     except (TypeError, ValueError):
         quantity = 1
 
@@ -116,7 +121,7 @@ def add_to_cart(request, slug):
         product=product, defaults={'quantity': quantity}
     )
     if not created:
-        item.quantity += quantity
+        item.quantity = min(MAX_QTY_PER_ITEM, item.quantity + quantity)
         item.save()
 
     messages.success(request, f'Added {product.name} to your cart.')
@@ -130,6 +135,7 @@ def view_cart(request):
     return render(request, 'store/cart.html', {'cart': cart})
 
 
+@require_POST
 def update_cart(request, item_id):
     cart = get_or_create_cart(request)
     item = get_object_or_404(cart.items, pk=item_id)
@@ -142,12 +148,13 @@ def update_cart(request, item_id):
         item.delete()
         messages.info(request, f'Removed {item.product.name} from your cart.')
     else:
-        item.quantity = quantity
+        item.quantity = min(MAX_QTY_PER_ITEM, quantity)
         item.save()
         messages.success(request, f'Updated {item.product.name} quantity.')
     return redirect('view-cart')
 
 
+@require_POST
 def remove_from_cart(request, item_id):
     cart = get_or_create_cart(request)
     item = get_object_or_404(cart.items, pk=item_id)
@@ -167,24 +174,36 @@ def checkout(request):
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
-            order = form.save(commit=False)
-            order.user = request.user
-            order.subtotal = cart.subtotal()
-            order.shipping_cost = cart.shipping()
-            order.tax = cart.tax()
-            order.total = cart.total()
-            order.save()
+            with transaction.atomic():
+                items = list(cart.items.select_related('product').select_for_update())
+                short = [i for i in items if not i.product.is_active or i.quantity > i.product.stock]
+                if short:
+                    messages.error(
+                        request,
+                        'Some items are no longer available in the requested quantity: '
+                        + ', '.join(i.product.name for i in short),
+                    )
+                    return redirect('view-cart')
+                # Totals are always recomputed on the server; the form cannot set them.
+                order = form.save(commit=False)
+                order.user = request.user
+                order.status = 'pending'
+                order.subtotal = cart.subtotal()
+                order.shipping_cost = cart.shipping()
+                order.tax = cart.tax()
+                order.total = cart.total()
+                order.save()
 
-            for item in cart.items.select_related('product'):
-                OrderItem.objects.create(
-                    order=order,
-                    product=item.product,
-                    product_name=item.product.name,
-                    product_price=item.product.price,
-                    quantity=item.quantity,
-                )
-                item.product.stock = max(0, item.product.stock - item.quantity)
-                item.product.save()
+                for item in items:
+                    OrderItem.objects.create(
+                        order=order,
+                        product=item.product,
+                        product_name=item.product.name,
+                        product_price=item.product.price,
+                        quantity=item.quantity,
+                    )
+                    item.product.stock = max(0, item.product.stock - item.quantity)
+                    item.product.save(update_fields=['stock'])
 
             cart.items.all().delete()
             messages.success(request, f'Order {order.order_number} placed successfully!')

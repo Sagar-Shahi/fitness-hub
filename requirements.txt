@@ -1,7 +1,4 @@
-Django==5.0.6
-django-crispy-forms
-crispy-bootstrap5
+Django>=5.2,<5.3
 pillow
 python-dotenv
-stripe
-coverage
+argon2-cffi

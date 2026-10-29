@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from core.admin_forms import safe_form_for
 from .models import FitnessIcon, InspirationCategory, MotivationQuote
 
 
@@ -12,6 +13,7 @@ class InspirationCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(FitnessIcon)
 class FitnessIconAdmin(admin.ModelAdmin):
+    form = safe_form_for(FitnessIcon)
     list_display = ('name', 'category', 'nationality', 'is_featured', 'display_order')
     list_filter = ('category', 'is_featured')
     search_fields = ('name', 'nickname', 'bio')
