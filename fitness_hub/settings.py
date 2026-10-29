@@ -1,12 +1,40 @@
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-change-this-in-production-2026'
+# Secrets and per-machine settings live in a local `.env` file that is never committed.
+# Copy `.env.example` to `.env` and fill it in. Real environment variables win over `.env`.
+try:
+    from dotenv import load_dotenv
 
-DEBUG = True
+    load_dotenv(BASE_DIR / '.env')
+except ImportError:  # python-dotenv is optional; plain environment variables still work
+    pass
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+
+def env_bool(name, default):
+    value = os.environ.get(name)
+    return default if value is None else value.strip().lower() in ('1', 'true', 'yes', 'on')
+
+
+# Defaults to True so local development works with no setup. Set DJANGO_DEBUG=False in production.
+DEBUG = env_bool('DJANGO_DEBUG', True)
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Set DJANGO_SECRET_KEY in your environment or .env file (see .env.example).')
+    # Development only, and not a secret. Sessions signed with it are not safe to trust.
+    SECRET_KEY = 'django-insecure-dev-only-key-set-DJANGO_SECRET_KEY-in-your-env'
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
+    if host.strip()
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',

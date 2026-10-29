@@ -21,6 +21,25 @@ This creates a "Staff (no user management)" group. Keep your account as superuse
 (to manage users), and add other team members to this group as staff (not superuser).
 They'll have access to everything except user/group/permission management.
 
+## Configuration (keeping secrets out of git)
+
+Secrets and per-machine settings are read from environment variables, which you can keep in a local `.env` file.
+`.env` is ignored by git, so it is never committed.
+
+```bash
+cp .env.example .env        # Windows PowerShell: Copy-Item .env.example .env
+python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
+# paste the printed value after DJANGO_SECRET_KEY= in .env
+```
+
+| Variable | Purpose |
+|----------|---------|
+| `DJANGO_SECRET_KEY` | Signs sessions and cookies. Required when `DJANGO_DEBUG=False` |
+| `DJANGO_DEBUG` | `True` for local development (default), `False` in production |
+| `DJANGO_ALLOWED_HOSTS` | Comma separated hostnames the site may be served from |
+
+Local development works without a `.env` file, using a clearly marked insecure development key.
+
 Features implemented:
 - User Profile with edit
 - Dashboard basic chart
