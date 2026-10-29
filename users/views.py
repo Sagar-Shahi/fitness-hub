@@ -6,6 +6,9 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 
+from django.http import HttpResponse
+
+from core import throttle
 from core.utils import sync_goal_from_profile
 
 from .forms import (
@@ -51,6 +54,39 @@ class CaseInsensitiveLoginView(LoginView):
 
     def get_form_class(self):
         return _CaseInsensitiveAuthenticationForm
+
+    # Brute-force protection: failed attempts are counted per IP and per username.
+    MAX_FAILURES_PER_IP = 20
+    MAX_FAILURES_PER_USER = 5
+    LOCKOUT_SECONDS = 15 * 60
+
+    def _idents(self, request):
+        username = (request.POST.get('username') or '').strip().lower()
+        return throttle.client_ip(request), username
+
+    def post(self, request, *args, **kwargs):
+        ip, username = self._idents(request)
+        if throttle.is_limited('login-ip', ip, self.MAX_FAILURES_PER_IP) or (
+            username and throttle.is_limited('login-user', username, self.MAX_FAILURES_PER_USER)
+        ):
+            return HttpResponse(
+                'Too many failed login attempts. Please try again in 15 minutes.',
+                status=429,
+                content_type='text/plain',
+            )
+        return super().post(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        ip, username = self._idents(self.request)
+        throttle.hit('login-ip', ip, self.LOCKOUT_SECONDS)
+        if username:
+            throttle.hit('login-user', username, self.LOCKOUT_SECONDS)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        ip, username = self._idents(self.request)
+        throttle.reset('login-user', username)
+        return super().form_valid(form)
 
 
 @login_required
@@ -192,8 +228,17 @@ def about(request):
     return render(request, 'about.html')
 
 
+REGISTER_LIMIT = 10          # sign-ups ...
+REGISTER_WINDOW = 60 * 60    # ... per IP per hour
+
+
 def register(request):
     if request.method == 'POST':
+        ip = throttle.client_ip(request)
+        # Bot protection: hidden honeypot field (humans never fill it) plus a per-IP limit.
+        if request.POST.get('website') or throttle.is_limited('register', ip, REGISTER_LIMIT):
+            return HttpResponse('Registration is temporarily unavailable.', status=429, content_type='text/plain')
+        throttle.hit('register', ip, REGISTER_WINDOW)
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)

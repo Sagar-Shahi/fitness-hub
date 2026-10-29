@@ -44,6 +44,7 @@
       {% endif %}
 
       <form method="post" novalidate>
+        <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
         {% csrf_token %}
         <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
           <div class="form-group">

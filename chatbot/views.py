@@ -10,11 +10,17 @@ import json
 
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
+
+from core import throttle
 
 from .models import ChatSession, ChatMessage
 from . import coach_context, personality, responder
+
+# Input limits for the chat API.
+MAX_MESSAGE_CHARS = 1000
+CHAT_RATE_LIMIT = 30          # requests ...
+CHAT_RATE_WINDOW = 60         # ... per this many seconds, per user (or per IP when logged out)
 
 
 # ---------------------------------------------------------------------------
@@ -57,16 +63,32 @@ def chat_page(request):
     })
 
 
-@csrf_exempt
 @require_POST
 def chat_api(request):
-    """Accept JSON `{message: "..."}` and return JSON `{reply, intent, refused, reason, suggestions}`."""
+    """Accept JSON `{message: "..."}` and return JSON `{reply, intent, refused, reason, suggestions}`.
+
+    CSRF protection is on: the widget sends the token in the X-CSRFToken header.
+    """
+    ident = f'user:{request.user.pk}' if request.user.is_authenticated else f'ip:{throttle.client_ip(request)}'
+    if throttle.is_limited('chat', ident, CHAT_RATE_LIMIT):
+        return JsonResponse({'error': 'Too many messages. Please slow down.'}, status=429)
+    throttle.hit('chat', ident, CHAT_RATE_WINDOW)
+
     try:
         payload = json.loads(request.body.decode('utf-8') or '{}')
     except (ValueError, UnicodeDecodeError):
         return HttpResponseBadRequest('invalid json')
+    if not isinstance(payload, dict):
+        return HttpResponseBadRequest('invalid json')
 
-    text = (payload.get('message') or '').strip()
+    message = payload.get('message') or ''
+    if not isinstance(message, str):
+        return HttpResponseBadRequest('message must be a string')
+    text = message.strip()
+    if len(text) > MAX_MESSAGE_CHARS:
+        return JsonResponse(
+            {'error': f'Message too long (max {MAX_MESSAGE_CHARS} characters).'}, status=400
+        )
     session = _get_or_create_session(request)
 
     if text:
