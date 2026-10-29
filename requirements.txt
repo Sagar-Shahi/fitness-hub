@@ -1,4 +1,4 @@
-Django==5.0.6
+Django>=5.2,<5.3
 pillow
 python-dotenv
 argon2-cffi
