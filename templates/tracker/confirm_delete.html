@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Delete workout · FitHub{% endblock %}
+{% block content %}
+<section class="auth-card card">
+  <h1>Delete this workout?</h1>
+  <p><strong>{{ workout.name }}</strong> on {{ workout.date|date:"M j, Y" }} and its {{ workout.exercises.count }} exercise{{ workout.exercises.count|pluralize }} will be deleted. This cannot be undone.</p>
+  <form method="post" class="form-actions">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Delete workout</button>
+    <a class="btn btn-quiet" href="{% url 'tracker:workout-detail' workout.pk %}">Keep it</a>
+  </form>
+</section>
+{% endblock %}

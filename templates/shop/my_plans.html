@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}My plans · FitHub{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>My plans</h1></div></div>
+{% if rows %}
+<div class="plan-grid">
+  {% for item in rows %}
+  <article class="card plan-card">
+    <span class="badge badge-{{ item.plan.kind }}">{{ item.plan.get_kind_display }}</span>
+    <h2 class="card-title">{{ item.title }}</h2>
+    <p class="muted">{{ item.plan.summary }}</p>
+    <div class="plan-foot"><span class="muted">Bought {{ item.order.created_at|date:"M j, Y" }}</span><a class="btn btn-primary btn-small" href="{% url 'shop:plan-detail' item.plan.slug %}">Open plan</a></div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<section class="card empty-state"><h2 class="card-title">You have no plans yet</h2><a class="btn btn-primary" href="{% url 'shop:plans' %}">Browse plans</a></section>
+{% endif %}
+{% endblock %}

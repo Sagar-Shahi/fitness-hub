@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}My goals · FitHub{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>My goals</h1><p class="muted">Used for the progress bars on your dashboard. You can change them whenever you like.</p></div></div>
+<form class="card form-card" method="post" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+  <div class="form-grid">
+    {% include 'partials/field.html' with field=form.calorie_target %}
+    {% include 'partials/field.html' with field=form.weekly_workout_target %}
+    {% include 'partials/field.html' with field=form.target_weight_kg %}
+  </div>
+  <p class="help">These are your own targets, not medical advice. For a calorie or weight plan that suits your health, ask a doctor or dietitian.</p>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Save goals</button><a class="btn btn-quiet" href="{% url 'tracker:dashboard' %}">Cancel</a></div>
+</form>
+{% endblock %}

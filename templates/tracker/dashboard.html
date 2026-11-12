@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard · FitHub{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="muted">Your week at a glance.</p>
+  </div>
+  <div class="head-actions">
+    {% include 'partials/period.html' %}
+    <a class="btn btn-primary" href="{% url 'tracker:workout-create' %}">Log workout</a>
+  </div>
+</div>
+
+{% if not has_data %}
+<section class="card empty-state">
+  <h2 class="card-title">Welcome. Let's get your first numbers in.</h2>
+  <p class="muted">Set your goals, then log a workout, a meal or today's weight. The charts fill in as you go.</p>
+  <div class="head-actions">
+    <a class="btn btn-primary" href="{% url 'tracker:goals' %}">Set my goals</a>
+    <a class="btn btn-quiet" href="{% url 'tracker:workout-create' %}">Log a workout</a>
+    <a class="btn btn-quiet" href="{% url 'tracker:meals' %}">Log a meal</a>
+  </div>
+</section>
+{% endif %}
+
+<dl class="stats">
+  <div class="stat"><dt>Workouts this week</dt><dd>{{ d.week_done }} / {{ d.week_target }}</dd>
+    <dd class="stat-note"><progress class="meter" max="100" value="{{ d.week_percent }}" aria-label="Weekly workout goal">{{ d.week_percent }}%</progress> {{ d.week_minutes }} min trained</dd></div>
+  <div class="stat"><dt>Calories today</dt><dd>{{ d.today.calories }}</dd>
+    <dd class="stat-note"><progress class="meter" max="100" value="{{ d.calorie_percent }}" aria-label="Calories against target">{{ d.calorie_percent }}%</progress>
+      {% if d.calorie_left >= 0 %}{{ d.calorie_left }} kcal left of {{ d.calorie_target }}{% else %}{{ d.calorie_left|cut:'-' }} kcal over {{ d.calorie_target }}{% endif %}</dd></div>
+  <div class="stat"><dt>Workout streak</dt><dd>{{ d.streak }} day{{ d.streak|pluralize }}</dd><dd class="stat-note">Days in a row with a workout.</dd></div>
+  <div class="stat"><dt>Weight</dt>
+    <dd>{% if d.latest_weight %}{{ d.latest_weight.weight_kg }} kg{% else %}&ndash;{% endif %}</dd>
+    <dd class="stat-note">{% if d.weight_change is not None %}{% if d.weight_change > 0 %}+{% endif %}{{ d.weight_change }} kg in 30 days{% elif d.target_weight %}Target {{ d.target_weight }} kg{% else %}Log it on the Weight page.{% endif %}</dd></div>
+</dl>
+
+<section class="card">
+  <h2 class="card-title">Workouts per day</h2>
+  {% include 'partials/chart.html' with chart=workout_chart %}
+</section>
+
+<div class="grid-2">
+  <section class="card">
+    <h2 class="card-title">Weight, last {{ days }} days</h2>
+    {% include 'partials/chart.html' with chart=weight_chart %}
+    {% if d.target_weight %}<p class="muted">Dashed line: your target of {{ d.target_weight }} kg.</p>{% endif %}
+  </section>
+  <section class="card">
+    <h2 class="card-title">Calories, last 14 days</h2>
+    {% include 'partials/chart.html' with chart=calorie_chart %}
+  </section>
+</div>
+
+<div class="grid-2">
+  <section class="card">
+    <h2 class="card-title">Today's macros</h2>
+    <dl class="macro-row">
+      <div><dt>Protein</dt><dd>{{ d.today.protein }} g</dd></div>
+      <div><dt>Carbs</dt><dd>{{ d.today.carbs }} g</dd></div>
+      <div><dt>Fat</dt><dd>{{ d.today.fat }} g</dd></div>
+    </dl>
+    <p><a href="{% url 'tracker:meals' %}">Log a meal</a></p>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2 class="card-title">Recent workouts</h2><a href="{% url 'tracker:workout-list' %}">All workouts</a></div>
+    {% if recent %}
+    <ul class="rank-list">
+      {% for w in recent %}
+      <li><a class="rank-main" href="{% url 'tracker:workout-detail' w.pk %}"><span class="rank-title">{{ w.name }}</span><span class="rank-sub muted">{{ w.date|date:"D, M j" }} &middot; {{ w.duration_min }} min</span></a><span class="rank-n">{{ w.volume_kg|floatformat:0 }} kg</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="muted">No workouts yet.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

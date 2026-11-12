@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}API keys · FitHub{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>API keys</h1>
+    <p class="muted">Use a key to log workouts, meals and weight and read your summary from your own scripts. Treat it like a password.</p>
+  </div>
+</div>
+
+{% if new_key %}
+<section class="card notice" aria-labelledby="new-key-title">
+  <h2 class="card-title" id="new-key-title">Copy your new key now</h2>
+  <p>This is the only time it is shown. FitHub stores a one-way hash, so it cannot be recovered later.</p>
+  <div class="copy-row">
+    <code class="copy-value" id="new-key">{{ new_key }}</code>
+    <button type="button" class="btn btn-primary btn-small" data-copy="{{ new_key }}">Copy</button>
+  </div>
+</section>
+{% endif %}
+
+<div class="two-col">
+  <section class="card">
+    <h2 class="card-title">Your keys</h2>
+    {% if keys %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th scope="col">Name</th><th scope="col">Starts with</th><th scope="col">Last used</th><th scope="col">Status</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody>
+          {% for key in keys %}
+          <tr>
+            <td>{{ key.name }}</td>
+            <td><code>{{ key.prefix }}…</code></td>
+            <td>{% if key.last_used_at %}{{ key.last_used_at|date:"M j, Y H:i" }}{% else %}<span class="muted">Never</span>{% endif %}</td>
+            <td>{% if key.is_active %}<span class="badge badge-live">Active</span>{% else %}<span class="badge badge-off">Revoked</span>{% endif %}</td>
+            <td class="actions-cell">
+              {% if key.is_active %}
+              <form method="post" action="{% url 'accounts:api-key-revoke' key.pk %}" data-confirm="Revoke this key? Anything using it will stop working.">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Revoke</button></form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="muted">No keys yet.</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2 class="card-title">Create a key</h2>
+    <form method="post" action="{% url 'accounts:api-key-create' %}" novalidate>
+      {% csrf_token %}
+      {% include 'partials/field.html' with field=form.name %}
+      <button class="btn btn-primary" type="submit">Create key</button>
+      <p class="help">Up to {{ max_keys }} active keys.</p>
+    </form>
+  </section>
+</div>
+
+<section class="card">
+  <h2 class="card-title">Quick start</h2>
+  <p class="muted">Replace <code>YOUR_KEY</code> with a key from above, and the address with your own site.</p>
+  <pre class="code-block"><code>curl -X POST {{ request.scheme }}://{{ request.get_host }}/api/v1/workouts/ \
+  -H "Authorization: Bearer YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"date": "2026-11-12", "name": "Push day", "duration_min": 55, "exercises": [{"name": "Bench press", "sets": 4, "reps": 8, "weight_kg": "60"}]}'
+
+curl -H "Authorization: Bearer YOUR_KEY" {{ request.scheme }}://{{ request.get_host }}/api/v1/summary/
+curl -H "Authorization: Bearer YOUR_KEY" {{ request.scheme }}://{{ request.get_host }}/api/v1/meals/?date=2026-11-12</code></pre>
+</section>
+{% endblock %}

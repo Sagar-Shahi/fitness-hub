@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Workouts · FitHub{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Workouts</h1><p class="muted">{{ total }} workout{{ total|pluralize }} logged.</p></div>
+  <div class="head-actions">
+    <a class="btn btn-quiet" href="{% url 'tracker:export' %}">Export CSV</a>
+    <a class="btn btn-primary" href="{% url 'tracker:workout-create' %}">Log workout</a>
+  </div>
+</div>
+{% if page.object_list %}
+<section class="card flush">
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th scope="col">Workout</th><th scope="col">Date</th><th scope="col" class="num">Minutes</th><th scope="col" class="num">Exercises</th></tr></thead>
+      <tbody>
+        {% for w in page.object_list %}
+        <tr>
+          <td><a class="cell-title" href="{% url 'tracker:workout-detail' w.pk %}">{{ w.name }}</a>{% if w.notes %}<span class="cell-sub muted">{{ w.notes|truncatechars:60 }}</span>{% endif %}</td>
+          <td class="nowrap">{{ w.date|date:"D, M j, Y" }}</td>
+          <td class="num">{{ w.duration_min }}</td>
+          <td class="num">{{ w.n_exercises }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% include 'partials/pager.html' %}
+{% else %}
+<section class="card empty-state">
+  <h2 class="card-title">No workouts yet</h2>
+  <p class="muted">Log your first session, then add the exercises you did.</p>
+  <a class="btn btn-primary" href="{% url 'tracker:workout-create' %}">Log a workout</a>
+</section>
+{% endif %}
+{% endblock %}

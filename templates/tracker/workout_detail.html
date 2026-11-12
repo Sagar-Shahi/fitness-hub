@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}{{ workout.name }} · FitHub{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'tracker:workout-list' %}">Workouts</a> / {{ workout.name }}</nav>
+<div class="page-head compact">
+  <div><h1>{{ workout.name }}</h1><p class="muted">{{ workout.date|date:"l, M j, Y" }} &middot; {{ workout.duration_min }} min{% if workout.notes %} &middot; {{ workout.notes }}{% endif %}</p></div>
+  <div class="head-actions">
+    <a class="btn btn-quiet" href="{% url 'tracker:workout-edit' workout.pk %}">Edit</a>
+    <a class="btn btn-danger-quiet" href="{% url 'tracker:workout-delete' workout.pk %}">Delete</a>
+  </div>
+</div>
+
+<dl class="stats">
+  <div class="stat"><dt>Exercises</dt><dd>{{ workout.exercises.all|length }}</dd></div>
+  <div class="stat"><dt>Total volume</dt><dd>{{ workout.volume_kg|floatformat:0 }} kg</dd><dd class="stat-note">Sets &times; reps &times; weight.</dd></div>
+</dl>
+
+<section class="card flush">
+  {% if workout.exercises.all %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th scope="col">Exercise</th><th scope="col" class="num">Sets</th><th scope="col" class="num">Reps</th><th scope="col" class="num">Weight</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+      <tbody>
+        {% for e in workout.exercises.all %}
+        <tr>
+          <td class="cell-title">{{ e.name }}</td><td class="num">{{ e.sets }}</td><td class="num">{{ e.reps }}</td><td class="num">{{ e.weight_kg }} kg</td>
+          <td class="actions-cell"><form method="post" action="{% url 'tracker:exercise-delete' workout.pk e.pk %}" data-confirm="Remove {{ e.name }}?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove</button></form></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted empty-state">No exercises yet. Add the first one below.</p>
+  {% endif %}
+</section>
+
+<form class="card form-card" method="post" action="{% url 'tracker:exercise-add' workout.pk %}" novalidate>
+  <h2 class="card-title">Add an exercise</h2>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+  <div class="form-grid">
+    {% include 'partials/field.html' with field=form.name %}
+    {% include 'partials/field.html' with field=form.sets %}
+    {% include 'partials/field.html' with field=form.reps %}
+    {% include 'partials/field.html' with field=form.weight_kg %}
+  </div>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Add exercise</button></div>
+</form>
+{% endblock %}

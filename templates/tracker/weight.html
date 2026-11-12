@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Weight · FitHub{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Weight</h1><p class="muted">One entry per day. Saving the same day again replaces it.</p></div>
+  <div class="head-actions">{% include 'partials/period.html' %}</div>
+</div>
+<section class="card">
+  <h2 class="card-title">Last {{ days }} days</h2>
+  {% include 'partials/chart.html' with chart=chart %}
+  {% if target %}<p class="muted">Dashed line: your target of {{ target }} kg.</p>{% endif %}
+</section>
+
+<div class="two-col">
+  <form class="card form-card" method="post" novalidate>
+    <h2 class="card-title">Add an entry</h2>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    {% include 'partials/field.html' with field=form.date %}
+    {% include 'partials/field.html' with field=form.weight_kg %}
+    <div class="form-actions"><button class="btn btn-primary" type="submit">Save weight</button></div>
+  </form>
+  <section class="card flush">
+    {% if page.object_list %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th scope="col">Date</th><th scope="col" class="num">Weight</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody>
+          {% for m in page.object_list %}
+          <tr><td>{{ m.date|date:"D, M j, Y" }}</td><td class="num">{{ m.weight_kg }} kg</td>
+            <td class="actions-cell"><form method="post" action="{% url 'tracker:weight-delete' m.pk %}" data-confirm="Delete this entry?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Delete</button></form></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include 'partials/pager.html' %}
+    {% else %}<p class="muted empty-state">No entries yet.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

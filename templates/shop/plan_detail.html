@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{{ plan.title }} · FitHub{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'shop:plans' %}">Plans</a> / {{ plan.title }}</nav>
+<div class="page-head compact">
+  <div><span class="badge badge-{{ plan.kind }}">{{ plan.get_kind_display }}</span><h1>{{ plan.title }}</h1><p class="muted">{{ plan.summary }}</p></div>
+  <div class="head-actions">
+    <span class="price">${{ plan.price }}</span>
+    {% if owned %}<span class="badge badge-paid">Owned</span>
+    {% elif in_cart %}<a class="btn btn-quiet" href="{% url 'shop:cart' %}">In cart</a>
+    {% else %}<form method="post" action="{% url 'shop:cart-add' plan.slug %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Add to cart</button></form>{% endif %}
+  </div>
+</div>
+<section class="card">
+  {% if owned %}
+  <h2 class="card-title">Your plan</h2>
+  <div class="plan-content">{{ plan.content }}</div>
+  <p class="muted">General fitness information, not medical advice. Check with a doctor before starting a new programme.</p>
+  {% else %}
+  <h2 class="card-title">What you get</h2>
+  <p class="muted">The full plan unlocks after checkout.</p>
+  {% endif %}
+</section>
+{% endblock %}

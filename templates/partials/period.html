@@ -1,0 +1,5 @@
+<nav class="segmented" aria-label="Time range">
+  {% for p in periods %}
+  <a href="?days={{ p }}" {% if p == days %}aria-current="true"{% endif %}>{{ p }} days</a>
+  {% endfor %}
+</nav>

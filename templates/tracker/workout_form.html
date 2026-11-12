@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} · FitHub{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ title }}</h1></div></div>
+<form class="card form-card" method="post" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+  <div class="form-grid">
+    {% include 'partials/field.html' with field=form.name %}
+    {% include 'partials/field.html' with field=form.date %}
+    {% include 'partials/field.html' with field=form.duration_min %}
+    {% include 'partials/field.html' with field=form.notes %}
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">Save workout</button>
+    <a class="btn btn-quiet" href="{% if workout %}{% url 'tracker:workout-detail' workout.pk %}{% else %}{% url 'tracker:workout-list' %}{% endif %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

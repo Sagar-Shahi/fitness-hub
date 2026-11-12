@@ -1,0 +1,25 @@
+<figure class="chart">
+  {% if chart.kind == 'line' and chart.empty %}
+  <p class="muted chart-empty">No weight entries in this period yet.</p>
+  {% else %}
+  <svg class="chart-svg" viewBox="0 0 {{ chart.width }} {{ chart.height }}" role="img" aria-label="{{ chart.description }}">
+    {% for tick in chart.ticks %}
+    <line class="chart-grid" x1="{{ chart.left }}" x2="{{ chart.right_edge }}" y1="{{ tick.y }}" y2="{{ tick.y }}"/>
+    <text class="chart-label" x="{{ chart.left }}" dx="-6" y="{{ tick.y }}" dy="4" text-anchor="end">{{ tick.value }}</text>
+    {% endfor %}
+    {% if chart.kind == 'bar' %}
+      {% for bar in chart.bars %}
+      <rect class="chart-bar{% if bar.n == 0 %} is-empty{% endif %}" x="{{ bar.x }}" y="{{ bar.y }}" width="{{ bar.w }}" height="{{ bar.h }}" rx="1.5"><title>{{ bar.label }}: {{ bar.n }} {{ chart.unit }}</title></rect>
+      {% endfor %}
+    {% else %}
+      {% if chart.target_y %}<line class="chart-target" x1="{{ chart.left }}" x2="{{ chart.right_edge }}" y1="{{ chart.target_y }}" y2="{{ chart.target_y }}"/>{% endif %}
+      <path class="chart-line" d="{{ chart.path }}"/>
+      {% for dot in chart.dots %}<circle class="chart-dot" cx="{{ dot.x }}" cy="{{ dot.y }}" r="3.5"><title>{{ dot.label }}</title></circle>{% endfor %}
+    {% endif %}
+    {% for label in chart.x_labels %}
+    <text class="chart-label" x="{{ label.x }}" y="{{ label.y }}" text-anchor="{{ label.anchor|default:'middle' }}">{{ label.text }}</text>
+    {% endfor %}
+  </svg>
+  <figcaption class="visually-hidden">{{ chart.description }}</figcaption>
+  {% endif %}
+</figure>
