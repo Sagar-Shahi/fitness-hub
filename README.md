@@ -97,7 +97,7 @@ See [SECURITY.md](SECURITY.md) to report a problem.
 3. `python manage.py migrate && python manage.py collectstatic --noinput`, then `gunicorn fithub.wsgi`.
 4. Check with `python manage.py check --deploy`.
 
-A `Dockerfile` (non-root user) is included but has not been built in the environment where this was written, so test it first. Rate limits use Django's cache; with several server processes use a shared cache such as Redis for exact limits.
+A `Dockerfile` (non-root user) is included. I could not pull the `python:3.13-slim` base image where this was written (registry access was blocked), so the image itself is unbuilt. I did run its exact steps by hand as an unprivileged user on Python 3.13 (install requirements, `collectstatic`, `migrate`, 3 gunicorn workers) and the app served pages, static files and `/healthz/` correctly. Run `docker build -t fithub .` once to confirm. Rate limits use Django's cache; with several server processes use a shared cache such as Redis for exact limits.
 
 ## Layout
 `core/` security headers, throttling, admin lockout, error pages · `accounts/` registration, login, API keys · `tracker/` workouts, meals, weight, goals, analytics, API · `shop/` plans, cart, orders · `templates/`, `static/` frontend.
