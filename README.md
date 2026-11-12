@@ -1,5 +1,7 @@
 # FitHub
 
+**Portfolio:** [https://sagar-shahi.github.io/](https://sagar-shahi.github.io/)
+
 A private fitness tracker with a plan shop, built from scratch with Django 5.2 and Django REST Framework.
 Log workouts, meals and body weight, see your weekly progress on a dashboard, and pick up training and diet plans.
 Security and privacy are design constraints here, not an afterthought.
@@ -102,4 +104,4 @@ A `Dockerfile` (non-root user) is included. I could not pull the `python:3.13-sl
 ## Layout
 `core/` security headers, throttling, admin lockout, error pages · `accounts/` registration, login, API keys · `tracker/` workouts, meals, weight, goals, analytics, API · `shop/` plans, cart, orders · `templates/`, `static/` frontend.
 
-Built by Sagar Bahadur Shahi.
+Built by [Sagar Bahadur Shahi](https://sagar-shahi.github.io/). See more of my work at [https://sagar-shahi.github.io/](https://sagar-shahi.github.io/).
