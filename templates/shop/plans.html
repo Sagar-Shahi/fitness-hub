@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Plans · FitHub{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Plans</h1><p class="muted">Ready-made training and diet plans. Checkout is a demo: no payment is taken.</p></div>
+  <nav class="segmented" aria-label="Plan type">
+    <a href="{% url 'shop:plans' %}" {% if not kind %}aria-current="true"{% endif %}>All</a>
+    <a href="?kind=workout" {% if kind == 'workout' %}aria-current="true"{% endif %}>Training</a>
+    <a href="?kind=diet" {% if kind == 'diet' %}aria-current="true"{% endif %}>Diet</a>
+  </nav>
+</div>
+{% if plans %}
+<div class="plan-grid">
+  {% for plan in plans %}
+  <article class="card plan-card">
+    <span class="badge badge-{{ plan.kind }}">{{ plan.get_kind_display }}</span>
+    <h2 class="card-title"><a href="{% url 'shop:plan-detail' plan.slug %}">{{ plan.title }}</a></h2>
+    <p class="muted">{{ plan.summary }}</p>
+    <div class="plan-foot">
+      <span class="price">${{ plan.price }}</span>
+      {% if plan.pk in owned %}<a class="btn btn-quiet btn-small" href="{% url 'shop:plan-detail' plan.slug %}">Open plan</a>
+      {% elif plan.pk in in_cart %}<a class="btn btn-quiet btn-small" href="{% url 'shop:cart' %}">In cart</a>
+      {% else %}<form method="post" action="{% url 'shop:cart-add' plan.slug %}">{% csrf_token %}<button class="btn btn-primary btn-small" type="submit">Add to cart</button></form>{% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<section class="card empty-state"><h2 class="card-title">No plans available</h2><p class="muted">Check back soon.</p></section>
+{% endif %}
+{% endblock %}

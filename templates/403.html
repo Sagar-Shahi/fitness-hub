@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Not allowed · FitHub{% endblock %}
+{% block content %}
+<section class="auth-card card center">
+  <p class="status-code">403</p>
+  <h1>You are not allowed to do that</h1>
+  <p class="muted">If you were sending a form, the page may have expired. Go back, refresh it and try again.</p>
+  <a class="btn btn-quiet" href="{% url 'home' %}">Go to the home page</a>
+</section>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Log in · FitHub{% endblock %}
+{% block content %}
+<section class="auth-card card">
+  <h1>Log in</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+    {% include 'partials/field.html' with field=form.username hide_required=True %}
+    {% include 'partials/field.html' with field=form.password hide_required=True %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn btn-primary btn-block" type="submit">Log in</button>
+  </form>
+  <p class="muted auth-alt">New here? <a href="{% url 'accounts:register' %}">Create an account</a></p>
+</section>
+{% endblock %}

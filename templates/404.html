@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Page not found · FitHub{% endblock %}
+{% block content %}
+<section class="auth-card card center">
+  <p class="status-code">404</p>
+  <h1>We could not find that page</h1>
+  <p class="muted">It may have been moved or deleted, or the address has a typo.</p>
+  <a class="btn btn-quiet" href="{% url 'home' %}">Go to the home page</a>
+</section>
+{% endblock %}

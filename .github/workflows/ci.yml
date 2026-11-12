@@ -1,0 +1,41 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: DJANGO_DEBUG=True python manage.py check
+      - run: DJANGO_DEBUG=True python manage.py makemigrations --check --dry-run
+      - name: Deployment checks with production-style settings
+        env:
+          DJANGO_SECRET_KEY: ci-only-secret-key-ci-only-secret-key-ci-only-secret-key-1234567890
+          DJANGO_ALLOWED_HOSTS: fit.example.com
+          DJANGO_HSTS_SECONDS: "31536000"
+          DJANGO_HSTS_INCLUDE_SUBDOMAINS: "True"
+          DJANGO_HSTS_PRELOAD: "True"
+        run: python manage.py check --deploy --fail-level WARNING
+      - run: python manage.py test
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements-dev.txt
+      - run: bandit -q -r core accounts tracker shop fithub -x '*/tests.py,*/test_*.py,*/testutils.py'
+      - run: pip-audit -r requirements.txt

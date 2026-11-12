@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Sign up · FitHub{% endblock %}
+{% block content %}
+<section class="auth-card card">
+  <h1>Create your account</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+    {% include 'partials/field.html' with field=form.username %}
+    {% include 'partials/field.html' with field=form.email %}
+    {% include 'partials/field.html' with field=form.password1 %}
+    {% include 'partials/field.html' with field=form.password2 %}
+    <div class="trap" aria-hidden="true">{% include 'partials/field.html' with field=form.website hide_required=True %}</div>
+    <button class="btn btn-primary btn-block" type="submit">Create account</button>
+  </form>
+  <p class="muted auth-alt">Already registered? <a href="{% url 'accounts:login' %}">Log in</a></p>
+</section>
+{% endblock %}

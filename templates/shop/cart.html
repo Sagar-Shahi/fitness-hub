@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Cart · FitHub{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Your cart</h1></div></div>
+{% if items %}
+<section class="card flush">
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th scope="col">Plan</th><th scope="col" class="num">Price</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+      <tbody>
+        {% for item in items %}
+        <tr><td><a class="cell-title" href="{% url 'shop:plan-detail' item.plan.slug %}">{{ item.plan.title }}</a><span class="cell-sub muted">{{ item.plan.get_kind_display }}</span></td>
+          <td class="num">${{ item.plan.price }}</td>
+          <td class="actions-cell"><form method="post" action="{% url 'shop:cart-remove' item.plan.slug %}">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove</button></form></td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot><tr><th scope="row">Total</th><td class="num price">${{ total }}</td><td></td></tr></tfoot>
+    </table>
+  </div>
+</section>
+<div class="notice"><p><strong>Demo checkout.</strong> No payment provider is connected, so nothing is charged. The order and your access to the plans are real inside this app.</p></div>
+<form method="post" action="{% url 'shop:checkout' %}" class="form-actions">{% csrf_token %}<button class="btn btn-primary" type="submit">Complete demo order</button><a class="btn btn-quiet" href="{% url 'shop:plans' %}">Keep browsing</a></form>
+{% else %}
+<section class="card empty-state"><h2 class="card-title">Your cart is empty</h2><p class="muted">Browse the plans and add one.</p><a class="btn btn-primary" href="{% url 'shop:plans' %}">See plans</a></section>
+{% endif %}
+{% endblock %}

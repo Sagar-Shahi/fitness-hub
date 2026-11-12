@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Meals · FitHub{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Meals</h1><p class="muted">{{ day|date:"l, M j, Y" }}</p></div>
+  <nav class="date-nav" aria-label="Choose day">
+    <a class="btn btn-quiet btn-small" href="?date={{ prev|date:'Y-m-d' }}">&larr; Previous day</a>
+    {% if next %}<a class="btn btn-quiet btn-small" href="?date={{ next|date:'Y-m-d' }}">Next day &rarr;</a>{% endif %}
+  </nav>
+</div>
+
+<section class="card">
+  <div class="progress-row">
+    <div class="goal-ring"><strong>{{ totals.calories }} of {{ target }} kcal</strong><span class="muted">{{ percent }}%</span></div>
+    <progress class="meter" max="100" value="{{ percent }}" aria-label="Calories against target">{{ percent }}%</progress>
+  </div>
+  <dl class="macro-row">
+    <div><dt>Protein</dt><dd>{{ totals.protein }} g</dd></div>
+    <div><dt>Carbs</dt><dd>{{ totals.carbs }} g</dd></div>
+    <div><dt>Fat</dt><dd>{{ totals.fat }} g</dd></div>
+  </dl>
+</section>
+
+<div class="two-col">
+  <form class="card form-card" method="post" novalidate>
+    <h2 class="card-title">Log a meal</h2>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    <div class="form-grid">
+      {% include 'partials/field.html' with field=form.name %}
+      {% include 'partials/field.html' with field=form.kind %}
+      {% include 'partials/field.html' with field=form.date %}
+      {% include 'partials/field.html' with field=form.calories %}
+      {% include 'partials/field.html' with field=form.protein_g %}
+      {% include 'partials/field.html' with field=form.carbs_g %}
+      {% include 'partials/field.html' with field=form.fat_g %}
+    </div>
+    <div class="form-actions"><button class="btn btn-primary" type="submit">Add meal</button></div>
+  </form>
+  <section class="card flush">
+    {% if items %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th scope="col">Meal</th><th scope="col" class="num">kcal</th><th scope="col" class="num">P / C / F</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody>
+          {% for m in items %}
+          <tr><td><span class="cell-title">{{ m.name }}</span><span class="cell-sub muted">{{ m.get_kind_display }}</span></td><td class="num">{{ m.calories }}</td><td class="num nowrap">{{ m.protein_g }} / {{ m.carbs_g }} / {{ m.fat_g }}</td>
+            <td class="actions-cell"><form method="post" action="{% url 'tracker:meal-delete' m.pk %}" data-confirm="Delete {{ m.name }}?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Delete</button></form></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}<p class="muted empty-state">Nothing logged for this day.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

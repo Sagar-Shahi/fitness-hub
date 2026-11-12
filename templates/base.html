@@ -1,0 +1,67 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="{% block description %}FitHub is a private fitness tracker: log workouts, meals and weight, see your progress, and pick up training and diet plans.{% endblock %}">
+  <title>{% block title %}FitHub{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="{% static 'js/app.js' %}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  {% with view=request.resolver_match.view_name %}
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{% if user.is_authenticated %}{% url 'tracker:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+        <svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><rect width="32" height="32" rx="7" class="brand-bg"/><path d="M7 16h18M9.5 10.5v11M5 13v6M22.5 10.5v11M27 13v6" class="brand-line"/></svg>
+        <span>FitHub</span>
+      </a>
+      {% if user.is_authenticated %}
+      <nav class="nav" aria-label="Main">
+        <a href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+        <a href="{% url 'tracker:workout-list' %}" {% if 'workout' in view %}aria-current="page"{% endif %}>Workouts</a>
+        <a href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>Meals</a>
+        <a href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>Weight</a>
+        <a href="{% url 'shop:plans' %}" {% if view|slice:':5' == 'shop:' and view != 'shop:cart' %}aria-current="page"{% endif %}>Plans</a>
+      </nav>
+      <div class="topbar-actions">
+        <a class="btn btn-quiet btn-small" href="{% url 'shop:cart' %}">Cart{% if cart_count %} ({{ cart_count }}){% endif %}</a>
+        <details class="account-menu">
+          <summary><span class="avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</span><span class="visually-hidden">Account menu for </span>{{ user.username }}</summary>
+          <div class="menu">
+            <a href="{% url 'tracker:goals' %}">My goals</a>
+            <a href="{% url 'shop:my-plans' %}">My plans</a>
+            <a href="{% url 'shop:orders' %}">Orders</a>
+            <a href="{% url 'tracker:export' %}">Export workouts (CSV)</a>
+            <a href="{% url 'accounts:api-keys' %}">API keys</a>
+            <a href="{% url 'accounts:password-change' %}">Change password</a>
+            <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
+          </div>
+        </details>
+      </div>
+      {% else %}
+      <div class="topbar-actions">
+        <a class="btn btn-quiet btn-small" href="{% url 'accounts:login' %}">Log in</a>
+        <a class="btn btn-primary btn-small" href="{% url 'accounts:register' %}">Sign up</a>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+  {% endwith %}
+
+  <main id="main" class="container">
+    {% include 'partials/messages.html' %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>FitHub. Your data stays yours: export it any time. Not medical advice.</span>
+      <span class="muted">Built by Sagar Bahadur Shahi</span>
+    </div>
+  </footer>
+</body>
+</html>

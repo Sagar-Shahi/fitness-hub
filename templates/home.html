@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}FitHub{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Private fitness tracking</p>
+    <h1>Train, eat and weigh in. See what is actually working.</h1>
+    <p class="lead">FitHub keeps your workouts, meals and body weight in one place, turns them into clear weekly progress, and offers training and diet plans when you want a head start. Your data is yours: export it any time.</p>
+    <div class="hero-actions">
+      {% if user.is_authenticated %}
+      <a class="btn btn-primary" href="{% url 'tracker:dashboard' %}">Open your dashboard</a>
+      {% else %}
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create a free account</a>
+      <a class="btn btn-quiet" href="{% url 'accounts:login' %}">Log in</a>
+      {% endif %}
+    </div>
+  </div>
+  <figure class="hero-demo" aria-label="Example week">
+    <p class="demo-label">This week</p>
+    <p class="demo-url">3 of 4 workouts &middot; 2 h 40 min</p>
+    <p class="demo-label">Today</p>
+    <p class="demo-url demo-short">1,840 of 2,200 kcal &middot; <strong>142 g</strong> protein</p>
+    <p class="demo-label">Last 30 days</p>
+    <p class="demo-url">Weight <span class="t1">82.4 &rarr; 80.9 kg</span> &middot; streak <span class="t2">5 days</span></p>
+  </figure>
+</section>
+
+<section class="features">
+  <div class="card"><h2 class="card-title">Log in seconds</h2><p class="muted">Workouts with sets, reps and weights. Meals with calories and macros. One weight entry per day.</p></div>
+  <div class="card"><h2 class="card-title">See the trend</h2><p class="muted">Weekly goal progress, calories against your target, workout streak and a weight chart with your goal line.</p></div>
+  <div class="card"><h2 class="card-title">Built to be safe</h2><p class="muted">Argon2 passwords, per-account data isolation, strict browser security headers and rate-limited logins.</p></div>
+</section>
+{% endblock %}
