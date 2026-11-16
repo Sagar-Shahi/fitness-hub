@@ -101,6 +101,13 @@ See [SECURITY.md](SECURITY.md) to report a problem.
 
 A `Dockerfile` (non-root user) is included. I could not pull the `python:3.13-slim` base image where this was written (registry access was blocked), so the image itself is unbuilt. I did run its exact steps by hand as an unprivileged user on Python 3.13 (install requirements, `collectstatic`, `migrate`, 3 gunicorn workers) and the app served pages, static files and `/healthz/` correctly. Run `docker build -t fithub .` once to confirm. Rate limits use Django's cache; with several server processes use a shared cache such as Redis for exact limits.
 
+## Known limitations and next steps
+- Checkout is a demo: no payment provider is connected and no card data is handled. A real provider (for example Stripe) is the natural next step.
+- Rate limits use the local cache, so exact limits across several server processes need a shared cache such as Redis.
+- The Docker image has not been built in the environment where this was written; test it before relying on it.
+- Fitness data is personal. Disk or database encryption is the host's job, so use a managed database with TLS in production.
+- Security checks are automated scans and tests written by the author, not an independent penetration test.
+
 ## Layout
 `core/` security headers, throttling, admin lockout, error pages · `accounts/` registration, login, API keys · `tracker/` workouts, meals, weight, goals, analytics, API · `shop/` plans, cart, orders · `templates/`, `static/` frontend.
 
