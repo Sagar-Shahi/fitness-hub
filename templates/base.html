@@ -32,8 +32,7 @@
         <details class="account-menu">
           <summary><span class="avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</span><span class="visually-hidden">Account menu for </span>{{ user.username }}</summary>
           <div class="menu">
-            <a href="{% url 'tracker:goals' %}">My goals</a>
-            <a href="{% url 'shop:my-plans' %}">My plans</a>
+            <a href="{% url 'tracker:goals' %}">My Fitness</a>
             <a href="{% url 'shop:orders' %}">Orders</a>
             <a href="{% url 'tracker:export' %}">Export workouts (CSV)</a>
             <a href="{% url 'accounts:password-change' %}">Change password</a>
