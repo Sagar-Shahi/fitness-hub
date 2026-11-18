@@ -1578,3 +1578,15 @@ main.container { gap: 22px; }
 @media(max-width:850px) { .workout-start-layout { grid-template-columns:1fr; } .workout-next-panel { display:none; } }
 @media(max-width:600px) { .workout-start-intro { margin-bottom:19px; } .workout-start-form { padding:19px; } .workout-fields-grid { grid-template-columns:1fr; gap:17px; } .workout-form-actions { display:grid; grid-template-columns:1fr; } .workout-form-actions .btn { width:100%; } }
 @media(prefers-reduced-motion:reduce) { .workout-start-save { transition:none; } }
+
+
+/* In-workout tutorial discovery */
+.tutorial-results { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:14px; }
+.tutorial-result { display:flex; align-items:center; gap:12px; min-width:0; padding:9px; border:1px solid #e2d7ca; border-radius:12px; background:#fffdf9; color:#45362a; text-align:left; cursor:pointer; transition:border-color .18s,transform .18s,box-shadow .18s; }
+.tutorial-result:hover { border-color:#c47b3d; transform:translateY(-2px); box-shadow:0 7px 18px rgba(65,45,27,.09); }
+.tutorial-result img { width:112px; aspect-ratio:16/9; object-fit:cover; border-radius:8px; background:#eee5d9; flex:none; }
+.tutorial-result span { display:grid; gap:5px; min-width:0; }
+.tutorial-result strong { display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; font-size:.84rem; line-height:1.35; }
+.tutorial-result small { color:#8a7a6a; font-size:.74rem; }
+[data-tutorial-search]:disabled { opacity:.65; cursor:wait; }
+@media(max-width:560px) { .tutorial-results { grid-template-columns:1fr; } }
