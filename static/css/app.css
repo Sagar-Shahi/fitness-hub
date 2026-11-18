@@ -394,14 +394,18 @@ input[type="datetime-local"], input[type="number"], input[type="date"], select, 
 
 
 /* Focus audio: optional, compact and out of the way until opened. */
-.focus-dock { position: fixed; z-index: 30; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); width: min(390px, calc(100vw - 28px)); color: var(--ink); }
+.focus-dock { position: fixed; z-index: 30; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); width: min(340px, calc(100vw - 28px)); color: var(--ink); }
 .focus-dock > summary { list-style: none; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 15px; border: 1px solid #34313a; border-radius: 999px; background: rgba(15,17,23,.96); box-shadow: 0 12px 36px rgba(0,0,0,.38); cursor: pointer; font-weight: 650; }
 .focus-dock > summary::-webkit-details-marker { display: none; }
 .focus-dock[open] > summary { border-radius: 12px 12px 0 0; border-bottom-color: transparent; }
 .focus-indicator { width: 9px; height: 9px; border-radius: 50%; background: var(--good); box-shadow: 0 0 12px rgba(95,211,164,.45); }
 .focus-hint { margin-left: auto; color: var(--muted); font: .72rem var(--mono); }
-.focus-panel { padding: 18px; border: 1px solid #34313a; border-top: 0; border-radius: 0 0 12px 12px; background: rgba(15,17,23,.98); box-shadow: 0 18px 42px rgba(0,0,0,.42); }
-.focus-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.focus-panel { max-height: min(430px, 62vh); overflow-y: auto; overscroll-behavior: contain; padding: 14px; border: 1px solid #34313a; border-top: 0; border-radius: 0 0 12px 12px; background: rgba(15,17,23,.98); box-shadow: 0 18px 42px rgba(0,0,0,.42); }
+.focus-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.focus-panel-tools { display: flex; align-items: center; gap: 8px; }
+.focus-panel-close { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--surface-2); color: var(--ink); font: 1.35rem/1 var(--sans); cursor: pointer; }
+.focus-panel-close:hover { background: var(--accent-soft); border-color: var(--accent); }
+.focus-panel-close:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .focus-panel-head .eyebrow { margin: 0 0 3px; }
 .focus-panel-head h2 { font-size: 1.15rem; }
 .focus-symbol { color: var(--accent); font-size: 2rem; }
