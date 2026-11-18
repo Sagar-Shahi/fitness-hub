@@ -8,7 +8,7 @@
 </section>
 <section class="session-command" aria-label="Workout progress">
   <div class="session-command-top"><div><span class="session-kicker">SESSION PROGRESS</span><strong><span data-completed-count>{{ completed_sets }}</span><small> / {{ total_sets }} sets</small></strong></div><span class="session-percent" data-progress-label>{{ progress_percent }}%</span></div>
-  <div class="session-progress-track"><span data-progress-bar style="width:{{ progress_percent }}%"></span></div>
+  <div class="session-progress-track"><span data-progress-bar data-progress-value="{{ progress_percent }}"></span></div>
   <div class="session-command-bottom"><span>Keep your rhythm. One set at a time.</span><div class="rest-clock" data-rest-clock><span>REST</span><strong data-rest-display>01:30</strong><button type="button" data-rest-start>Start rest</button><button type="button" data-rest-reset hidden>Reset</button></div></div>
 </section>
 <dl class="stats workout-stats"><div class="stat"><dt>EXERCISES</dt><dd>{{ workout.exercises.all|length }}</dd></div><div class="stat"><dt>COMPLETED VOLUME</dt><dd>{{ workout.volume_kg|floatformat:0 }} kg</dd><dd class="stat-note">Completed reps × weight.</dd></div></dl>
