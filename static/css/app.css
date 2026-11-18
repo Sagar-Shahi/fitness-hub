@@ -1634,3 +1634,51 @@ main.container { gap: 22px; }
 .library-exercise-content details summary { color:#8d5d34; font-weight:750; cursor:pointer; }
 .library-exercise-content details ol { padding-left:20px; color:#76695c; font-size:.86rem; }
 @media(prefers-reduced-motion:reduce) { .library-exercise-image { transition:none; } .library-exercise-card:hover .library-exercise-image { transform:none; } }
+
+
+/* Exercise tutorial: large, centered in-app viewing mode */
+.exercise-video-frame:not([hidden]) {
+  position:fixed;
+  z-index:2000;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(1100px, calc(100vw - 48px));
+  aspect-ratio:16/9;
+  max-height:calc(100vh - 100px);
+  margin:0;
+  border:1px solid #cfc5b8;
+  border-radius:16px;
+  overflow:visible;
+  background:#171512;
+  box-shadow:0 0 0 100vmax rgba(22,18,14,.82), 0 24px 70px rgba(0,0,0,.38);
+}
+.exercise-video-frame iframe {
+  width:100%;
+  height:100%;
+  border:0;
+  border-radius:15px;
+  overflow:hidden;
+}
+.exercise-video-close {
+  position:absolute;
+  right:0;
+  top:-46px;
+  min-height:36px;
+  padding:7px 13px;
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:999px;
+  background:#f8f2e9;
+  color:#34291f;
+  font:inherit;
+  font-size:.88rem;
+  font-weight:700;
+  cursor:pointer;
+}
+@media(max-width:600px) {
+  .exercise-video-frame:not([hidden]) {
+    width:calc(100vw - 24px);
+    border-radius:11px;
+  }
+  .exercise-video-close { top:-43px; }
+}
