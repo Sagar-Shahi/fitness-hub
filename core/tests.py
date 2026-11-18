@@ -85,6 +85,8 @@ class SecurityHeaderTests(TestCase):
         self.client.force_login(user)
         self.assertContains(self.client.get(reverse('tracker:dashboard')), 'Focus audio')
         self.assertContains(self.client.get(reverse('tracker:dashboard')), 'focus-audio-url')
+        self.assertContains(self.client.get(reverse('tracker:dashboard')), 'focus-local-file')
+        self.assertContains(self.client.get(reverse('tracker:dashboard')), 'focus-stop-speak')
 
     def test_other_security_headers(self):
         response = self.client.get('/')
