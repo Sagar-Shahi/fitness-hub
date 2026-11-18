@@ -114,6 +114,18 @@ DATABASES = {
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Shared database-backed cache for reusable research results across app instances.
+# The table is created by tracker migration 0003_research_cache.
+CACHES = {
+    'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': 'fithub-default'},
+    'research': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'fithub_research_cache',
+        'TIMEOUT': 60 * 60 * 24,
+    },
+}
+YOUTUBE_DAILY_SEARCH_LIMIT = env_int('YOUTUBE_DAILY_SEARCH_LIMIT', 75)
+
 # --- Passwords -------------------------------------------------------------------------------
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.Argon2PasswordHasher',
