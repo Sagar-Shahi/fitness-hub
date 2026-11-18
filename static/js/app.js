@@ -53,6 +53,7 @@
   function revealChart(chart) {
     if (chart.classList.contains('is-visible')) return;
     chart.classList.add('is-visible');
+    chart.querySelectorAll('.chart-bar:not(.is-empty)').forEach(function (bar, index) { bar.style.setProperty('--bar-index', index); });
     chart.querySelectorAll('.chart-line').forEach(function (path) {
       try {
         var length = path.getTotalLength();
