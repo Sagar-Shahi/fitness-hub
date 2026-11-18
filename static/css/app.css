@@ -379,3 +379,15 @@ input[type="datetime-local"], input[type="number"], input[type="date"], select, 
 }
 .plan-card .card-title, .plan-card .card-title a { font-family: var(--sans); text-transform: none; letter-spacing: -0.01em; font-size: 1.08rem; font-weight: 650; color: var(--ink); text-decoration: none; }
 .plan-card .card-title a:hover { color: var(--accent); }
+
+
+/* Individual workout set editor */
+.set-card {
+  margin-top: .75rem;
+}
+.set-edit-form {
+  padding: 0;
+}
+.set-add-form {
+  margin-top: .75rem;
+}
