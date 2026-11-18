@@ -70,9 +70,10 @@
     <summary><span class="focus-indicator" aria-hidden="true"></span><span>Focus audio</span><span class="focus-hint">music · voice</span></summary>
     <section class="focus-panel" aria-label="Focus audio player">
       <div class="focus-panel-head"><div><p class="eyebrow">TRAINING MODE</p><h2>Find your rhythm.</h2></div><span class="focus-symbol" aria-hidden="true">♫</span></div>
-      <label class="focus-label" for="focus-audio-url">Audio file or YouTube link</label>
-      <div class="focus-url-row"><input id="focus-audio-url" type="url" inputmode="url" placeholder="Paste an MP3 or YouTube link" autocomplete="url"><button class="btn btn-primary btn-small" id="focus-load" type="button">Load</button></div>
-      <p class="focus-help" id="focus-status" role="status">Direct audio files play here. YouTube videos play in this panel. Spotify links open on Spotify.</p>
+      <label class="focus-label" for="focus-audio-url">Find music or use a link</label>
+      <div class="focus-url-row"><input id="focus-audio-url" type="search" inputmode="search" placeholder="Song, artist, playlist or audio link" autocomplete="off"><button class="btn btn-primary btn-small" id="focus-load" type="button">YouTube</button></div>
+      <div class="focus-actions focus-search-actions"><button class="btn btn-quiet btn-small" id="focus-spotify-search" type="button">Search Spotify</button><span class="focus-help">Search by name — no URL needed.</span></div>
+      <p class="focus-help" id="focus-status" role="status">Search YouTube or Spotify by song or artist, paste a supported link, or choose a file below.</p>
       <audio id="focus-audio" controls preload="none"></audio>
       <section class="focus-video-stage" id="focus-video-stage" aria-label="Video player" hidden>
         <div class="focus-video-heading"><strong id="focus-video-title">Now playing</strong><button class="btn btn-quiet btn-small" id="focus-video-close" type="button">Close video</button></div>
