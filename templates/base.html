@@ -29,6 +29,7 @@
           <summary>Explore <span aria-hidden="true">⌄</span></summary>
           <div class="nav-more-menu">
             <a href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>Exercise library</a>
+            <a href="{% url 'about' %}" {% if view == 'about' %}aria-current="page"{% endif %}>About FitHub</a>
             <a href="{% url 'tracker:learn' %}" {% if view == 'tracker:learn' %}aria-current="page"{% endif %}>Learn</a>
             <a href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>Weight tracking</a>
             <a href="{% url 'shop:store' %}" {% if view == 'shop:store' %}aria-current="page"{% endif %}>Gear guide</a>
@@ -92,7 +93,7 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <span>FitHub. Your data stays yours: export it any time. Not medical advice.</span>
+      <span>FitHub. Your data stays yours: export it any time. Not medical advice. <a href="{% url 'about' %}">About FitHub</a></span>
       <span class="muted">Built by Sagar Bahadur Shahi</span>
     </div>
   </footer>
