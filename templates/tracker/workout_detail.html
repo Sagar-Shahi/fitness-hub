@@ -12,7 +12,8 @@
 {% if workout.exercises.all %}
   {% for e in workout.exercises.all %}
   <section class="card form-card exercise-card">
-    <div class="exercise-heading"><div><p class="eyebrow">EXERCISE {{ forloop.counter|stringformat:"02d" }}</p><h2 class="card-title">{{ e.name }}</h2><p class="muted">{{ e.set_entries.all|length }} sets recorded</p></div>
+    <div class="exercise-heading"><div><p class="eyebrow">EXERCISE {{ forloop.counter|stringformat:"02d" }}</p><h2 class="card-title">{{ e.name }}</h2><p class="muted">{{ e.set_entries.all|length }} sets recorded</p>
+        <a class="btn btn-quiet btn-small" href="https://www.youtube.com/results?search_query={{ e.name|urlencode }}+exercise+tutorial" target="_blank" rel="noopener noreferrer">▶ Watch exercise tutorial</a></div>
       <form method="post" action="{% url 'tracker:exercise-delete' workout.pk e.pk %}" data-confirm="Remove {{ e.name }} and all its sets?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove exercise</button></form>
     </div>
 
