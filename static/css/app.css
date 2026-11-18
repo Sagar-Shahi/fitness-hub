@@ -2359,3 +2359,15 @@ input:focus,select:focus,textarea:focus {
   .brand-mark,.nav .nav-link,.nav-icon,.nav-more>summary,.nav-chevron,.explore-icon,.explore-arrow { transition:none; }
   .nav-more-menu { animation:none; }
 }
+
+
+/* Cart and account controls join the icon-led navigation system. */
+.nav-cart { color:#49372c; }
+.nav-cart:hover { color:#352b25; background:#fffdf9; border-color:#d9cbbb; transform:translateY(-1px); box-shadow:0 5px 13px rgba(65,48,36,.07); }
+.account-menu>summary .account-name { max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.83rem; font-weight:680; }
+.account-chevron { width:14px; height:14px; fill:none; stroke:#8a7768; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:transform .2s ease; }
+.account-menu[open]>summary .account-chevron { transform:rotate(180deg); }
+@media(max-width:620px) {
+  .account-menu>summary { padding-right:7px; }
+  .account-menu>summary .account-name { max-width:70px; }
+}
