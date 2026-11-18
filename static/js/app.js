@@ -78,6 +78,21 @@
   }
 
 
+  // Progress card: share a text summary when supported, or copy it as a fallback.
+  document.addEventListener('click', function (event) {
+    var shareButton = event.target.closest('[data-share-progress]');
+    if (shareButton) {
+      var text = shareButton.getAttribute('data-share-progress') || '';
+      if (navigator.share) {
+        navigator.share({ title: 'My FitHub progress', text: text }).catch(function () {});
+      } else {
+        copyText(text, shareButton);
+      }
+    }
+    var printButton = event.target.closest('[data-print-share-card]');
+    if (printButton) window.print();
+  });
+
   // Homepage demo: let visitors complete sample sets and feel the UI respond.
   var demoSets = document.querySelectorAll('[data-demo-set]');
   var demoCount = document.querySelector('[data-demo-completed]');
