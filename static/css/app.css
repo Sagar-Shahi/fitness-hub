@@ -1636,7 +1636,7 @@ main.container { gap: 22px; }
 @media(prefers-reduced-motion:reduce) { .library-exercise-image { transition:none; } .library-exercise-card:hover .library-exercise-image { transform:none; } }
 
 
-/* Exercise tutorial: square viewing stage; preserve the complete 16:9 video without cropping */
+/* Exercise tutorial: square viewing stage; crop the sides so the video fills the square */
 .exercise-video-frame:not([hidden]) {
   position:fixed;
   z-index:2000;
@@ -1646,21 +1646,24 @@ main.container { gap: 22px; }
   width:min(92vw, 88vh, 900px);
   aspect-ratio:1 / 1;
   margin:0;
-  display:grid;
-  place-items:center;
+  display:block;
   border:1px solid #cfc5b8;
   border-radius:18px;
-  overflow:visible;
-  background:#171512;
+  overflow:hidden;
+  background:#000;
   box-shadow:0 0 0 100vmax rgba(22,18,14,.86), 0 24px 70px rgba(0,0,0,.42);
 }
 .exercise-video-frame iframe {
+  position:absolute;
+  left:50%;
+  top:0;
   display:block;
-  width:100%;
-  height:auto;
-  aspect-ratio:16 / 9;
+  width:177.7778%;
+  max-width:none;
+  height:100%;
+  transform:translateX(-50%);
   border:0;
-  border-radius:12px;
+  border-radius:0;
   background:#000;
 }
 .tutorial-recommendation {
@@ -1672,7 +1675,7 @@ main.container { gap: 22px; }
   position:absolute;
   right:10px;
   top:10px;
-  z-index:1;
+  z-index:2;
   min-height:36px;
   padding:7px 13px;
   border:1px solid rgba(255,255,255,.35);
