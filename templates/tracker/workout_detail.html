@@ -7,7 +7,7 @@
   <div class="head-actions"><a class="btn btn-quiet" href="{% url 'tracker:workout-edit' workout.pk %}">Edit workout</a><a class="btn btn-danger-quiet" href="{% url 'tracker:workout-delete' workout.pk %}">Delete</a></div>
 </section>
 
-<dl class="stats workout-stats"><div class="stat"><dt>EXERCISES</dt><dd>{{ workout.exercises.all|length }}</dd></div><div class="stat"><dt>COMPLETED VOLUME</dt><dd>{{ workout.volume_kg|floatformat:0 }} <span class="stat-denom">kg</span></dd><dd class="stat-note">Completed reps × weight.</dd></div></dl>
+<dl class="stats workout-stats"><div class="stat"><dt>EXERCISES</dt><dd>{{ workout.exercises.all|length }}</dd></div><div class="stat"><dt>COMPLETED VOLUME</dt><dd>{{ workout.volume_kg|floatformat:0 }} kg</dd><dd class="stat-note">Completed reps × weight.</dd></div></dl>
 
 {% if workout.exercises.all %}
   {% for e in workout.exercises.all %}
