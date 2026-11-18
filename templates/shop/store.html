@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Fitness Store · FitHub{% endblock %}
+{% block description %}Curated fitness gear and training essentials from independent sellers.{% endblock %}
+{% block content %}
+<section class="page-head store-head">
+  <div>
+    <p class="eyebrow">THE FITHUB STORE</p>
+    <h1>Gear up for your next session.</h1>
+    <p class="muted">Useful training essentials, curated for your fitness journey.</p>
+  </div>
+</section>
+<section class="store-disclosure" aria-label="Affiliate disclosure">
+  <span aria-hidden="true">↗</span>
+  <p><strong>Shop with confidence.</strong> Products are sold by independent sellers. When you choose a product, you’ll visit the seller’s website to check the latest price, pay and arrange delivery. FitHub does not take payments or handle orders. Some links may become affiliate links in future; if so, FitHub may earn a commission at no extra cost to you.</p>
+</section>
+<form class="store-filters" method="get">
+  <label class="visually-hidden" for="store-search">Search products</label>
+  <input id="store-search" type="search" name="q" value="{{ search }}" placeholder="Search equipment, accessories…">
+  <label class="visually-hidden" for="store-category">Category</label>
+  <select id="store-category" name="category">
+    <option value="">All categories</option>
+    {% for key, label in categories %}<option value="{{ key }}" {% if category == key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-primary" type="submit">Find gear</button>
+</form>
+{% if products %}
+<div class="store-grid">
+  {% for product in products %}
+  <article class="card store-product">
+    {% if product.image_url %}<img class="store-product-image" src="{{ product.image_url }}" alt="{{ product.title }}" loading="lazy" referrerpolicy="no-referrer">{% else %}<div class="store-product-placeholder" aria-hidden="true">FH</div>{% endif %}
+    <div class="store-product-body">
+      <span class="store-category">{{ product.get_category_display }}</span>
+      <h2>{{ product.title }}</h2>
+      <p class="muted">{{ product.description }}</p>
+      <div class="store-product-meta"><span>{{ product.seller_name }}</span>{% if product.price_label %}<strong>{{ product.price_label }}</strong>{% endif %}</div>
+      <a class="btn btn-primary btn-block" href="{% url 'shop:product-outbound' product.slug %}" target="_blank" rel="noopener noreferrer sponsored">View at seller <span aria-hidden="true">↗</span></a>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<section class="card empty-state store-empty">
+  <span class="store-empty-mark" aria-hidden="true">✳</span>
+  <h2 class="card-title">Your store is being curated.</h2>
+  <p class="muted">We’re checking sellers and products before adding them. No placeholder products or unverified prices.</p>
+</section>
+{% endif %}
+{% endblock %}
