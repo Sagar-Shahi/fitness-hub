@@ -116,6 +116,7 @@
   var progressBar = document.querySelector('[data-progress-bar]');
   var progressLabel = document.querySelector('[data-progress-label]');
   var completedCount = document.querySelector('[data-completed-count]');
+  if (progressBar) progressBar.style.width = (progressBar.getAttribute('data-progress-value') || '0') + '%';
   function refreshSessionProgress() {
     if (!sessionSets.length) return;
     var done = document.querySelectorAll('[data-workout-set].is-complete').length;
