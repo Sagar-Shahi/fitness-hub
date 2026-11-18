@@ -188,8 +188,8 @@
     dock.open = true;
     stage.hidden = false;
     if (heading) heading.textContent = title || 'Now playing';
-    if (videoStatus) videoStatus.textContent = 'Starting video… Use the YouTube controls to pause or turn sound on.';
-    frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0&autoplay=1&mute=1&controls=1&playsinline=1';
+    if (videoStatus) videoStatus.textContent = 'Starting video… If your browser blocks autoplay, press Play in the YouTube player.';
+    frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0&autoplay=1&mute=0&controls=1&playsinline=1';
     window.setTimeout(function () {
       stage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 80);
@@ -212,7 +212,7 @@
   if (focusVideoFrame) focusVideoFrame.addEventListener('load', function () {
     var stage = document.getElementById('focus-video-stage');
     if (stage && !stage.hidden && focusVideoFrame.getAttribute('src') && focusVideoStatus) {
-      focusVideoStatus.textContent = 'Player ready. Use the YouTube controls to pause or turn sound on.';
+      focusVideoStatus.textContent = 'Player ready. Press Play if playback has not started.';
     }
   });
 
@@ -375,18 +375,84 @@
     }
   }
 
+  function renderFocusMusicResults(videos) {
+    var results = document.getElementById('focus-music-results');
+    if (!results) return;
+    results.textContent = '';
+    if (!videos.length) {
+      showStatus('No embeddable videos found. Try a different song or artist.');
+      return;
+    }
+    videos.forEach(function (video) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'focus-music-result';
+      button.setAttribute('data-video-id', video.id);
+      button.setAttribute('data-title', video.title || 'YouTube music');
+      var thumbnail = document.createElement('img');
+      thumbnail.src = video.thumbnail || '';
+      thumbnail.alt = '';
+      thumbnail.loading = 'lazy';
+      thumbnail.referrerPolicy = 'strict-origin-when-cross-origin';
+      var details = document.createElement('span');
+      details.className = 'focus-music-result-copy';
+      var title = document.createElement('strong');
+      title.textContent = video.title || 'YouTube video';
+      var channel = document.createElement('small');
+      channel.textContent = video.channel || 'YouTube';
+      details.appendChild(title);
+      details.appendChild(channel);
+      button.appendChild(thumbnail);
+      button.appendChild(details);
+      results.appendChild(button);
+    });
+    showStatus('Choose a result to play it in the Focus Audio player.');
+  }
+
+  var focusMusicResults = document.getElementById('focus-music-results');
+  if (focusMusicResults) focusMusicResults.addEventListener('click', function (event) {
+    var result = event.target.closest('.focus-music-result[data-video-id]');
+    if (!result || !focusMusicResults.contains(result)) return;
+    showFocusVideo(result.getAttribute('data-video-id'), result.getAttribute('data-title'));
+  });
+
   function searchMusic(provider) {
     var query = input.value.trim();
     if (!query) {
-      showStatus('Type a song, artist or playlist name first.');
+      showStatus('Type a song or artist first.');
       input.focus();
       return;
     }
-    var target = provider === 'spotify'
-      ? 'https://open.spotify.com/search/' + encodeURIComponent(query)
-      : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
-    window.open(target, '_blank', 'noopener,noreferrer');
-    showStatus('Opened ' + (provider === 'spotify' ? 'Spotify' : 'YouTube') + ' search results in a new tab.');
+    if (provider === 'spotify') {
+      window.open('https://open.spotify.com/search/' + encodeURIComponent(query), '_blank', 'noopener,noreferrer');
+      showStatus('Spotify search opened in a new tab. Playback stays on Spotify.');
+      return;
+    }
+    var dock = document.getElementById('focus-dock');
+    var endpoint = dock && dock.getAttribute('data-music-search-url');
+    if (!endpoint) {
+      showStatus('YouTube search is unavailable right now. You can still paste a video link.');
+      return;
+    }
+    var results = document.getElementById('focus-music-results');
+    if (results) results.textContent = '';
+    showStatus('Searching YouTube…');
+    load.disabled = true;
+    fetch(endpoint + '?q=' + encodeURIComponent(query), {
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' }
+    }).then(function (response) {
+      return response.json().then(function (data) {
+        if (!response.ok) throw new Error(data.error || 'YouTube search is unavailable.');
+        return data;
+      });
+    }).then(function (data) {
+      renderFocusMusicResults(data.videos || []);
+    }).catch(function (error) {
+      showStatus(error.message || 'Could not search YouTube. Please try again.');
+    }).finally(function () {
+      load.disabled = false;
+    });
   }
 
   load.addEventListener('click', function () {
