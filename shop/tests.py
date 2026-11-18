@@ -198,7 +198,8 @@ class AffiliateStoreTests(Base):
         response = self.client.get(reverse('shop:store'))
         self.assertContains(response, 'Adjustable Dumbbells')
         self.assertNotContains(response, 'Hidden Product')
-        self.assertContains(response, 'FitHub does not take payments')
+        self.assertContains(response, 'FitHub is your guide, not the seller')
+        self.assertContains(response, 'FitHub does not take payment')
 
     def test_store_search_and_category_filter(self):
         self.make_product()
