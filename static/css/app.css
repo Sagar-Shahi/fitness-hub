@@ -1940,3 +1940,333 @@ main.container { gap: 22px; }
 @media (max-width: 620px) {
   .focus-dock.has-video { right: 12px; width: min(350px, calc(100vw - 24px)); }
 }
+
+
+/* FitHub 2026 warm premium system — final, unified page-wide layer. */
+:root {
+  color-scheme: light;
+  --bg: #f2eee8;
+  --surface: #fcfaf6;
+  --surface-2: #ebe4da;
+  --ink: #352b25;
+  --muted: #786d63;
+  --line: #ded5ca;
+  --accent: #896047;
+  --accent-hover: #704a37;
+  --accent-ink: #fffaf5;
+  --accent-soft: rgba(137,96,71,.12);
+  --good: #6d806c;
+  --good-soft: rgba(109,128,108,.12);
+  --warn: #a17a4d;
+  --warn-soft: rgba(161,122,77,.12);
+  --bad: #9a6259;
+  --bad-soft: rgba(154,98,89,.11);
+  --focus: #896047;
+  --radius: 18px;
+  --shadow: 0 10px 30px rgba(65,48,36,.065);
+  --motion-fast: 160ms;
+  --motion-smooth: 260ms;
+}
+html { scroll-behavior: smooth; }
+body {
+  color: var(--ink);
+  background: var(--bg);
+  background-image:
+    radial-gradient(52rem 34rem at 2% -12%, rgba(255,255,255,.78), transparent 72%),
+    radial-gradient(42rem 30rem at 100% 2%, rgba(196,174,153,.17), transparent 74%);
+  background-attachment: fixed;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+::selection { color: #352b25; background: #e4cdbb; }
+a { color: #79543f; text-underline-offset: .2em; }
+a:hover { color: #593b2d; }
+h1,h2,h3 { color: var(--ink); }
+h1 { letter-spacing: -.055em; }
+main.container { width: min(100% - 32px, 1272px); max-width: 1272px; padding-top: clamp(22px,3vw,36px); padding-bottom: 8rem; gap: 22px; }
+
+/* Calm, light navigation with a readable active state. */
+.topbar {
+  background: rgba(252,250,246,.91);
+  border-bottom: 1px solid rgba(99,75,56,.13);
+  box-shadow: 0 5px 22px rgba(65,48,36,.045);
+  backdrop-filter: blur(18px) saturate(125%);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+}
+.topbar-inner { max-width: 1272px; min-height: 72px; gap: clamp(12px,2vw,26px); }
+.brand,.brand:hover { color: #352b25; font-size: 1.2rem; letter-spacing: -.055em; }
+.brand-bg { fill: #896047; }
+.brand-line { stroke: #fffaf5; }
+.nav { align-items: center; gap: 5px; }
+.nav a {
+  color: #76695f; padding: 9px 13px; border: 1px solid transparent;
+  border-radius: 999px; font-size: .9rem; font-weight: 620;
+  font-family: inherit; letter-spacing: 0; text-transform: none;
+}
+.nav a:hover { color: #49372c; background: #f0e9e0; border-color: #e5d9cd; transform: translateY(-1px); }
+.nav a[aria-current="page"] { color: #fffaf5; background: #76543f; border-color: #76543f; box-shadow: none; }
+.nav-more>summary {
+  color: #76695f; border: 1px solid transparent; border-radius: 999px;
+  padding: 9px 13px; font-weight: 620;
+}
+.nav-more>summary:hover,.nav-more[open]>summary { color: #49372c; background: #f0e9e0; }
+.nav-more>summary span { color: #896047; }
+.nav-more-menu {
+  background: #fcfaf6; border: 1px solid #ded5ca; border-radius: 15px;
+  box-shadow: 0 18px 44px rgba(65,48,36,.16);
+}
+.nav-more-menu a { color: #554438; }
+.nav-more-menu a:hover,.nav-more-menu a[aria-current="page"] { color: #352b25; background: #eee6dc; box-shadow: inset 2px 0 #896047; }
+.topbar-actions .btn-quiet { background: #f5f0e9; color: #4a392e; border-color: #ded5ca; }
+.account-menu summary { color: #49372c; border-color: #ded5ca; background: rgba(255,255,255,.55); }
+.avatar { color: #fffaf5; background: #896047; }
+.menu { background: #fcfaf6; border-color: #ded5ca; box-shadow: 0 16px 38px rgba(65,48,36,.15); }
+.menu a,.menu button { color: #49372c; }
+.menu a:hover,.menu button:hover { color: #352b25; background: #eee6dc; }
+
+/* Shared surfaces, form controls and actions. */
+.card,.stat,.hero-demo {
+  background: rgba(252,250,246,.94); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.card { padding: clamp(17px,2.2vw,24px); }
+.card:hover,.stat:hover { border-color: #cbb9a8; box-shadow: 0 14px 34px rgba(65,48,36,.085); }
+.card-title { color: #3b3028; font-family: inherit; font-size: 1.02rem; font-weight: 760; letter-spacing: -.025em; text-transform: none; }
+.eyebrow { color: #896047; font-size: .69rem; font-weight: 850; letter-spacing: .14em; }
+.page-head { gap: 16px 24px; }
+.page-head>div:first-child h1 { color: #352b25; }
+.muted,.help,.cell-sub { color: #786d63; }
+.btn {
+  min-height: 44px; padding: 10px 18px; border-radius: 999px;
+  font-weight: 720; letter-spacing: -.01em; box-shadow: none;
+}
+.btn-primary { color: #fffaf5; background: #896047; border-color: #896047; box-shadow: 0 5px 14px rgba(91,60,42,.15); }
+.btn-primary:hover { color: #fffaf5; background: #704a37; border-color: #704a37; box-shadow: 0 8px 19px rgba(91,60,42,.19); }
+.btn-quiet { color: #49372c; background: #f6f1ea; border-color: #ded5ca; }
+.btn-quiet:hover { color: #352b25; background: #ebe2d8; border-color: #cdbbaa; }
+.btn-danger,.btn-danger-quiet { filter: none; }
+.btn-danger { color: #fffaf5; background: #9a6259; border-color: #9a6259; }
+.btn-danger-quiet { color: #8b554d; background: #f8efeb; border-color: #e5d1ca; }
+input[type="text"],input[type="url"],input[type="email"],input[type="password"],input[type="search"],
+input[type="datetime-local"],input[type="number"],input[type="date"],select,textarea {
+  color: #352b25; background: #fffdf9; border: 1px solid #d9cfc4;
+  border-radius: 11px; box-shadow: inset 0 1px 2px rgba(65,48,36,.025);
+}
+input:focus,select:focus,textarea:focus {
+  border-color: #896047; outline: 3px solid rgba(137,96,71,.16); background: #fff;
+}
+.checkbox input { accent-color: #896047; }
+:where(a,button,input,select,textarea,summary):focus-visible { outline: 3px solid rgba(137,96,71,.58); outline-offset: 3px; }
+.table th { color: #786d63; background: #f1ebe3; }
+.table th,.table td { border-color: #e7ded4; }
+.table tbody tr:hover td { background: rgba(137,96,71,.045); }
+.badge,.badge-live,.badge-paused,.badge-off,.badge-expired {
+  color: #684b39; background: #eee5db; border: 1px solid #dfd1c3; border-radius: 999px;
+}
+.message-success,.message-error,.message-warning { color: #554237; background: #f0e8de; border-color: #dfd1c3; }
+.message-success { border-left: 4px solid #788a70; }
+.message-warning { border-left: 4px solid #a17a4d; }
+.message-error { border-left: 4px solid #9a6259; }
+.chip { color: #49372c; background: #f6f1ea; border-color: #ded5ca; }
+.segmented { background: #fcfaf6; border-color: #ded5ca; }
+.segmented a[aria-current="true"] { color: #fffaf5; background: #896047; }
+.site-footer { color: #786d63; border-color: #ded5ca; }
+.footer-inner { max-width: 1272px; }
+
+/* Homepage: warm editorial hero, interactive workout preview and clear feature hierarchy. */
+.home-hero-athletic .home-copy h1 { color: #352b25; }
+.home-hero-athletic .home-copy h1 em { color: #986d52; }
+.home-hero-athletic .home-lead { color: #71645a; }
+.home-hero-athletic .home-proof { color: #82756b; }
+.home-hero-athletic .eyebrow-mark,.home-hero-athletic .proof-dot { background: #986d52; }
+.athletic-preview {
+  color: #352b25; border: 1px solid #d9cfc4; border-radius: 22px;
+  background: linear-gradient(145deg,#e8ded2,#d8c8b8);
+  box-shadow: 0 24px 58px rgba(65,48,36,.14), 12px 14px 0 rgba(113,82,61,.045);
+}
+.athletic-preview .visual-topline,.athletic-preview .preview-bottom { color: #806e60; }
+.athletic-preview .visual-live { color: #76543f; }
+.athletic-preview .visual-live i { background: #788a70; box-shadow: 0 0 0 4px rgba(120,138,112,.13); }
+.preview-main { color: #352b25; background: #fcfaf6; border: 1px solid rgba(105,78,57,.12); box-shadow: 0 12px 28px rgba(65,48,36,.09); }
+.preview-main-head strong,.preview-exercise strong { color: #352b25; }
+.preview-tag,.exercise-number { color: #76543f; background: #eee4d9; }
+.preview-exercise { border-color: #e9e0d7; }
+.preview-exercise small,.preview-metrics span,.preview-footer { color: #82766c; }
+.exercise-weight { color: #76543f; }
+.preview-set-button:hover { background: #f5efe8; }
+.preview-set-button[aria-pressed="true"] { background: #eee8de; }
+.home-section-athletic { border-color: #ded5ca; }
+.home-section-athletic .section-heading h2 em { color: #986d52; }
+.home-section-athletic .feature-tile {
+  background: #fcfaf6; border-color: #ded5ca; border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(65,48,36,.045);
+}
+.home-section-athletic .feature-tile:hover { border-color: #b99b83; box-shadow: 0 15px 32px rgba(65,48,36,.085); }
+.home-section-athletic .tile-index,.home-section-athletic .tile-symbol { color: #896047; }
+.home-section-athletic .feature-tile p { color: #786d63; }
+
+/* Dashboard: consistent stat cards, strong quick actions and quiet data visualizations. */
+.dashboard-hero h1 { color: #352b25; }
+.dashboard-hero h1 em { color: #986d52; }
+.dashboard-hero .muted { color: #786d63; }
+.dashboard-stats .stat { background: #fcfaf6; border-color: #ded5ca; }
+.dashboard-stats .stat:after { background: #a77b5d; opacity: .65; }
+.dashboard-stats .stat:nth-child(2):after { background: #b8a28e; }
+.dashboard-stats .stat:nth-child(3):after { background: #788a70; }
+.dashboard-stats .stat:nth-child(4):after { background: #9a8270; }
+.stat dt { color: #82766c; }
+.stat dd:not(.stat-note) { color: #352b25; }
+.stat-denom { color: #897c71; }
+.dashboard-action {
+  color: #49372c; background: linear-gradient(145deg,#fffdf9,#f5efe7);
+  border-color: #ded5ca; border-radius: 17px;
+  box-shadow: 0 7px 19px rgba(65,48,36,.045);
+}
+.dashboard-action:hover { color: #352b25; border-color: #b99b83; box-shadow: 0 13px 27px rgba(65,48,36,.085); }
+.dashboard-action-primary { color: #fffaf5; background: linear-gradient(130deg,#604635,#896047); border-color: #76543f; }
+.dashboard-action-primary:hover { color: #fffaf5; background: linear-gradient(130deg,#523a2d,#79543e); }
+.dashboard-action-icon { color: #80583f; background: #eee4d9; }
+.dashboard-action-primary .dashboard-action-icon { color: #f4dfcf; background: rgba(255,255,255,.13); }
+.dashboard-action small { color: #82766c; }
+.dashboard-action-primary small { color: #ead8c9; }
+.dashboard-action-arrow { color: #986d52; }
+.dashboard-chart-card,.dashboard-grid>.card { background: #fcfaf6; }
+.chart-grid { stroke: #e5ddd3; }
+.chart-label { fill: #82766c; }
+.chart-bar { fill: #a77b5d; }
+.chart-bar:hover { fill: #76543f; }
+.chart-line { stroke: #896047; }
+.chart-dot { fill: #fcfaf6; stroke: #896047; }
+.chart-target { stroke: #b9aa9b; }
+.meter,.meter::-webkit-progress-bar { background: #e9e1d8; }
+.meter::-webkit-progress-value,.meter::-moz-progress-bar { background: #98745a; }
+.macro-row>div { background: #f4eee7; border-color: #e7ddd2; }
+.macro-row dt { color: #82766c; }
+.macro-row dd { color: #49372c; }
+
+/* Workout logging and session: readable set cards, clear completion state and tactile controls. */
+.workout-hero h1 { color: #352b25; }
+.exercise-card,.live-exercise-card { background: #fcfaf6; border-color: #ded5ca; }
+.exercise-heading { border-color: #e7ded4; }
+.exercise-heading .card-title { color: #352b25; }
+.set-list { gap: 12px; }
+.set-card,.live-exercise-card .set-card {
+  background: #f7f2eb; border: 1px solid #e3d8cc; border-radius: 15px;
+}
+.set-card:has(input[name$="is_completed"]:checked),.set-card.is-complete {
+  background: #f1f1e9; border-color: #b9c1ad; box-shadow: inset 3px 0 #788a70;
+}
+.set-status { color: #65785f; }
+.set-status.pending { color: #98745a; }
+.warmup-chip { color: #795a42; background: #eee2d5; border-radius: 999px; padding: 3px 7px; }
+.set-add-form,.set-add-quick,.add-exercise-card { background: #f7f1e9; border-color: #d7c7b7; }
+.session-command {
+  color: #fff8f1; background: linear-gradient(130deg,#49372c,#76543f);
+  border: 1px solid #76543f; border-radius: 18px; box-shadow: 0 12px 28px rgba(65,48,36,.12);
+}
+.session-command .session-kicker,.session-command-bottom { color: #e3d2c3; }
+.session-progress-track { background: rgba(255,255,255,.17); }
+.session-progress-track>span { background: #d7b69d; }
+.rest-clock { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.08); }
+.rest-clock button { color: #fff8f1; border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.1); }
+.workout-next-panel { background: #49372c; }
+.exercise-tutorial,.add-exercise-card,.learn-details { border-color: #e4d9ce; }
+.exercise-tutorial summary,.library-exercise-content details summary { color: #79543f; }
+.tutorial-result { color: #49372c; background: #fcfaf6; border-color: #e2d7ca; }
+.tutorial-result:hover { border-color: #b99b83; }
+.form-card,.form-grid,.form-actions { min-width: 0; }
+.form-actions { gap: 10px; }
+.empty-state { background: #fcfaf6; }
+
+/* Secondary pages: nutrition, plans, learning, gear, about and sharing use the same system. */
+.plan-card,.learn-card,.library-exercise-card,.store-product {
+  border-color: #ded5ca; border-radius: 17px; box-shadow: 0 8px 22px rgba(65,48,36,.045);
+}
+.plan-card:hover,.learn-card:hover,.library-exercise-card:hover,.store-product:hover { border-color: #b99b83; }
+.library-exercise-card,.store-product { background: #fcfaf6; }
+.library-exercise-content,.store-product-body { color: #49372c; }
+.store-disclosure,.store-empty { background: #f7f1e9; border-color: #e2d6c9; }
+.store-disclosure strong,.store-product h2 { color: #352b25; }
+.store-product .btn { color: #fffaf5; background: #896047; }
+.store-product .btn:hover { color: #fffaf5; background: #704a37; }
+.learn-intro { background: linear-gradient(135deg,#fcfaf6,#eee6dc); border-color: #ded5ca; }
+.learn-details,.learn-sources { border-color: #e4d9ce; }
+.about-hero { border-color: #ded1c3; background: radial-gradient(circle at 88% 12%,rgba(176,137,106,.18),transparent 34%),linear-gradient(135deg,#fcf8f1,#eee4d8); }
+.about-hero h1,.about-section h2 { color: #352b25; }
+.about-hero h1 em,.about-value-index { color: #986d52; }
+.about-lead,.about-section-copy,.about-value p { color: #786d63; }
+.about-value { background: #fcfaf6; border-color: #e2d8cd; }
+.about-value h3 { color: #49372c; }
+.about-cta { background: linear-gradient(130deg,#49372c,#76543f); }
+.share-progress-card { border-color: #ded1c3; background: radial-gradient(circle at 90% 5%,rgba(176,137,106,.18),transparent 32%),linear-gradient(135deg,#fffdf9,#f0e7dc); }
+.share-progress-card h1 { color: #352b25; }
+.share-progress-card h1 em { color: #986d52; }
+.share-progress-stat { background: rgba(255,255,255,.76); border-color: #e2d7c8; }
+.share-progress-stat strong { color: #49372c; }
+
+/* Focus Audio stays compact and visually part of FitHub. */
+.focus-dock { width: min(350px,calc(100vw - 28px)); color: #352b25; }
+.focus-dock>summary {
+  min-height: 50px; color: #49372c; background: rgba(252,250,246,.97);
+  border: 1px solid #d6c8ba; box-shadow: 0 10px 28px rgba(65,48,36,.15);
+}
+.focus-indicator { background: #788a70; box-shadow: 0 0 0 5px rgba(120,138,112,.12); }
+.focus-panel { color: #352b25; background: #fcfaf6; border-color: #d6c8ba; box-shadow: 0 18px 42px rgba(65,48,36,.16); }
+.focus-panel-head h2 { color: #352b25; }
+.focus-panel-close { color: #49372c; background: #f1e9e0; border-color: #ded5ca; }
+.focus-panel-close:hover { color: #352b25; background: #e8d9ca; border-color: #b99b83; }
+.focus-symbol { color: #896047; }
+.focus-help,.focus-legal { color: #786d63; }
+.focus-video-stage { background: #eee6dc; border-color: #d9cbbd; }
+.focus-video-heading { color: #49372c; }
+.focus-video-stage .focus-help { color: #786d63; }
+.focus-dock.has-video { width: min(350px,calc(100vw - 28px)); }
+.focus-dock.has-video .focus-panel { max-height: min(430px,62vh); }
+.focus-dock.has-video .focus-video-square { max-width: 300px; margin-inline: auto; aspect-ratio: 1/1; }
+.focus-music-result { color: #49372c; background: #fffdf9; border-color: #e2d8cd; }
+.focus-music-result:hover { background: #f5efe8; border-color: #b99b83; }
+.focus-local-file { color: #786d63; background: #f5efe8; border-color: #d6c8ba; }
+.focus-local-file::file-selector-button { color: #49372c; background: #e9dfd4; border-color: #d6c8ba; }
+
+/* Responsive details: avoid cramped navigation and keep workout actions thumb-friendly. */
+@media(max-width:900px) {
+  .home-hero-athletic { grid-template-columns:1fr; }
+  .athletic-preview { width:min(100%,720px); justify-self:center; }
+  .dashboard-next-steps { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:760px) {
+  .topbar { position:sticky; }
+  .topbar-inner { gap:8px 12px; padding-block:8px; }
+  .nav { order:3; flex:1 0 100%; overflow-x:auto; overflow-y:visible; padding:4px 0 7px; scrollbar-width:thin; }
+  .nav-more-menu { position:fixed; top:auto; left:12px; right:12px; bottom:auto; width:auto; }
+  .dashboard-hero { align-items:flex-start; flex-direction:column; }
+  .dashboard-hero .head-actions { width:100%; justify-content:flex-start; }
+}
+@media(max-width:620px) {
+  main.container { width:calc(100% - 24px); padding-top:19px; gap:16px; }
+  .topbar-inner { padding-inline:12px; }
+  .nav a,.nav-more>summary { padding:8px 11px; min-height:40px; }
+  .dashboard-next-steps { grid-template-columns:1fr; }
+  .dashboard-action { min-height:74px; }
+  .dashboard-hero h1 { font-size:2.45rem; }
+  .home-hero-athletic { padding:30px 0 44px; }
+  .home-hero-athletic .home-copy h1 { font-size:clamp(2.8rem,13.5vw,4.6rem); }
+  .athletic-preview { padding:11px; border-radius:18px; }
+  .preview-main { padding:15px; }
+  .set-list { grid-template-columns:1fr; }
+  .exercise-heading { align-items:flex-start; }
+  .session-command { padding:17px; }
+  .session-command-bottom { align-items:flex-start; flex-direction:column; }
+  .live-exercise-card .set-quick-footer { display:grid; grid-template-columns:1fr 1fr; }
+  .live-exercise-card .set-save-button { grid-column:1/-1; width:100%; }
+  .about-values { grid-template-columns:1fr; }
+  .about-cta { align-items:flex-start; flex-direction:column; }
+  .learn-grid { grid-template-columns:1fr; }
+  .focus-dock { right:12px; bottom:max(12px,env(safe-area-inset-bottom)); width:min(350px,calc(100vw - 24px)); }
+  .focus-dock.has-video { right:12px; width:min(350px,calc(100vw - 24px)); }
+}
+@media(prefers-reduced-motion:reduce) {
+  html { scroll-behavior:auto; }
+  *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  .card:hover,.stat:hover,.feature-tile:hover,.btn:hover,.nav a:hover,.athletic-preview:hover { transform:none; }
+}
