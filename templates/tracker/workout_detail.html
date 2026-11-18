@@ -26,12 +26,12 @@
     </div>
 
     {% for set in e.set_entries.all %}
-    <div class="card" style="margin-top: .75rem;">
+    <div class="card set-card">
       <div class="page-head compact">
         <strong>Set {{ set.set_number }}{% if set.is_warmup %} <span class="muted">· Warm-up</span>{% endif %}</strong>
         {% if set.is_completed %}<span class="badge">Completed</span>{% else %}<span class="muted">Not completed</span>{% endif %}
       </div>
-      <form method="post" action="{% url 'tracker:exercise-set-edit' workout.pk e.pk set.pk %}" class="form-card" style="padding: 0;">
+      <form method="post" action="{% url 'tracker:exercise-set-edit' workout.pk e.pk set.pk %}" class="form-card set-edit-form">
         {% csrf_token %}
         <div class="form-grid">
           {% include 'partials/field.html' with field=set.edit_form.reps %}
@@ -49,7 +49,7 @@
       <p class="muted empty-state">No sets yet. Add the first set below.</p>
     {% endfor %}
 
-    <form class="card form-card" method="post" action="{% url 'tracker:exercise-set-add' workout.pk e.pk %}" style="margin-top: .75rem;">
+    <form class="card form-card set-add-form" method="post" action="{% url 'tracker:exercise-set-add' workout.pk e.pk %}">
       <h3 class="card-title">Add a set</h3>
       {% csrf_token %}
       <div class="form-grid">
