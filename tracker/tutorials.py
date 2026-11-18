@@ -5,35 +5,56 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
+from django.core.cache import caches
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.http import require_GET
 
 
 @login_required
 @require_GET
 def exercise_library_tutorials(request):
-    """Find embeddable public exercise videos for a catalogue exercise."""
+    """Find embeddable public exercise videos, reusing shared results before using quota."""
     name = " ".join(request.GET.get("name", "").split())[:80]
     if not name:
         return JsonResponse({"error": "Choose an exercise first."}, status=400)
+
+    query = f"{name} exercise proper form tutorial"
+    research_cache = caches["research"]
+    cache_key = "fithub:youtube:" + hashlib.sha256(query.lower().encode("utf-8")).hexdigest()
+
+    # Cached results remain available even if the API key is temporarily unavailable.
+    cached = research_cache.get(cache_key)
+    if cached is not None:
+        return JsonResponse({"videos": cached})
 
     api_key = os.environ.get("YOUTUBE_API_KEY", "").strip()
     if not api_key:
         return JsonResponse({"error": "Tutorial search is being set up. Please try again shortly."}, status=503)
 
-    query = f"{name} exercise proper form tutorial"
-    cache_key = "fithub:youtube:" + hashlib.sha256(query.lower().encode("utf-8")).hexdigest()
-    cached = cache.get(cache_key)
-    if cached is not None:
-        return JsonResponse({"videos": cached})
-
+    # Share this per-user limit across Render instances instead of relying on local memory.
     rate_key = f"fithub:youtube:rate:{request.user.pk}"
-    count = cache.get(rate_key, 0)
+    count = research_cache.get(rate_key, 0)
     if count >= 8:
         return JsonResponse({"error": "Please wait a minute before searching for more tutorials."}, status=429)
-    cache.set(rate_key, count + 1, 60)
+    research_cache.set(rate_key, count + 1, 60)
+
+    # Search.list costs 100 quota units. Cap FitHub at 75 searches/day by default,
+    # leaving a buffer for quota changes and other project usage.
+    today = timezone.now().date().isoformat()
+    daily_key = f"fithub:youtube:daily:{today}"
+    research_cache.add(daily_key, 0, timeout=60 * 60 * 30)
+    try:
+        daily_count = research_cache.incr(daily_key)
+    except ValueError:
+        research_cache.set(daily_key, 1, timeout=60 * 60 * 30)
+        daily_count = 1
+    if daily_count > settings.YOUTUBE_DAILY_SEARCH_LIMIT:
+        return JsonResponse({
+            "error": "FitHub has reached today's live-search limit. Saved tutorials are still available; please try again tomorrow."
+        }, status=429)
 
     params = urlencode({
         "part": "snippet",
@@ -72,5 +93,7 @@ def exercise_library_tutorials(request):
             "channel": snippet.get("channelTitle", ""),
             "thumbnail": thumbnail,
         })
-    cache.set(cache_key, videos, 60 * 60 * 24)
+
+    # Store both matches and empty results for 24 hours to avoid repeat API charges.
+    research_cache.set(cache_key, videos, 60 * 60 * 24)
     return JsonResponse({"videos": videos})
