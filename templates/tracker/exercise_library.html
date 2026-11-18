@@ -11,6 +11,8 @@
     <div class="field"><label for="library-search">Search exercises</label><input id="library-search" name="q" value="{{ query }}" placeholder="e.g. squat, push-up, dumbbell curl"></div>
     <div class="field"><label for="library-muscle">Muscle group</label><select id="library-muscle" name="muscle"><option value="">All muscles</option>{% for item in muscles %}<option value="{{ item|lower }}" {% if muscle == item|lower %}selected{% endif %}>{{ item|title }}</option>{% endfor %}</select></div>
     <div class="field"><label for="library-equipment">Equipment</label><select id="library-equipment" name="equipment"><option value="">All equipment</option>{% for item in equipment_types %}<option value="{{ item|lower }}" {% if equipment == item|lower %}selected{% endif %}>{{ item|title }}</option>{% endfor %}</select></div>
+    <div class="field"><label for="library-level">Difficulty</label><select id="library-level" name="level"><option value="">All levels</option>{% for item in levels %}<option value="{{ item|lower }}" {% if level == item|lower %}selected{% endif %}>{{ item|title }}</option>{% endfor %}</select></div>
+    <div class="field"><label for="library-category">Movement type</label><select id="library-category" name="category"><option value="">All types</option>{% for item in categories %}<option value="{{ item|lower }}" {% if category == item|lower %}selected{% endif %}>{{ item|title }}</option>{% endfor %}</select></div>
     <div class="field"><label for="library-workout">Add to workout</label><select id="library-workout" name="workout"><option value="">Choose a workout</option>{% for item in workouts %}<option value="{{ item.pk }}" {% if selected_workout.pk == item.pk %}selected{% endif %}>{{ item.name }} · {{ item.date|date:"M j" }}</option>{% endfor %}</select></div>
   </div>
   <div class="form-actions"><button class="btn btn-primary" type="submit">Find exercises</button><a class="btn btn-quiet" href="{% url 'tracker:exercise-library' %}">Reset</a></div>
@@ -23,6 +25,8 @@
     <div class="exercise-heading"><span class="badge">{{ item.level|default:"All levels"|title }}</span><span class="muted">{{ item.category|default:"Training"|title }}</span></div>
     <h2 class="card-title">{{ item.name }}</h2>
     <p class="muted">{{ item.primaryMuscles|join:", "|title }}{% if item.equipment %} · {{ item.equipment|title }}{% endif %}</p>
+    {% if item.secondaryMuscles %}<p class="small muted">Also works: {{ item.secondaryMuscles|join:", "|title }}</p>{% endif %}
+    {% if item.mechanic %}<span class="small muted">{{ item.mechanic|title }} movement</span>{% endif %}
     {% if item.instructions %}<details><summary>How to perform</summary><ol>{% for step in item.instructions %}<li>{{ step }}</li>{% endfor %}</ol></details>{% endif %}
     {% if selected_workout %}
     <form method="post" action="{% url 'tracker:exercise-add' selected_workout.pk %}" class="form-actions">{% csrf_token %}
@@ -36,7 +40,7 @@
 </div>
 {% else %}<section class="card empty-state"><h2 class="card-title">No matching exercises</h2><p class="muted">Try another name, muscle group or equipment filter.</p></section>{% endif %}
 {% if page_count > 1 %}<nav class="form-actions" aria-label="Exercise pages">
-  {% if previous_page %}<a class="btn btn-quiet" href="?q={{ query|urlencode }}&muscle={{ muscle|urlencode }}&equipment={{ equipment|urlencode }}&workout={{ selected_workout.pk|default:'' }}&page={{ previous_page }}">Previous</a>{% endif %}
+  {% if previous_page %}<a class="btn btn-quiet" href="?q={{ query|urlencode }}&muscle={{ muscle|urlencode }}&equipment={{ equipment|urlencode }}&level={{ level|urlencode }}&category={{ category|urlencode }}&workout={{ selected_workout.pk|default:'' }}&page={{ previous_page }}">Previous</a>{% endif %}
   <span class="muted">Page {{ page }} of {{ page_count }}</span>
   {% if next_page %}<a class="btn btn-quiet" href="?q={{ query|urlencode }}&muscle={{ muscle|urlencode }}&equipment={{ equipment|urlencode }}&workout={{ selected_workout.pk|default:'' }}&page={{ next_page }}">Next</a>{% endif %}
 </nav>{% endif %}
