@@ -173,9 +173,9 @@
         status.textContent = 'This video link is invalid. Please choose another result.';
         return;
       }
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0';
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0&autoplay=1&mute=1&controls=1&playsinline=1';
       frameWrap.hidden = false;
-      status.textContent = 'Loading video inside FitHub…';
+      status.textContent = 'Starting video inside FitHub… It starts muted; use the player controls to turn sound on or pause.';
     }
 
     // Delegate selection from the results container so clicks on the thumbnail,
@@ -189,7 +189,7 @@
 
     frame.addEventListener('load', function () {
       if (!frameWrap.hidden && frame.getAttribute('src')) {
-        status.textContent = 'Video player loaded. Press play to start.';
+        status.textContent = 'Video player ready. Use the controls to pause or turn sound on.';
       }
     });
     closeButton.addEventListener('click', function () {
