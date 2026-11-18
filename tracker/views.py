@@ -104,9 +104,17 @@ def workout_create(request):
 def workout_detail(request, pk):
     workout = _attach_set_forms(_own_workout(request, pk))
     form = ExerciseForm(workout=workout)
+    exercises = list(workout.exercises.all())
+    total_sets = sum(exercise.set_entries.count() for exercise in exercises)
+    completed_sets = sum(
+        exercise.set_entries.filter(is_completed=True).count() for exercise in exercises
+    )
     return render(request, 'tracker/workout_detail.html', {
         'workout': workout,
         'form': form,
+        'total_sets': total_sets,
+        'completed_sets': completed_sets,
+        'progress_percent': round(completed_sets * 100 / total_sets) if total_sets else 0,
     })
 
 
