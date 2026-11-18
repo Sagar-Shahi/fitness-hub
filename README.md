@@ -19,7 +19,7 @@ Security and privacy are design constraints here, not an afterthought.
 
 ## Features
 - **Workouts**: sessions with exercises and individually editable sets (reps, weight, completion, warm-up), completed-set volume, edit and delete, CSV export.
-- **Focus audio**: optional in-app playback for direct audio-file links, local audio files selected from your device for offline playback (without uploading; reselect the file after a page reload), a saved source link in this browser, and browser-based spoken motivation. Spotify and YouTube links open on their own platforms; protected streams are never extracted. Downloads depend on the source's permission and browser support.
+- **Focus audio**: search public YouTube videos by song or artist and play embeddable results in the existing in-app player; paste YouTube links; play direct audio-file links or local files selected from your device (without uploading; reselect after reload); save a source link in this browser; and use browser-based spoken motivation. YouTube search uses the optional YOUTUBE_API_KEY server variable. Spotify search opens Spotify rather than streaming inside FitHub; full Spotify streaming requires Premium and is restricted for commercial apps by Spotify's policy. Protected streams are never extracted.
 - **Meals**: calories and protein/carbs/fat per meal, daily totals against your calorie target, day-by-day browsing.
 - **Weight**: one entry per day, chart with your target line.
 - **Dashboard**: weekly workout goal, calories left today, workout streak, 7/30/90-day charts. Charts are drawn as SVG on the server, so there is no chart library and no inline script.
@@ -42,7 +42,7 @@ python manage.py runserver
 Then open http://127.0.0.1:8000/ and sign up, or log in with the demo account printed by `seed_demo`.
 To create the sample plans on a live site run `python manage.py seed_plans`; you can also manage plans in the admin.
 
-Run the tests with `python manage.py test` (170 tests, no setup needed).
+Run the tests with `python manage.py test` (174 tests, no setup needed).
 
 ## API
 Create a key on the **API keys** page (shown once, stored only as a SHA-256 hash) and send it as a Bearer token.
