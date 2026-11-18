@@ -21,6 +21,24 @@
   <div class="stat"><dt>BODY WEIGHT</dt><dd>{% if d.latest_weight %}{{ d.latest_weight.weight_kg }} <span class="stat-denom">kg</span>{% else %}&ndash;{% endif %}</dd><dd class="stat-note">{% if d.weight_change is not None %}{% if d.weight_change > 0 %}+{% endif %}{{ d.weight_change }} kg in 30 days{% elif d.target_weight %}Target {{ d.target_weight }} kg{% else %}Log it on the Weight page.{% endif %}</dd></div>
 </dl>
 
+<section class="dashboard-next-steps" aria-label="Quick actions">
+  <a class="dashboard-action dashboard-action-primary" href="{% url 'tracker:workout-create' %}">
+    <span class="dashboard-action-icon" aria-hidden="true">＋</span>
+    <span><strong>Start a workout</strong><small>Log today's training, set by set.</small></span>
+    <span class="dashboard-action-arrow" aria-hidden="true">↗</span>
+  </a>
+  <a class="dashboard-action" href="{% url 'tracker:meals' %}">
+    <span class="dashboard-action-icon" aria-hidden="true">◒</span>
+    <span><strong>Log nutrition</strong><small>Keep meals and macros up to date.</small></span>
+    <span class="dashboard-action-arrow" aria-hidden="true">↗</span>
+  </a>
+  <a class="dashboard-action" href="{% url 'tracker:exercise-library' %}">
+    <span class="dashboard-action-icon" aria-hidden="true">↗</span>
+    <span><strong>Find an exercise</strong><small>Browse movements and learn form.</small></span>
+    <span class="dashboard-action-arrow" aria-hidden="true">↗</span>
+  </a>
+</section>
+
 <section class="card dashboard-chart-card"><div class="card-head"><div><p class="eyebrow">CONSISTENCY</p><h2 class="card-title">Workouts per day</h2></div></div>{% include 'partials/chart.html' with chart=workout_chart %}</section>
 
 <div class="grid-2 dashboard-grid">
