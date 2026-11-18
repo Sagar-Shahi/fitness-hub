@@ -192,6 +192,9 @@ class PasswordResetTests(TestCase):
         uid = urlsafe_base64_encode(force_bytes(self.user.pk))
         token = default_token_generator.make_token(self.user)
         confirm_url = reverse('accounts:password-reset-confirm', kwargs={'uidb64': uid, 'token': token})
+        response = self.client.get(confirm_url)
+        self.assertEqual(response.status_code, 302)
+        confirm_url = response.url  # Django exchanges the emailed token for a session-bound token.
         self.assertEqual(self.client.get(confirm_url).status_code, 200)
         new_password = 'A-New-Strong-Passphrase-2026'
         response = self.client.post(confirm_url, {
