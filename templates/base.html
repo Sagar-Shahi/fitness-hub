@@ -26,7 +26,8 @@
         <a href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>Exercise Library</a>
         <a href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>Meals</a>
         <a href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>Weight</a>
-        <a href="{% url 'shop:plans' %}" {% if view|slice:':5' == 'shop:' and view != 'shop:cart' %}aria-current="page"{% endif %}>Plans</a>
+        <a href="{% url 'shop:store' %}" {% if view == 'shop:store' %}aria-current="page"{% endif %}>Store</a>
+        <a href="{% url 'shop:plans' %}" {% if view|slice:':5' == 'shop:' and view != 'shop:cart' and view != 'shop:store' and view != 'shop:product-outbound' %}aria-current="page"{% endif %}>Plans</a>
       </nav>
       <div class="topbar-actions">
         <a class="btn btn-quiet btn-small" href="{% url 'shop:cart' %}">Cart{% if cart_count %} ({{ cart_count }}){% endif %}</a>
