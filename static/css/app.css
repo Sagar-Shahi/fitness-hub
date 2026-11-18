@@ -1211,3 +1211,63 @@ main.container { max-width:1320px; padding-top:28px; padding-bottom:7rem; }
   .feature-tile,.card,.stat,.btn,.nav a { transition:none; }
   .feature-tile:hover,.card:hover,.stat:hover,.btn:hover,.nav a:hover { transform:none; }
 }
+
+
+/* Interactive fitness-tech layer: tactile 3D controls and responsive depth. */
+:root { --motion-fast: 180ms; --motion-smooth: 420ms; }
+.btn, button, .chip, .nav a, .account-menu summary {
+  transition: transform var(--motion-fast) cubic-bezier(.2,.8,.2,1), box-shadow var(--motion-fast), background-color var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast);
+}
+.btn {
+  position:relative; transform:translateY(0);
+  box-shadow:0 4px 0 rgba(45,35,24,.2), 0 7px 15px rgba(45,35,24,.09);
+}
+.btn:hover { transform:translateY(-3px); box-shadow:0 7px 0 rgba(45,35,24,.16), 0 13px 22px rgba(45,35,24,.13); }
+.btn:active { transform:translateY(2px) scale(.985); box-shadow:0 1px 0 rgba(45,35,24,.18), 0 3px 7px rgba(45,35,24,.1); }
+.btn-primary { box-shadow:0 5px 0 #8e4e1c, 0 9px 18px rgba(155,91,36,.2); }
+.btn-primary:hover { box-shadow:0 8px 0 #8e4e1c, 0 14px 24px rgba(155,91,36,.24); }
+.btn-primary:active { box-shadow:0 1px 0 #8e4e1c, 0 3px 8px rgba(155,91,36,.15); }
+.nav a:hover,.chip:hover { transform:translateY(-2px); }
+.card,.stat,.feature-tile { transition:transform 280ms cubic-bezier(.2,.8,.2,1), box-shadow 280ms, border-color 280ms; transform-style:preserve-3d; }
+.card:hover,.stat:hover,.feature-tile:hover { transform:translateY(-4px); }
+.home-hero-athletic { perspective:1200px; }
+.athletic-preview {
+  transform:perspective(1100px) rotateY(-5deg) rotateX(2deg);
+  transform-style:preserve-3d;
+  transition:transform 420ms cubic-bezier(.2,.8,.2,1), box-shadow 420ms;
+  box-shadow:22px 28px 0 rgba(68,53,35,.07), 0 28px 60px rgba(34,30,24,.22);
+}
+.athletic-preview:hover {
+  transform:perspective(1100px) rotateY(-1deg) rotateX(0deg) translateY(-5px);
+  box-shadow:12px 18px 0 rgba(68,53,35,.06), 0 34px 70px rgba(34,30,24,.25);
+}
+.preview-main { transform:translateZ(18px); box-shadow:0 12px 25px rgba(0,0,0,.12); }
+.preview-set-button {
+  width:100%; text-align:left; color:inherit; font:inherit; cursor:pointer;
+  background:transparent; border:0; border-bottom:1px solid #e9e5dc;
+  padding:10px 34px 10px 0; position:relative; border-radius:7px;
+}
+.preview-set-button:hover { background:#f0ece3; padding-left:7px; }
+.preview-set-button:active { transform:scale(.99); }
+.preview-set-button .demo-set-state {
+  position:absolute; right:2px; top:50%; transform:translateY(-50%);
+  display:grid; place-items:center; width:25px; height:25px; border-radius:50%;
+  background:#eee7dc; color:#815329; font-weight:900; font-size:1rem;
+  box-shadow:0 3px 0 #d5c9b8;
+}
+.preview-set-button[aria-pressed="true"] { background:#edf1e8; padding-left:7px; }
+.preview-set-button[aria-pressed="true"] .demo-set-state {
+  background:#5c795d; color:white; box-shadow:0 3px 0 #3d593e;
+}
+.preview-set-button[aria-pressed="true"] .exercise-number { background:#5c795d; color:white; }
+.demo-set-state { font-size:0; }
+.preview-set-button[aria-pressed="true"] .demo-set-state { font-size:0; }
+.preview-set-button[aria-pressed="true"] .demo-set-state:after { content:"✓"; font-size:1rem; }
+.preview-footer { align-items:center; }
+.preview-footer [data-demo-completed] { color:#fffaf2; font-size:.8rem; }
+@media(max-width:900px) {
+  .athletic-preview,.athletic-preview:hover { transform:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .athletic-preview,.athletic-preview:hover,.preview-set-button,.btn,.card,.stat,.feature-tile { transition:none; transform:none; }
+}
