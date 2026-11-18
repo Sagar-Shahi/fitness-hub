@@ -44,8 +44,22 @@ class ExerciseSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated):
-        set_details = validated.pop('set_entries', [])
+        # Older API clients send only summary fields. Materialize those as completed
+        # sets to preserve their historical volume semantics. An explicit [] means
+        # the client intentionally supplied no sets and must remain zero volume.
+        set_details = validated.pop('set_entries', None)
         exercise = Exercise.objects.create(**validated)
+        if set_details is None:
+            set_details = [
+                {
+                    'set_number': number,
+                    'reps': exercise.reps,
+                    'weight_kg': exercise.weight_kg,
+                    'is_completed': True,
+                    'is_warmup': False,
+                }
+                for number in range(1, exercise.sets + 1)
+            ]
         ExerciseSet.objects.bulk_create([
             ExerciseSet(exercise=exercise, **entry) for entry in set_details
         ])
