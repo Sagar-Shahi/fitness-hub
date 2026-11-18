@@ -21,19 +21,39 @@
       </a>
       {% if user.is_authenticated %}
       <nav class="nav" aria-label="Main">
-        <a href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>Home</a>
-        <a href="{% url 'tracker:workout-list' %}" {% if 'workout' in view %}aria-current="page"{% endif %}>Workouts</a>
-        <a href="{% url 'tracker:progress' %}" {% if view == 'tracker:progress' %}aria-current="page"{% endif %}>Progress</a>
-        <a href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>Nutrition</a>
+        <a class="nav-link" href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Home</span>
+        </a>
+        <a class="nav-link" href="{% url 'tracker:workout-list' %}" {% if 'workout' in view %}aria-current="page"{% endif %}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11"/></svg><span>Workouts</span>
+        </a>
+        <a class="nav-link" href="{% url 'tracker:progress' %}" {% if view == 'tracker:progress' %}aria-current="page"{% endif %}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 6-7"/><path d="M16 6h4v4"/></svg><span>Progress</span>
+        </a>
+        <a class="nav-link" href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v7M4.5 3v4a2.5 2.5 0 0 0 5 0V3M7 9.5V21M16 3v18M16 3c3 2 4 5 4 8h-4"/></svg><span>Nutrition</span>
+        </a>
         <details class="nav-more">
-          <summary>Explore <span aria-hidden="true">⌄</span></summary>
+          <summary><svg class="nav-icon nav-explore-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/></svg><span>Explore</span><svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></summary>
           <div class="nav-more-menu">
-            <a href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>Exercise library</a>
-            <a href="{% url 'about' %}" {% if view == 'about' %}aria-current="page"{% endif %}>About FitHub</a>
-            <a href="{% url 'tracker:learn' %}" {% if view == 'tracker:learn' %}aria-current="page"{% endif %}>Learn</a>
-            <a href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>Weight tracking</a>
-            <a href="{% url 'shop:store' %}" {% if view == 'shop:store' %}aria-current="page"{% endif %}>Gear guide</a>
-            <a href="{% url 'shop:plans' %}" {% if view|slice:':5' == 'shop:' and view != 'shop:cart' and view != 'shop:store' and view != 'shop:product-outbound' %}aria-current="page"{% endif %}>Training plans</a>
+            <a class="explore-link" href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v13A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 10h6"/></svg><span><strong>Exercise library</strong><small>Find your next movement</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'about' %}" {% if view == 'about' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.4 1.6c-1.1 1.1-1.9 1.3-1.9 3M12 17h.01"/></svg><span><strong>About FitHub</strong><small>Our approach and mission</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'tracker:learn' %}" {% if view == 'tracker:learn' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H12v17H5.5A2.5 2.5 0 0 0 3 22zM21 5.5A2.5 2.5 0 0 0 18.5 3H12v17h6.5a2.5 2.5 0 0 1 2.5 2z"/></svg><span><strong>Learn</strong><small>Training tips and guides</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l1 14H3zM9 7a3 3 0 0 1 6 0M12 11v4m0 0 2-2"/></svg><span><strong>Weight tracking</strong><small>Follow your trend over time</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'shop:store' %}" {% if view == 'shop:store' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 2-5h12l2 5M3 8h18l-1 13H4zM9 12v3m6-3v3"/></svg><span><strong>Gear guide</strong><small>Explore training essentials</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'shop:plans' %}" {% if view|slice:':5' == 'shop:' and view != 'shop:cart' and view != 'shop:store' and view != 'shop:product-outbound' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-7-4-7 4zM9 8h6M9 11h6"/></svg><span><strong>Training plans</strong><small>Build a routine that fits you</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
           </div>
         </details>
       </nav>
