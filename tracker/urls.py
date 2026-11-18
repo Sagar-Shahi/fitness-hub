@@ -8,7 +8,7 @@ app_name = 'tracker'
 
 urlpatterns = [
     path('app/', views.dashboard, name='dashboard'),
-    path('app/progress/', views.progress, name='progress'),
+    path('app/progress/', progress, name='progress'),
     path('app/exercise-library/', exercise_library, name='exercise-library'),
     path('app/goals/', views.goals, name='goals'),
     path('app/workouts/', views.workout_list, name='workout-list'),
