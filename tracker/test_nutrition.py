@@ -3,13 +3,17 @@ from django.test import TestCase
 
 from .models import Profile, BodyMetric
 from .nutrition import calculate_nutrition_targets
+from django.urls import reverse
+
 from .testutils import make_user
 
 
 class PersonalizedNutritionTests(TestCase):
     def setUp(self):
+        self.user = make_user('nutrition-user')
+        self.client.force_login(self.user)
         self.profile = Profile.objects.create(
-            owner=make_user('nutrition-user'),
+            owner=self.user,
             age=25,
             height_cm=Decimal('175'),
             starting_weight_kg=Decimal('75'),
@@ -48,3 +52,32 @@ class PersonalizedNutritionTests(TestCase):
         self.profile.activity_level = 'sedentary'
         self.profile.nutrition_goal = 'fat_loss'
         self.assertIn('reason', calculate_nutrition_targets(self.profile))
+
+    def test_goals_form_saves_profile_and_personalized_calorie_target(self):
+        response = self.client.post(reverse('tracker:goals'), {
+            'age': '25',
+            'sex_for_calculation': 'male',
+            'height_cm': '175',
+            'starting_weight_kg': '75',
+            'activity_level': 'moderate',
+            'training_type': 'strength',
+            'nutrition_goal': 'muscle_gain',
+            'calorie_target': '2200',
+            'weekly_workout_target': '4',
+            'target_weight_kg': '',
+        })
+        self.assertRedirects(response, reverse('tracker:dashboard'))
+        profile = Profile.objects.get(owner=self.user)
+        self.assertGreater(profile.calorie_target, 2200)
+        self.assertEqual(profile.nutrition_goal, 'muscle_gain')
+
+    def test_meals_page_uses_personalized_calorie_and_macro_targets(self):
+        self.profile.calorie_target = 2200
+        self.profile.save()
+        BodyMetric.objects.create(owner=self.user, weight_kg=Decimal('80'))
+        response = self.client.get(reverse('tracker:meals'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['nutrition_plan'])
+        self.assertEqual(response.context['target'], response.context['nutrition_plan']['calories'])
+        self.assertEqual(response.context['macro_remaining']['protein'], response.context['nutrition_plan']['protein_g'])
+        self.assertContains(response, 'PERSONALIZED DAILY TARGETS')
