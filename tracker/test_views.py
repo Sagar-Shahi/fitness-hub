@@ -398,7 +398,8 @@ class ExerciseLibraryTests(Base):
             "name": "Dumbbell Curl", "level": "beginner", "category": "strength",
             "equipment": "dumbbell", "primaryMuscles": ["biceps"],
             "secondaryMuscles": ["forearms"], "instructions": ["Curl the weight."],
-            "mechanic": "isolation",
+            "mechanic": "isolation", "id": "Dumbbell_Curl",
+            "images": ["Dumbbell_Curl/0.jpg", "Dumbbell_Curl/1.jpg"],
         },
         {
             "name": "Barbell Squat", "level": "intermediate", "category": "strength",
@@ -413,6 +414,17 @@ class ExerciseLibraryTests(Base):
             "mechanic": None,
         },
     ]
+
+    @patch("tracker.library._catalog", return_value=(EXERCISES, None))
+    def test_exercise_cards_include_catalogue_images_and_safe_fallback(self, catalog):
+        response = self.client.get(reverse("tracker:exercise-library"))
+        self.assertEqual(
+            response.context["exercises"][0]["image_url"],
+            "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Curl/0.jpg",
+        )
+        self.assertEqual(response.context["exercises"][1]["image_url"], "")
+        self.assertContains(response, 'class="library-exercise-image"')
+        self.assertContains(response, "Movement guide")
 
     @patch("tracker.library._catalog", return_value=(EXERCISES, None))
     def test_search_includes_secondary_muscles(self, catalog):
