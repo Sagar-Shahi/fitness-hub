@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Exercise Library · FitHub{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div><p class="eyebrow">TRAIN SMARTER</p><h1>Exercise Library</h1><p class="muted">Explore movements, learn what they train, and add them straight to a workout.</p></div>
+  <span class="badge">{{ result_count }} exercises</span>
+</section>
+{% if error %}<div class="card"><p class="muted">{{ error }}</p></div>{% endif %}
+<form method="get" class="card form-card" role="search">
+  <div class="form-grid">
+    <div class="field"><label for="library-search">Search exercises</label><input id="library-search" name="q" value="{{ query }}" placeholder="e.g. squat, push-up, dumbbell curl"></div>
+    <div class="field"><label for="library-muscle">Muscle group</label><select id="library-muscle" name="muscle"><option value="">All muscles</option>{% for item in muscles %}<option value="{{ item|lower }}" {% if muscle == item|lower %}selected{% endif %}>{{ item|title }}</option>{% endfor %}</select></div>
+    <div class="field"><label for="library-equipment">Equipment</label><select id="library-equipment" name="equipment"><option value="">All equipment</option>{% for item in equipment_types %}<option value="{{ item|lower }}" {% if equipment == item|lower %}selected{% endif %}>{{ item|title }}</option>{% endfor %}</select></div>
+    <div class="field"><label for="library-workout">Add to workout</label><select id="library-workout" name="workout"><option value="">Choose a workout</option>{% for item in workouts %}<option value="{{ item.pk }}" {% if selected_workout.pk == item.pk %}selected{% endif %}>{{ item.name }} · {{ item.date|date:"M j" }}</option>{% endfor %}</select></div>
+  </div>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Find exercises</button><a class="btn btn-quiet" href="{% url 'tracker:exercise-library' %}">Reset</a></div>
+</form>
+{% if selected_workout %}<p class="muted">Adding exercises to <strong>{{ selected_workout.name }}</strong>. Choose a movement below.</p>{% elif workouts %}<p class="muted">Choose a workout above to enable one-click adding.</p>{% else %}<p class="muted">Create a workout first, then return here to add exercises.</p>{% endif %}
+{% if exercises %}
+<div class="plan-grid">
+{% for item in exercises %}
+  <article class="card plan-card library-exercise-card">
+    <div class="exercise-heading"><span class="badge">{{ item.level|default:"All levels"|title }}</span><span class="muted">{{ item.category|default:"Training"|title }}</span></div>
+    <h2 class="card-title">{{ item.name }}</h2>
+    <p class="muted">{{ item.primaryMuscles|join:", "|title }}{% if item.equipment %} · {{ item.equipment|title }}{% endif %}</p>
+    {% if item.instructions %}<details><summary>How to perform</summary><ol>{% for step in item.instructions %}<li>{{ step }}</li>{% endfor %}</ol></details>{% endif %}
+    {% if selected_workout %}
+    <form method="post" action="{% url 'tracker:exercise-add' selected_workout.pk %}" class="form-actions">{% csrf_token %}
+      <input type="hidden" name="name" value="{{ item.name|truncatechars:80 }}">
+      <input type="hidden" name="sets" value="3"><input type="hidden" name="reps" value="10"><input type="hidden" name="weight_kg" value="0">
+      <button class="btn btn-primary btn-small" type="submit">＋ Add to workout</button>
+    </form>
+    {% endif %}
+  </article>
+{% endfor %}
+</div>
+{% else %}<section class="card empty-state"><h2 class="card-title">No matching exercises</h2><p class="muted">Try another name, muscle group or equipment filter.</p></section>{% endif %}
+{% if page_count > 1 %}<nav class="form-actions" aria-label="Exercise pages">
+  {% if previous_page %}<a class="btn btn-quiet" href="?q={{ query|urlencode }}&muscle={{ muscle|urlencode }}&equipment={{ equipment|urlencode }}&workout={{ selected_workout.pk|default:'' }}&page={{ previous_page }}">Previous</a>{% endif %}
+  <span class="muted">Page {{ page }} of {{ page_count }}</span>
+  {% if next_page %}<a class="btn btn-quiet" href="?q={{ query|urlencode }}&muscle={{ muscle|urlencode }}&equipment={{ equipment|urlencode }}&workout={{ selected_workout.pk|default:'' }}&page={{ next_page }}">Next</a>{% endif %}
+</nav>{% endif %}
+<p class="muted small">Exercise data: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener noreferrer">Free Exercise DB</a>, released under the Unlicense (public domain). Exercise instructions are general education, not medical advice.</p>
+{% endblock %}
