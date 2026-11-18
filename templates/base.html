@@ -11,6 +11,9 @@
   <script src="{% static 'js/app.js' %}" defer></script>
 </head>
 <body>
+  <video class="ambient-workout-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true" tabindex="-1">
+    <source src="https://videos.pexels.com/video-files/4921640/4921640-hd_1066_1920_25fps.mp4" type="video/mp4">
+  </video>
   <a class="skip-link" href="#main">Skip to content</a>
   {% with view=request.resolver_match.view_name %}
   <header class="topbar">
