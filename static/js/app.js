@@ -35,6 +35,16 @@
     if (message && !window.confirm(message)) event.preventDefault();
   });
 
+  // Close Explore after choosing a destination, and keep Escape consistent with the account menu.
+
+  document.addEventListener('click', function (event) {
+    var exploreLink = event.target.closest('.nav-more-menu a');
+    if (exploreLink) {
+      var exploreMenu = exploreLink.closest('details.nav-more');
+      if (exploreMenu) exploreMenu.removeAttribute('open');
+    }
+  });
+
   document.addEventListener('click', function (event) {
     document.querySelectorAll('details.account-menu[open]').forEach(function (menu) {
       if (!menu.contains(event.target)) menu.removeAttribute('open');
