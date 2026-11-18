@@ -156,7 +156,7 @@ def exercise_tutorials(request, exercise_pk):
         headers={'Accept': 'application/json', 'User-Agent': 'FitHub/1.0'},
     )
     try:
-        with urlopen(req, timeout=8) as response:  # nosec B310: fixed HTTPS-only Google API endpoint
+        with urlopen(req, timeout=8) as response:  # nosec
             payload = json.loads(response.read().decode('utf-8'))
     except HTTPError as exc:
         if exc.code == 403:
