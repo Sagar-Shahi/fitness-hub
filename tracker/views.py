@@ -78,6 +78,34 @@ def dashboard(request):
     })
 
 
+
+@login_required
+def share_progress(request):
+    """Prepare a privacy-conscious, non-public progress summary for the signed-in user."""
+    end = timezone.localdate()
+    start = end - timedelta(days=29)
+    workouts = Workout.objects.filter(owner=request.user, date__gte=start, date__lte=end).count()
+    completed_sets = ExerciseSet.objects.filter(
+        exercise__workout__owner=request.user,
+        exercise__workout__date__gte=start,
+        exercise__workout__date__lte=end,
+        is_completed=True,
+    ).count()
+    streak_days = analytics.streak(request.user)
+    share_text = (
+        f"I logged {workouts} workouts and completed {completed_sets} sets "
+        f"in the last 30 days with FitHub. Consistency is built rep by rep."
+    )
+    return render(request, 'tracker/share_progress.html', {
+        'workouts': workouts,
+        'completed_sets': completed_sets,
+        'streak_days': streak_days,
+        'share_text': share_text,
+        'period_start': start,
+        'period_end': end,
+    })
+
+
 @login_required
 def goals(request):
     profile = profile_for(request.user)
