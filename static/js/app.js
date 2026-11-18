@@ -200,31 +200,16 @@
     function renderVideos(videos) {
       results.textContent = '';
       if (!videos.length) {
-        status.textContent = 'No suitable videos found. Try again later.';
+        status.textContent = 'No suitable video found. Try again later.';
         return;
       }
-      videos.forEach(function (video) {
-        var card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'tutorial-result';
-        card.setAttribute('data-video-id', String(video.id || ''));
-        card.setAttribute('aria-label', 'Play ' + video.title);
-        var image = document.createElement('img');
-        image.src = video.thumbnail;
-        image.alt = '';
-        image.loading = 'lazy';
-        var details = document.createElement('span');
-        var title = document.createElement('strong');
-        title.textContent = video.title;
-        var channel = document.createElement('small');
-        channel.textContent = video.channel;
-        details.appendChild(title);
-        details.appendChild(channel);
-        card.appendChild(image);
-        card.appendChild(details);
-        results.appendChild(card);
-      });
-      status.textContent = 'Choose a video to play it here.';
+      // YouTube returns relevance-ranked results; use its top embeddable match only.
+      var video = videos[0];
+      var recommendation = document.createElement('p');
+      recommendation.className = 'tutorial-recommendation';
+      recommendation.textContent = 'Recommended tutorial: ' + video.title + (video.channel ? ' · ' + video.channel : '');
+      results.appendChild(recommendation);
+      playVideo(video.id);
     }
     searchButton.addEventListener('click', function () {
       searchButton.disabled = true;
