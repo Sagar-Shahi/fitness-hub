@@ -472,9 +472,16 @@ def meals(request):
     target = nutrition_plan['calories'] if nutrition_plan and nutrition_plan.get('calories') else profile.calorie_target
     items = Meal.objects.filter(owner=request.user, date=day)
     totals = analytics.day_totals(request.user, day)
+    macro_remaining = None
+    if nutrition_plan and nutrition_plan.get('calories'):
+        macro_remaining = {
+            'protein': max(0, nutrition_plan['protein_g'] - totals['protein']),
+            'carbs': max(0, nutrition_plan['carbs_g'] - totals['carbs']),
+            'fat': max(0, nutrition_plan['fat_g'] - totals['fat']),
+        }
     return render(request, 'tracker/meals.html', {
         'form': form, 'day': day, 'items': items, 'totals': totals, 'target': target,
-        'nutrition_plan': nutrition_plan,
+        'nutrition_plan': nutrition_plan, 'macro_remaining': macro_remaining,
         'percent': analytics.percent(totals['calories'], target),
         'prev': day - timedelta(days=1), 'next': day + timedelta(days=1) if day < timezone.localdate() else None})
 
