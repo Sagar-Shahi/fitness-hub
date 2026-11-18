@@ -134,3 +134,14 @@ class Meal(models.Model):
 def profile_for(user):
     profile, _ = Profile.objects.get_or_create(owner=user)
     return profile
+
+
+class ResearchCacheEntry(models.Model):
+    """Django database-cache row for shared, short-lived research results."""
+
+    cache_key = models.CharField(max_length=255, primary_key=True)
+    value = models.TextField()
+    expires = models.DateTimeField(db_index=True)
+
+    class Meta:
+        db_table = 'fithub_research_cache'
