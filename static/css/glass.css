@@ -564,3 +564,18 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
     right: 12px;
   }
 }
+
+
+/* Navigation hit-testing: real navigation links always win over an open Explore panel. */
+.nav { position: relative; isolation: auto; }
+.nav > .nav-link {
+  position: relative;
+  z-index: 45;
+  pointer-events: auto;
+}
+.nav > details.nav-more { position: relative; z-index: 40; }
+.nav > details.nav-more > .nav-more-menu {
+  z-index: 40;
+  pointer-events: auto;
+}
+.nav > details.nav-more > summary { position: relative; z-index: 41; }
