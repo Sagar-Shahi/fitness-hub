@@ -249,4 +249,3 @@ class RepositoryHygieneTests(TestCase):
         text = (Path(settings.BASE_DIR) / '.env.example').read_text()
         active = [line for line in text.splitlines() if line.strip() and not line.lstrip().startswith('#')]
         self.assertEqual(active, ['DJANGO_DEBUG=True'])
-}
