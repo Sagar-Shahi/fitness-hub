@@ -42,7 +42,7 @@
 {% if page_count > 1 %}<nav class="form-actions" aria-label="Exercise pages">
   {% if previous_page %}<a class="btn btn-quiet" href="?q={{ query|urlencode }}&muscle={{ muscle|urlencode }}&equipment={{ equipment|urlencode }}&level={{ level|urlencode }}&category={{ category|urlencode }}&workout={{ selected_workout.pk|default:'' }}&page={{ previous_page }}">Previous</a>{% endif %}
   <span class="muted">Page {{ page }} of {{ page_count }}</span>
-  {% if next_page %}<a class="btn btn-quiet" href="?q={{ query|urlencode }}&muscle={{ muscle|urlencode }}&equipment={{ equipment|urlencode }}&workout={{ selected_workout.pk|default:'' }}&page={{ next_page }}">Next</a>{% endif %}
+  {% if next_page %}<a class="btn btn-quiet" href="?q={{ query|urlencode }}&muscle={{ muscle|urlencode }}&equipment={{ equipment|urlencode }}&level={{ level|urlencode }}&category={{ category|urlencode }}&workout={{ selected_workout.pk|default:'' }}&page={{ next_page }}">Next</a>{% endif %}
 </nav>{% endif %}
 <p class="muted small">Exercise data: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener noreferrer">Free Exercise DB</a>, released under the Unlicense (public domain). Exercise instructions are general education, not medical advice.</p>
 {% endblock %}
