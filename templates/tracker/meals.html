@@ -1,5 +1,45 @@
 {% extends 'base.html' %}
-{% block title %}Meals · FitHub{% endblock %}
+{% block title %}Meals · FitHub<script>
+(function () {
+  var form = document.getElementById('meal-entry-form');
+  if (!form) return;
+  var fields = {
+    calories: form.querySelector('[name="calories"]'),
+    protein: form.querySelector('[name="protein_g"]'),
+    carbs: form.querySelector('[name="carbs_g"]'),
+    fat: form.querySelector('[name="fat_g"]')
+  };
+  var current = {
+    calories: {{ totals.calories|default:0 }},
+    protein: {{ totals.protein|default:0 }},
+    carbs: {{ totals.carbs|default:0 }},
+    fat: {{ totals.fat|default:0 }}
+  };
+  function value(field) { return Math.max(0, Number(field && field.value) || 0); }
+  function update() {
+    Object.keys(fields).forEach(function (key) {
+      var amount = value(fields[key]);
+      var node = document.getElementById('meal-preview-' + key);
+      if (node) node.textContent = amount;
+    });
+    var after = current.calories + value(fields.calories);
+    var note = document.getElementById('meal-after-add');
+    if (note) note.textContent = 'After adding: ' + after + ' / {{ target }} kcal today (' + Math.round(after / Math.max(1, {{ target }}) * 100) + '%).';
+  }
+  Object.keys(fields).forEach(function (key) {
+    if (fields[key]) fields[key].addEventListener('input', update);
+  });
+  form.querySelectorAll('[data-meal-kind]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var select = form.querySelector('[name="kind"]');
+      if (select) { select.value = button.getAttribute('data-meal-kind'); select.dispatchEvent(new Event('change', {bubbles:true})); }
+      form.querySelectorAll('[data-meal-kind]').forEach(function (item) { item.setAttribute('aria-pressed', item === button ? 'true' : 'false'); });
+    });
+  });
+  update();
+})();
+</script>
+{% endblock %}
 {% block content %}
 <div class="page-head">
   <div><h1>Meals</h1><p class="muted">{{ day|date:"l, M j, Y" }}</p></div>
@@ -9,12 +49,13 @@
   </nav>
 </div>
 
-<section class="card">
+<section class="card meals-overview">
   <div class="progress-row">
     <div class="goal-ring"><strong>{{ totals.calories }} of {{ target }} kcal</strong><span class="muted">{{ percent }}%</span></div>
     <progress class="meter" max="100" value="{{ percent }}" aria-label="Calories against target">{{ percent }}%</progress>
+    <p class="meal-goal-note">{% if percent >= 100 %}Daily calorie target reached{% else %}{{ target|add:"-"|default:"" }}{% endif %}<span>{{ totals.calories }} / {{ target }} kcal logged</span></p>
   </div>
-  <dl class="macro-row">
+  <dl class="macro-row meals-macros">
     <div><dt>Protein</dt><dd>{{ totals.protein }} g</dd></div>
     <div><dt>Carbs</dt><dd>{{ totals.carbs }} g</dd></div>
     <div><dt>Fat</dt><dd>{{ totals.fat }} g</dd></div>
@@ -22,8 +63,10 @@
 </section>
 
 <div class="two-col">
-  <form class="card form-card" method="post" novalidate>
+  <form class="card form-card meal-entry-card" method="post" novalidate id="meal-entry-form">
     <h2 class="card-title">Log a meal</h2>
+    <p class="muted meal-form-intro">Enter the nutrition from your food label or estimate. Your totals update as you type.</p>
+    <div class="meal-kind-shortcuts" aria-label="Choose meal type"><button type="button" data-meal-kind="breakfast">☀ Breakfast</button><button type="button" data-meal-kind="lunch">◷ Lunch</button><button type="button" data-meal-kind="dinner">☾ Dinner</button><button type="button" data-meal-kind="snack">＋ Snack</button></div>
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
     <div class="form-grid">
@@ -35,10 +78,13 @@
       {% include 'partials/field.html' with field=form.carbs_g %}
       {% include 'partials/field.html' with field=form.fat_g %}
     </div>
-    <div class="form-actions"><button class="btn btn-primary" type="submit">Add meal</button></div>
+    <section class="meal-live-preview" aria-live="polite" aria-atomic="true"><div><span class="muted">This meal</span><strong><span id="meal-preview-kcal">0</span> kcal</strong></div><div><span class="muted">Protein</span><strong><span id="meal-preview-protein">0</span> g</strong></div><div><span class="muted">Carbs</span><strong><span id="meal-preview-carbs">0</span> g</strong></div><div><span class="muted">Fat</span><strong><span id="meal-preview-fat">0</span> g</strong></div></section>
+    <p class="meal-after-add muted" id="meal-after-add">After adding: {{ totals.calories }} / {{ target }} kcal today.</p>
+    <div class="form-actions"><button class="btn btn-primary" type="submit">＋ Add meal</button></div>
   </form>
-  <section class="card flush">
+  <section class="card flush meal-history-card">
     {% if items %}
+    <div class="meal-history-heading"><h2 class="card-title">Food log</h2><span class="muted">{{ items|length }} entr{{ items|length|pluralize:"y,ies" }}</span></div>
     <div class="table-wrap">
       <table class="table">
         <thead><tr><th scope="col">Meal</th><th scope="col" class="num">kcal</th><th scope="col" class="num">P / C / F</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
@@ -50,7 +96,7 @@
         </tbody>
       </table>
     </div>
-    {% else %}<p class="muted empty-state">Nothing logged for this day.</p>{% endif %}
+    {% else %}<div class="meal-empty-state"><span aria-hidden="true">◒</span><h3>No meals logged yet</h3><p class="muted">Add your first meal to see calories and macros build throughout the day.</p></div>{% endif %}
   </section>
 </div>
 {% endblock %}
