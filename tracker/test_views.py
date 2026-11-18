@@ -1,3 +1,4 @@
+import re
 import csv
 import io
 from datetime import timedelta
@@ -189,6 +190,15 @@ class ExerciseSetTests(Base):
         self.second = ExerciseSet.objects.create(
             exercise=self.exercise, set_number=2, reps=8, weight_kg=Decimal('50.0')
         )
+
+    def test_set_forms_have_unique_accessible_field_ids(self):
+        workout = make_workout(
+            self.user,
+            exercises=(('Squat', 2, 8, '60'), ('Row', 2, 10, '40')),
+        )
+        response = self.client.get(reverse('tracker:workout-detail', args=[workout.pk]))
+        ids = re.findall(r'\bid="([^"]+)"', response.content.decode())
+        self.assertEqual(len(ids), len(set(ids)))
 
     def test_completed_set_volume(self):
         self.assertEqual(self.workout.volume_kg, Decimal('0'))
