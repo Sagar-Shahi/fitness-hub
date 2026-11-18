@@ -20,7 +20,7 @@ class LoginRequiredTests(TestCase):
         workout, meal, weight = make_workout(owner), make_meal(owner), make_weight(owner)
         exercise = workout.exercises.first()
         urls = [
-            reverse('tracker:dashboard'), reverse('tracker:share-progress'), reverse('tracker:goals'), reverse('tracker:workout-list'), reverse('tracker:workout-create'),
+            reverse('tracker:dashboard'), reverse('tracker:share-progress'), reverse('tracker:focus-music-search'), reverse('tracker:goals'), reverse('tracker:workout-list'), reverse('tracker:workout-create'),
             reverse('tracker:exercise-library'),
             reverse('tracker:export'), reverse('tracker:weight'), reverse('tracker:meals'),
             reverse('tracker:workout-detail', args=[workout.pk]), reverse('tracker:workout-edit', args=[workout.pk]),
@@ -43,6 +43,43 @@ class Base(TestCase):
         cache.clear()
         self.user = make_user('sam')
         self.client.force_login(self.user)
+
+
+
+class FocusMusicSearchTests(Base):
+    def test_query_is_required_and_bounded(self):
+        url = reverse('tracker:focus-music-search')
+        for query in ('', 'x', 'x' * 101):
+            with self.subTest(query=query):
+                self.assertEqual(self.client.get(url, {'q': query}).status_code, 400)
+
+    @patch.dict('os.environ', {'YOUTUBE_API_KEY': ''})
+    def test_missing_api_key_has_a_safe_fallback_message(self):
+        response = self.client.get(reverse('tracker:focus-music-search'), {'q': 'gym music'})
+        self.assertEqual(response.status_code, 503)
+        self.assertIn('paste a YouTube video link', response.json()['error'])
+
+    @patch.dict('os.environ', {'YOUTUBE_API_KEY': 'test-key'})
+    @patch('tracker.views.urlopen')
+    def test_returns_only_valid_embeddable_video_results(self, urlopen_mock):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+            def __exit__(self, exc_type, exc_value, traceback):
+                return False
+            def read(self):
+                return (
+                    b'{"items":['
+                    b'{"id":{"videoId":"abcdefghijk"},"snippet":{"title":"Gym mix","channelTitle":"Music","thumbnails":{"medium":{"url":"https://i.ytimg.com/vi/abcdefghijk/mqdefault.jpg"}}}},'
+                    b'{"id":{"videoId":"bad"},"snippet":{"title":"Invalid"}}]}'
+                )
+        urlopen_mock.return_value = FakeResponse()
+        response = self.client.get(reverse('tracker:focus-music-search'), {'q': 'gym music'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['videos']), 1)
+        self.assertEqual(response.json()['videos'][0]['id'], 'abcdefghijk')
+        self.assertEqual(response.json()['videos'][0]['title'], 'Gym mix')
+        self.assertIn('videoEmbeddable=true', urlopen_mock.call_args.args[0].full_url)
 
 
 class DashboardTests(Base):
