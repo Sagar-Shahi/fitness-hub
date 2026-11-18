@@ -2492,3 +2492,9 @@ input:focus,select:focus,textarea:focus {
 .nutrition-target-incomplete { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
 @media(max-width:560px) { .nutrition-target-grid { grid-template-columns:1fr; } .nutrition-target-grid>div { grid-template-columns:1fr auto; align-items:center; } }
 @media(prefers-reduced-motion:reduce) { .nutrition-target-card,.nutrition-recommendation { scroll-behavior:auto; } }
+
+
+/* Optional body composition fields in the personal profile */
+.body-profile-subsection { margin-top:20px; padding-top:18px; border-top:1px solid var(--line,#ded6ca); }
+.body-profile-subsection .goals-kicker { display:block; margin-bottom:8px; }
+.body-profile-subsection .goal-description { max-width:680px; }

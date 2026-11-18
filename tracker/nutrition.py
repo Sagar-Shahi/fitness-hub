@@ -54,15 +54,31 @@ def calculate_nutrition_targets(profile, weight_kg=None):
     # Avoid presenting very low or implausibly high calorie prescriptions.
     if calories < 1400 or calories > 5000:
         return {'reason': 'Your calculated energy estimate falls outside FitHub’s safe display range. Please ask a registered dietitian or healthcare professional to set an appropriate target.'}
-    protein = _whole(weight * PROTEIN_FACTORS[profile.training_type])
+    if profile.body_fat_percentage is not None:
+        # Use estimated lean mass for protein when a user supplies body-fat data.
+        # The body-fat figure is optional and does not alter the Mifflin calorie estimate.
+        lean_mass = weight * (Decimal('1') - Decimal(str(profile.body_fat_percentage)) / Decimal('100'))
+        lean_factors = {
+            'strength': Decimal('2.0'),
+            'cardio': Decimal('1.6'),
+            'mixed': Decimal('1.8'),
+            'general': Decimal('1.6'),
+        }
+        protein = _whole(lean_mass * lean_factors[profile.training_type])
+    else:
+        lean_mass = None
+        protein = _whole(weight * PROTEIN_FACTORS[profile.training_type])
     fat = _whole(weight * Decimal('0.8'))
     carbs = max(0, _whole((Decimal(calories) - protein * 4 - fat * 9) / 4))
     return {
         'calories': calories,
         'maintenance_calories': _whole(maintenance),
         'protein_g': protein,
+        'lean_mass_kg': _whole(lean_mass) if lean_mass is not None else None,
+        'body_composition_used': lean_mass is not None,
         'carbs_g': carbs,
         'fat_g': fat,
         'goal_label': goal_label,
         'method': 'Mifflin-St Jeor BMR with an activity multiplier',
+        'protein_method': 'Estimated lean mass' if lean_mass is not None else 'Current body weight',
     }

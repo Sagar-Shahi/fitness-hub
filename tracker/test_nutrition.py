@@ -81,3 +81,25 @@ class PersonalizedNutritionTests(TestCase):
         self.assertEqual(response.context['target'], response.context['nutrition_plan']['calories'])
         self.assertEqual(response.context['macro_remaining']['protein'], response.context['nutrition_plan']['protein_g'])
         self.assertContains(response, 'PERSONALIZED DAILY TARGETS')
+
+    def test_body_fat_is_optional_and_uses_lean_mass_for_protein(self):
+        self.profile.body_fat_percentage = Decimal('20')
+        result = calculate_nutrition_targets(self.profile)
+        self.assertTrue(result['body_composition_used'])
+        self.assertEqual(result['lean_mass_kg'], 60)
+        self.assertEqual(result['protein_g'], 120)
+
+    def test_body_type_does_not_change_calorie_estimate(self):
+        baseline = calculate_nutrition_targets(self.profile)
+        self.profile.body_type = 'ectomorph'
+        with_type = calculate_nutrition_targets(self.profile)
+        self.assertEqual(baseline['calories'], with_type['calories'])
+
+    def test_body_composition_fields_can_be_left_blank(self):
+        self.profile.body_type = ''
+        self.profile.body_fat_percentage = None
+        self.profile.waist_cm = None
+        self.profile.muscle_mass_kg = None
+        result = calculate_nutrition_targets(self.profile)
+        self.assertFalse(result['body_composition_used'])
+        self.assertEqual(result['protein_g'], 135)
