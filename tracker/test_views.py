@@ -382,7 +382,9 @@ class ExportTests(Base):
         response = self.client.get(reverse('tracker:export'))
         self.assertTrue(response['Content-Type'].startswith('text/csv'))
         rows = list(csv.DictReader(io.StringIO(response.content.decode())))
-        self.assertEqual(len(rows), 2)
-        formula = next(r for r in rows if r['minutes'] == '45')
+        self.assertEqual(len(rows), 4)  # three individual sets plus the empty workout row
+        formula = next(r for r in rows if r['minutes'] == '45' and r['set_number'] == '1')
+        self.assertEqual([r['set_number'] for r in rows if r['exercise'] == "'@SUM(A1)"], ['1', '2', '3'])
+        self.assertEqual(formula['is_completed'], 'True')
         self.assertTrue(formula['workout'].startswith("'"))
         self.assertTrue(formula['exercise'].startswith("'"))
