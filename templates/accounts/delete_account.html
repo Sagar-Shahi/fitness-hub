@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Delete account · FitHub{% endblock %}
+{% block content %}
+<section class="auth-card card">
+  <h1>Delete account</h1>
+  <p>This permanently deletes your profile, workouts, meals, weight log, orders and API keys. It cannot be undone.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="field">
+      <label for="id_password">Type your password to confirm</label>
+      <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Delete my account for good</button>
+  </form>
+</section>
+{% endblock %}

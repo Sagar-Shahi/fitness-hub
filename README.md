@@ -40,7 +40,7 @@ python manage.py runserver
 Then open http://127.0.0.1:8000/ and sign up, or log in with the demo account printed by `seed_demo`.
 To create the sample plans on a live site run `python manage.py seed_plans`; you can also manage plans in the admin.
 
-Run the tests with `python manage.py test` (158 tests, no setup needed).
+Run the tests with `python manage.py test` (162 tests, no setup needed).
 
 ## API
 Create a key on the **API keys** page (shown once, stored only as a SHA-256 hash) and send it as a Bearer token.
