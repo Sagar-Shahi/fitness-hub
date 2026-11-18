@@ -77,6 +77,40 @@
     charts.forEach(revealChart);
   }
 
+
+  // Homepage demo: let visitors complete sample sets and feel the UI respond.
+  var demoSets = document.querySelectorAll('[data-demo-set]');
+  var demoCount = document.querySelector('[data-demo-completed]');
+  function updateDemoCount() {
+    if (!demoCount) return;
+    var completed = document.querySelectorAll('[data-demo-set][aria-pressed="true"]').length;
+    demoCount.textContent = String(completed);
+  }
+  demoSets.forEach(function (set) {
+    set.addEventListener('click', function () {
+      var done = set.getAttribute('aria-pressed') === 'true';
+      set.setAttribute('aria-pressed', done ? 'false' : 'true');
+      updateDemoCount();
+    });
+  });
+
+  // Subtle pointer tilt on the training preview. Touch and reduced-motion users get a static card.
+  var tiltCard = document.querySelector('.athletic-preview');
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (tiltCard && !reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    tiltCard.addEventListener('pointermove', function (event) {
+      var bounds = tiltCard.getBoundingClientRect();
+      var x = (event.clientX - bounds.left) / bounds.width;
+      var y = (event.clientY - bounds.top) / bounds.height;
+      var rotateY = (x - 0.5) * 8;
+      var rotateX = (0.5 - y) * 6;
+      tiltCard.style.transform = 'perspective(1100px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg) translateY(-4px)';
+    });
+    tiltCard.addEventListener('pointerleave', function () {
+      tiltCard.style.transform = '';
+    });
+  }
+
   // Focus player deliberately plays direct audio URLs only. It never scrapes provider pages.
   var input = document.getElementById('focus-audio-url');
   if (!input) return;
