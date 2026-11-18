@@ -67,6 +67,13 @@
       <div class="focus-url-row"><input id="focus-audio-url" type="url" inputmode="url" placeholder="Paste an MP3 or music link" autocomplete="url"><button class="btn btn-primary btn-small" id="focus-load" type="button">Load</button></div>
       <p class="focus-help" id="focus-status" role="status">Direct audio files can play here. Spotify and YouTube links open on their platforms.</p>
       <audio id="focus-audio" controls preload="none"></audio>
+      <section class="focus-video-stage" id="focus-video-stage" aria-label="Video player" hidden>
+        <div class="focus-video-heading"><strong id="focus-video-title">Now playing</strong><button class="btn btn-quiet btn-small" id="focus-video-close" type="button">Close video</button></div>
+        <div class="focus-video-square">
+          <iframe id="focus-video-frame" title="FitHub video player" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <p class="focus-help" id="focus-video-status" role="status" aria-live="polite">Video plays here inside Focus Audio.</p>
+      </section>
       <label class="focus-label" for="focus-local-file">Or play an audio file already on this device</label>
       <input class="focus-local-file" id="focus-local-file" type="file" accept="audio/*">
       <p class="focus-help">Local files stay on your device; FitHub does not upload them.</p>
