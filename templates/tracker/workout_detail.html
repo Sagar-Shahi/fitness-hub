@@ -53,9 +53,9 @@
       <h3 class="card-title">Add a set</h3>
       {% csrf_token %}
       <div class="form-grid">
-        {% include 'partials/field.html' with field=set_add_form.reps %}
-        {% include 'partials/field.html' with field=set_add_form.weight_kg %}
-        {% include 'partials/field.html' with field=set_add_form.is_warmup %}
+        {% include 'partials/field.html' with field=e.add_set_form.reps %}
+        {% include 'partials/field.html' with field=e.add_set_form.weight_kg %}
+        {% include 'partials/field.html' with field=e.add_set_form.is_warmup %}
       </div>
       <div class="form-actions"><button class="btn btn-quiet btn-small" type="submit">Add set</button></div>
     </form>
