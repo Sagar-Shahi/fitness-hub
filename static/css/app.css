@@ -2476,3 +2476,19 @@ input:focus,select:focus,textarea:focus {
 .meal-empty-state h3 { margin:.8rem 0 .25rem; }
 @media(max-width:560px) { .meal-live-preview { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(prefers-reduced-motion:reduce) { .meal-kind-shortcuts button { transition:none; } }
+
+
+/* Personalized nutrition profile and meal targets */
+.nutrition-profile-card { margin:0 0 16px; }
+.nutrition-recommendation,.nutrition-target-card { margin:18px 0; padding:22px; border:1px solid var(--line,#ded6ca); border-radius:18px; background:var(--surface,#faf7f1); }
+.nutrition-recommendation h2,.nutrition-target-card h2 { margin:.35rem 0; font-size:clamp(1.8rem,4vw,2.5rem); font-variant-numeric:tabular-nums; }
+.nutrition-recommendation>p,.nutrition-target-card p { color:var(--muted,#766c61); }
+.nutrition-target-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:16px 0; }
+.nutrition-target-grid>div { display:grid; gap:4px; padding:13px; border:1px solid var(--line,#ded6ca); border-radius:12px; background:rgba(255,255,255,.55); }
+.nutrition-target-grid strong { font-size:1.25rem; font-variant-numeric:tabular-nums; }
+.nutrition-target-grid span,.nutrition-recommendation small { color:var(--muted,#766c61); font-size:.78rem; }
+.nutrition-plan-note { margin:8px 0 0; font-size:.82rem; }
+.nutrition-plan-note a { color:var(--accent,#986d52); font-weight:700; }
+.nutrition-target-incomplete { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+@media(max-width:560px) { .nutrition-target-grid { grid-template-columns:1fr; } .nutrition-target-grid>div { grid-template-columns:1fr auto; align-items:center; } }
+@media(prefers-reduced-motion:reduce) { .nutrition-target-card,.nutrition-recommendation { scroll-behavior:auto; } }

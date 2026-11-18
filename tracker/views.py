@@ -110,10 +110,20 @@ def share_progress(request):
 def goals(request):
     profile = profile_for(request.user)
     form = ProfileForm(request.POST or None, instance=profile)
+    latest_weight = BodyMetric.objects.filter(owner=request.user).first()
+    current_weight = latest_weight.weight_kg if latest_weight else profile.starting_weight_kg
+    from .nutrition import calculate_nutrition_targets
+    nutrition_plan = calculate_nutrition_targets(profile, current_weight)
     if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, 'Goals saved.')
-        return redirect('tracker:dashboard')
+        profile = form.save()
+        latest_weight = BodyMetric.objects.filter(owner=request.user).first()
+        current_weight = latest_weight.weight_kg if latest_weight else profile.starting_weight_kg
+        nutrition_plan = calculate_nutrition_targets(profile, current_weight)
+        if nutrition_plan and nutrition_plan.get('calories'):
+            profile.calorie_target = nutrition_plan['calories']
+            profile.save(update_fields=['calorie_target'])
+        messages.success(request, 'Your fitness profile and nutrition targets have been saved.')
+        return redirect('tracker:goals')
     items = (OrderItem.objects.filter(order__owner=request.user).select_related('plan', 'order')
              .order_by('-order__created_at'))
     seen, my_plans = set(), []
@@ -121,7 +131,10 @@ def goals(request):
         if item.plan_id not in seen:
             seen.add(item.plan_id)
             my_plans.append(item)
-    return render(request, 'tracker/goals.html', {'form': form, 'my_plans': my_plans})
+    return render(request, 'tracker/goals.html', {
+        'form': form, 'my_plans': my_plans, 'nutrition_plan': nutrition_plan,
+        'current_weight': current_weight,
+    })
 
 
 @login_required
@@ -452,11 +465,17 @@ def meals(request):
         messages.success(request, f'Logged {meal.name}.')
         return redirect(f"{reverse('tracker:meals')}?date={meal.date:%Y-%m-%d}")
     profile = profile_for(request.user)
+    latest_weight = BodyMetric.objects.filter(owner=request.user).first()
+    current_weight = latest_weight.weight_kg if latest_weight else profile.starting_weight_kg
+    from .nutrition import calculate_nutrition_targets
+    nutrition_plan = calculate_nutrition_targets(profile, current_weight)
+    target = nutrition_plan['calories'] if nutrition_plan and nutrition_plan.get('calories') else profile.calorie_target
     items = Meal.objects.filter(owner=request.user, date=day)
     totals = analytics.day_totals(request.user, day)
     return render(request, 'tracker/meals.html', {
-        'form': form, 'day': day, 'items': items, 'totals': totals, 'target': profile.calorie_target,
-        'percent': analytics.percent(totals['calories'], profile.calorie_target),
+        'form': form, 'day': day, 'items': items, 'totals': totals, 'target': target,
+        'nutrition_plan': nutrition_plan,
+        'percent': analytics.percent(totals['calories'], target),
         'prev': day - timedelta(days=1), 'next': day + timedelta(days=1) if day < timezone.localdate() else None})
 
 
