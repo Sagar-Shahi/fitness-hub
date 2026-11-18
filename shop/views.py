@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 
 from core import throttle
 
-from .models import MONEY, CartItem, Order, OrderItem, Plan
+from .models import MONEY, AffiliateProduct, CartItem, Order, OrderItem, Plan
 
 
 def _owned_plan_ids(user):
@@ -116,3 +116,29 @@ def orders(request):
 def order_detail(request, reference):
     order = get_object_or_404(Order.objects.filter(owner=request.user).prefetch_related('items__plan'), reference=reference)
     return render(request, 'shop/order_detail.html', {'order': order})
+
+
+def store(request):
+    products = AffiliateProduct.objects.filter(is_active=True)
+    category = request.GET.get('category', '')
+    valid_categories = {key for key, _label in AffiliateProduct.CATEGORIES}
+    if category in valid_categories:
+        products = products.filter(category=category)
+    else:
+        category = ''
+    search = request.GET.get('q', '').strip()[:80]
+    if search:
+        from django.db.models import Q
+        products = products.filter(Q(title__icontains=search) | Q(description__icontains=search) | Q(seller_name__icontains=search))
+    return render(request, 'shop/store.html', {
+        'products': products, 'category': category, 'categories': AffiliateProduct.CATEGORIES, 'search': search,
+    })
+
+
+def product_outbound(request, slug):
+    product = get_object_or_404(AffiliateProduct, slug=slug, is_active=True)
+    # Only verified HTTPS destinations are allowed; URLs are maintained by FitHub admins.
+    destination = product.outbound_url
+    if not destination.startswith('https://'):
+        return HttpResponse('This seller link is not available yet.', status=503, content_type='text/plain')
+    return redirect(destination)
