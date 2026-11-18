@@ -48,6 +48,34 @@
     }
   });
 
+  // Animate real dashboard charts once when they enter view; keep the data and SVG geometry unchanged.
+  var charts = document.querySelectorAll('[data-animate-chart]');
+  function revealChart(chart) {
+    if (chart.classList.contains('is-visible')) return;
+    chart.classList.add('is-visible');
+    chart.querySelectorAll('.chart-line').forEach(function (path) {
+      try {
+        var length = path.getTotalLength();
+        path.style.strokeDasharray = length;
+        path.style.strokeDashoffset = length;
+        window.requestAnimationFrame(function () { path.style.strokeDashoffset = '0'; });
+      } catch (error) { /* retain the static chart if SVG measurement is unavailable */ }
+    });
+  }
+  if ('IntersectionObserver' in window) {
+    var chartObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          revealChart(entry.target);
+          chartObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.18 });
+    charts.forEach(function (chart) { chartObserver.observe(chart); });
+  } else {
+    charts.forEach(revealChart);
+  }
+
   // Focus player deliberately plays direct audio URLs only. It never scrapes provider pages.
   var input = document.getElementById('focus-audio-url');
   if (!input) return;
