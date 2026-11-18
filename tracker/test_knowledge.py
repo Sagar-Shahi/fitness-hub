@@ -16,6 +16,9 @@ class LearnPageTests(TestCase):
         self.assertContains(response, "Train with understanding.")
         self.assertContains(response, "The weekly activity baseline")
         self.assertContains(response, "Protein and training: what matters")
+        self.assertContains(response, "Strength vs muscle growth: train with a purpose")
+        self.assertContains(response, "Hydration basics for training")
+        self.assertContains(response, "ACSM — 2026 resistance training position stand")
         self.assertContains(response, "Sources and further reading")
         self.assertContains(response, "pmc.ncbi.nlm.nih.gov")
 
