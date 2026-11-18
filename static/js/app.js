@@ -125,7 +125,7 @@
     function videoIdFrom(value) {
       try {
         var url = new URL(value.trim());
-        var host = url.hostname.toLowerCase().replace(/^www\\./, '');
+        var host = url.hostname.toLowerCase().replace(/^www\./, '');
         if (host === 'youtu.be') return url.pathname.split('/').filter(Boolean)[0] || '';
         if (host !== 'youtube.com' && host !== 'm.youtube.com' && host !== 'youtube-nocookie.com') return '';
         if (url.pathname === '/watch') return url.searchParams.get('v') || '';
