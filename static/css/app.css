@@ -1740,3 +1740,5 @@ main.container { gap: 22px; }
   .learn-grid { grid-template-columns:1fr; }
   .learn-intro { align-items:flex-start; flex-direction:column; }
 }
+
+.learn-practice-link { align-self:flex-start; margin-top:2px; }
