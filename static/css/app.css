@@ -391,3 +391,34 @@ input[type="datetime-local"], input[type="number"], input[type="date"], select, 
 .set-add-form {
   margin-top: .75rem;
 }
+
+
+/* Focus audio: optional, compact and out of the way until opened. */
+.focus-dock { position: fixed; z-index: 30; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); width: min(390px, calc(100vw - 28px)); color: var(--ink); }
+.focus-dock > summary { list-style: none; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 15px; border: 1px solid #34313a; border-radius: 999px; background: rgba(15,17,23,.96); box-shadow: 0 12px 36px rgba(0,0,0,.38); cursor: pointer; font-weight: 650; }
+.focus-dock > summary::-webkit-details-marker { display: none; }
+.focus-dock[open] > summary { border-radius: 12px 12px 0 0; border-bottom-color: transparent; }
+.focus-indicator { width: 9px; height: 9px; border-radius: 50%; background: var(--good); box-shadow: 0 0 12px rgba(95,211,164,.45); }
+.focus-hint { margin-left: auto; color: var(--muted); font: .72rem var(--mono); }
+.focus-panel { padding: 18px; border: 1px solid #34313a; border-top: 0; border-radius: 0 0 12px 12px; background: rgba(15,17,23,.98); box-shadow: 0 18px 42px rgba(0,0,0,.42); }
+.focus-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.focus-panel-head .eyebrow { margin: 0 0 3px; }
+.focus-panel-head h2 { font-size: 1.15rem; }
+.focus-symbol { color: var(--accent); font-size: 2rem; }
+.focus-label { display: block; margin-bottom: 6px; font-size: .84rem; font-weight: 650; }
+.focus-url-row { display: flex; gap: 7px; }
+.focus-url-row input { min-width: 0; }
+.focus-help { margin: 7px 0 10px; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+.focus-panel audio { display: block; width: 100%; min-height: 38px; margin: 10px 0; }
+.focus-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.focus-voice { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 13px; margin-top: 13px; border-top: 1px solid var(--line); }
+.focus-voice p { margin: 3px 0 0; }
+.focus-legal { margin: 12px 0 0; font-size: .7rem; }
+@media (max-width: 620px) {
+  .focus-dock { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); width: min(390px, calc(100vw - 24px)); }
+  .focus-panel { padding: 14px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .focus-dock > summary, .focus-panel { transition: border-color .18s ease, box-shadow .18s ease; }
+  .focus-dock > summary:hover { border-color: var(--accent); }
+}
