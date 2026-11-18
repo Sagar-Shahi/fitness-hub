@@ -16,9 +16,28 @@ def _not_future(value):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['calorie_target', 'weekly_workout_target', 'target_weight_kg']
-        labels = {'calorie_target': 'Daily calories (kcal)', 'weekly_workout_target': 'Workouts per week',
-                  'target_weight_kg': 'Target weight (kg, optional)'}
+        fields = [
+            'age', 'sex_for_calculation', 'height_cm', 'starting_weight_kg',
+            'activity_level', 'training_type', 'nutrition_goal', 'calorie_target',
+            'weekly_workout_target', 'target_weight_kg',
+        ]
+        labels = {
+            'age': 'Age (years)',
+            'sex_for_calculation': 'Sex used for the energy estimate',
+            'height_cm': 'Height (cm)',
+            'starting_weight_kg': 'Current weight (kg)',
+            'activity_level': 'Usual activity level',
+            'training_type': 'Main training style',
+            'nutrition_goal': 'Main fitness goal',
+            'calorie_target': 'Fallback daily calorie target (kcal)',
+            'weekly_workout_target': 'Workouts per week',
+            'target_weight_kg': 'Target weight (kg, optional)',
+        }
+        help_texts = {
+            'starting_weight_kg': 'FitHub uses your latest Weight entry when one is available.',
+            'sex_for_calculation': 'Used only in the standard BMR equation; choose the average estimate if unsure.',
+            'calorie_target': 'Used until your profile has enough details for a personalized estimate.',
+        }
 
 
 class WorkoutForm(forms.ModelForm):

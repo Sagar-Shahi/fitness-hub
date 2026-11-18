@@ -18,6 +18,47 @@ class Profile(models.Model):
 
     owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='fit_profile')
     calorie_target = models.PositiveIntegerField(default=2200, validators=[MinValueValidator(800), MaxValueValidator(6000)])
+
+    age = models.PositiveSmallIntegerField(
+        null=True, blank=True, validators=[MinValueValidator(13), MaxValueValidator(100)]
+    )
+    height_cm = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(120), MaxValueValidator(230)],
+    )
+    starting_weight_kg = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(30), MaxValueValidator(300)],
+    )
+    sex_for_calculation = models.CharField(
+        max_length=20, blank=True,
+        choices=[
+            ('female', 'Female'), ('male', 'Male'),
+            ('other', 'Other / prefer not to say'),
+        ],
+    )
+    activity_level = models.CharField(
+        max_length=20, blank=True,
+        choices=[
+            ('sedentary', 'Mostly sitting / little exercise'),
+            ('light', 'Light activity (1–3 days/week)'),
+            ('moderate', 'Moderate activity (3–5 days/week)'),
+            ('very_active', 'Very active (6–7 days/week)'),
+        ],
+    )
+    nutrition_goal = models.CharField(
+        max_length=12, blank=True, default='maintain',
+        choices=[('fat_loss', 'Fat loss'), ('maintain', 'Weight maintenance'), ('muscle_gain', 'Muscle gain')],
+    )
+    training_type = models.CharField(
+        max_length=12, blank=True,
+        choices=[
+            ('strength', 'Strength / muscle building'),
+            ('cardio', 'Cardio / endurance'),
+            ('mixed', 'Mixed strength and cardio'),
+            ('general', 'General fitness'),
+        ],
+    )
     weekly_workout_target = models.PositiveSmallIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(14)])
     target_weight_kg = models.DecimalField(
         max_digits=4, decimal_places=1, null=True, blank=True,
