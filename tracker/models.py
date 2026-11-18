@@ -45,18 +45,16 @@ class Workout(models.Model):
 
     @property
     def volume_kg(self):
-        """Completed-set volume, falling back to legacy exercise summaries."""
-        total = Decimal('0')
-        for exercise in self.exercises.all():
-            entries = list(exercise.set_entries.all())
-            if entries:
-                total += sum(
-                    (entry.reps * entry.weight_kg for entry in entries if entry.is_completed),
-                    Decimal('0'),
-                )
-            else:
-                total += exercise.sets * exercise.reps * exercise.weight_kg
-        return total
+        """Total volume from completed individual sets only."""
+        return sum(
+            (
+                entry.reps * entry.weight_kg
+                for exercise in self.exercises.all()
+                for entry in exercise.set_entries.all()
+                if entry.is_completed
+            ),
+            Decimal('0'),
+        )
 
 
 class Exercise(models.Model):
