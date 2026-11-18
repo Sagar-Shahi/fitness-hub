@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
                 ('seller_name', models.CharField(max_length=100)),
                 ('seller_url', models.URLField(max_length=500, help_text='HTTPS product page on the seller website.')),
                 ('affiliate_url', models.URLField(blank=True, max_length=500, help_text='Optional tracked link supplied by an affiliate programme. Leave blank to use seller URL.')),
-                ('image_url', models.URLField(blank=True, max_length=500)),
                 ('price_label', models.CharField(blank=True, max_length=60, help_text='Optional display price, including currency; keep it updated.')),
                 ('is_active', models.BooleanField(default=False, help_text='Enable only after verifying the product, seller link and image rights.')),
                 ('featured', models.BooleanField(default=False)),
