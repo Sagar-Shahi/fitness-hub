@@ -37,7 +37,7 @@ class AffiliateProductAdmin(admin.ModelAdmin):
     search_fields = ('title', 'seller_name', 'description')
     prepopulated_fields = {'slug': ('title',)}
     fieldsets = (
-        ('Product', {'fields': ('title', 'slug', 'category', 'description', 'image_url', 'price_label')}),
+        ('Product', {'fields': ('title', 'slug', 'category', 'description', 'price_label')}),
         ('Seller links', {'fields': ('seller_name', 'seller_url', 'affiliate_url')}),
         ('Publishing', {'fields': ('is_active', 'featured')}),
     )
