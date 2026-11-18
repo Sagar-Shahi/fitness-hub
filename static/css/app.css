@@ -1590,3 +1590,30 @@ main.container { gap: 22px; }
 .tutorial-result small { color:#8a7a6a; font-size:.74rem; }
 [data-tutorial-search]:disabled { opacity:.65; cursor:wait; }
 @media(max-width:560px) { .tutorial-results { grid-template-columns:1fr; } }
+
+/* FitHub affiliate store */
+.store-head { align-items:flex-end; }
+.store-head h1 { color:#382b22; font-size:clamp(2rem,1.4rem + 2vw,2.8rem); letter-spacing:-.04em; }
+.store-head .eyebrow { color:#a76a32; }
+.store-disclosure { display:flex; gap:13px; align-items:flex-start; padding:15px 17px; border:1px solid #e1d6c8; border-radius:14px; background:#f8f3eb; color:#756656; }
+.store-disclosure>span { display:grid; place-items:center; width:30px; height:30px; flex:none; border-radius:9px; background:#eee2d2; color:#95653c; font-weight:900; }
+.store-disclosure p { margin:0; font-size:.86rem; line-height:1.55; }
+.store-disclosure strong { color:#4c3929; }
+.store-filters { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.store-filters input { flex:1 1 260px; width:auto; }
+.store-filters select { flex:0 1 220px; }
+.store-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(235px,1fr)); gap:16px; }
+.store-product { padding:0; overflow:hidden; display:flex; flex-direction:column; background:linear-gradient(160deg,#fffdf9,#f5efe6); border-color:#e0d5c7; }
+.store-product-image,.store-product-placeholder { display:grid; place-items:center; width:100%; aspect-ratio:4/3; object-fit:cover; background:#eee6da; color:#b69a7c; font-size:2rem; font-weight:900; }
+.store-product-body { display:flex; flex-direction:column; flex:1; padding:17px; color:#44362a; }
+.store-category { color:#9b6a3d; font-size:.68rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+.store-product h2 { margin:7px 0 8px; color:#403126; font-size:1.12rem; }
+.store-product p { font-size:.87rem; line-height:1.5; margin-bottom:15px; }
+.store-product-meta { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-top:auto; padding:12px 0; border-top:1px solid #e6dbcf; color:#817363; font-size:.8rem; }
+.store-product-meta strong { color:#493728; font-size:.94rem; }
+.store-product .btn { background:#c87932; color:#24180f; border:0; }
+.store-product .btn:hover { background:#d88943; color:#24180f; }
+.store-empty { background:linear-gradient(155deg,#fffdf9,#f7f1e8); border-color:#e1d6c8; }
+.store-empty h2 { color:#44362a; }
+.store-empty-mark { display:grid; place-items:center; width:46px; height:46px; margin:0 auto 14px; border-radius:14px; background:#eee2d2; color:#a76a32; font-size:1.4rem; }
+@media(max-width:600px) { .store-filters { display:grid; grid-template-columns:1fr; } .store-filters select { width:100%; } .store-grid { grid-template-columns:1fr; } }
