@@ -34,7 +34,6 @@
           <div class="menu">
             <a href="{% url 'tracker:goals' %}">My Fitness</a>
             <a href="{% url 'shop:orders' %}">Orders</a>
-            <a href="{% url 'tracker:export' %}">Export workouts (CSV)</a>
             <a href="{% url 'accounts:password-change' %}">Change password</a>
             <a href="{% url 'accounts:delete' %}">Delete account</a>
             <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
