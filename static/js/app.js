@@ -111,6 +111,59 @@
     });
   }
 
+  // Exercise tutorials: accept standard YouTube video links and play through YouTube's official embed.
+  // The video stays hosted by YouTube; FitHub never downloads or rehosts it.
+  document.querySelectorAll('[data-exercise-tutorial]').forEach(function (panel) {
+    var exerciseId = panel.getAttribute('data-exercise-tutorial');
+    var urlInput = panel.querySelector('[data-video-url]');
+    var playButton = panel.querySelector('[data-video-load]');
+    var frameWrap = panel.querySelector('[data-video-frame-wrap]');
+    var frame = panel.querySelector('[data-video-frame]');
+    var status = panel.querySelector('[data-video-status]');
+    var storageKey = 'fithub.exerciseVideo.' + exerciseId;
+
+    function videoIdFrom(value) {
+      try {
+        var url = new URL(value.trim());
+        var host = url.hostname.toLowerCase().replace(/^www\\./, '');
+        if (host === 'youtu.be') return url.pathname.split('/').filter(Boolean)[0] || '';
+        if (host !== 'youtube.com' && host !== 'm.youtube.com' && host !== 'youtube-nocookie.com') return '';
+        if (url.pathname === '/watch') return url.searchParams.get('v') || '';
+        var parts = url.pathname.split('/').filter(Boolean);
+        if (parts.length >= 2 && ['embed', 'shorts', 'live'].indexOf(parts[0]) !== -1) return parts[1];
+      } catch (error) { return ''; }
+      return '';
+    }
+
+    function playVideo(value, save) {
+      var id = videoIdFrom(value);
+      if (!/^[A-Za-z0-9_-]{11}$/.test(id)) {
+        status.textContent = 'Please paste a valid YouTube video link (not a channel or search-results link).';
+        frame.removeAttribute('src');
+        frameWrap.hidden = true;
+        return;
+      }
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?rel=0&modestbranding=1';
+      frameWrap.hidden = false;
+      status.textContent = 'Playing inside FitHub. If the creator has disabled embedding, use the YouTube link to watch there.';
+      if (save) {
+        try { window.localStorage.setItem(storageKey, value.trim()); } catch (error) { /* storage may be disabled */ }
+      }
+    }
+
+    playButton.addEventListener('click', function () { playVideo(urlInput.value, true); });
+    urlInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') { event.preventDefault(); playVideo(urlInput.value, true); }
+    });
+    try {
+      var savedVideo = window.localStorage.getItem(storageKey);
+      if (savedVideo) {
+        urlInput.value = savedVideo;
+        playVideo(savedVideo, false);
+      }
+    } catch (error) { /* storage may be disabled */ }
+  });
+
   // Focus player deliberately plays direct audio URLs only. It never scrapes provider pages.
   var input = document.getElementById('focus-audio-url');
   if (!input) return;
