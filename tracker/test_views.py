@@ -211,14 +211,15 @@ class ExerciseSetTests(Base):
 
     def test_add_edit_and_delete_sets(self):
         add_url = reverse('tracker:exercise-set-add', args=[self.workout.pk, self.exercise.pk])
-        response = self.client.post(add_url, {'reps': 6, 'weight_kg': '60.0', 'is_warmup': False})
+        response = self.client.post(add_url, {'add-set-' + str(self.exercise.pk) + '-reps': 6, 'add-set-' + str(self.exercise.pk) + '-weight_kg': '60.0', 'add-set-' + str(self.exercise.pk) + '-is_warmup': False})
         self.assertRedirects(response, reverse('tracker:workout-detail', args=[self.workout.pk]))
         third = self.exercise.set_entries.get(set_number=3)
         self.assertEqual((third.reps, third.weight_kg, third.is_completed), (6, Decimal('60.0'), False))
 
         edit_url = reverse('tracker:exercise-set-edit', args=[self.workout.pk, self.exercise.pk, third.pk])
         response = self.client.post(edit_url, {
-            'reps': 5, 'weight_kg': '65.0', 'is_warmup': False, 'is_completed': True,
+            f'set-{third.pk}-reps': 5, f'set-{third.pk}-weight_kg': '65.0',
+            f'set-{third.pk}-is_warmup': False, f'set-{third.pk}-is_completed': True,
         })
         self.assertRedirects(response, reverse('tracker:workout-detail', args=[self.workout.pk]))
         third.refresh_from_db()
