@@ -21,15 +21,20 @@
       </a>
       {% if user.is_authenticated %}
       <nav class="nav" aria-label="Main">
-        <a href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+        <a href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>Home</a>
         <a href="{% url 'tracker:workout-list' %}" {% if 'workout' in view %}aria-current="page"{% endif %}>Workouts</a>
         <a href="{% url 'tracker:progress' %}" {% if view == 'tracker:progress' %}aria-current="page"{% endif %}>Progress</a>
-        <a href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>Exercise Library</a>
-        <a href="{% url 'tracker:learn' %}" {% if view == 'tracker:learn' %}aria-current="page"{% endif %}>Learn</a>
-        <a href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>Meals</a>
-        <a href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>Weight</a>
-        <a href="{% url 'shop:store' %}" {% if view == 'shop:store' %}aria-current="page"{% endif %}>Gear Guide</a>
-        <a href="{% url 'shop:plans' %}" {% if view|slice:':5' == 'shop:' and view != 'shop:cart' and view != 'shop:store' and view != 'shop:product-outbound' %}aria-current="page"{% endif %}>Plans</a>
+        <a href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>Nutrition</a>
+        <details class="nav-more" {% if view == 'tracker:exercise-library' or view == 'tracker:learn' or view == 'tracker:weight' or view == 'shop:store' or view|slice:':5' == 'shop:' and view != 'shop:cart' and view != 'shop:product-outbound' %}open{% endif %}>
+          <summary>Explore <span aria-hidden="true">⌄</span></summary>
+          <div class="nav-more-menu">
+            <a href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>Exercise library</a>
+            <a href="{% url 'tracker:learn' %}" {% if view == 'tracker:learn' %}aria-current="page"{% endif %}>Learn</a>
+            <a href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>Weight tracking</a>
+            <a href="{% url 'shop:store' %}" {% if view == 'shop:store' %}aria-current="page"{% endif %}>Gear guide</a>
+            <a href="{% url 'shop:plans' %}" {% if view|slice:':5' == 'shop:' and view != 'shop:cart' and view != 'shop:store' and view != 'shop:product-outbound' %}aria-current="page"{% endif %}>Training plans</a>
+          </div>
+        </details>
       </nav>
       <div class="topbar-actions">
         <a class="btn btn-quiet btn-small" href="{% url 'shop:cart' %}">Cart{% if cart_count %} ({{ cart_count }}){% endif %}</a>
