@@ -69,7 +69,7 @@
   <details class="focus-dock" id="focus-dock" data-music-search-url="{% url 'tracker:focus-music-search' %}">
     <summary><span class="focus-indicator" aria-hidden="true"></span><span>Focus audio</span><span class="focus-hint">music · voice</span></summary>
     <section class="focus-panel" aria-label="Focus audio player">
-      <div class="focus-panel-head"><div><p class="eyebrow">TRAINING MODE</p><h2>Find your rhythm.</h2></div><span class="focus-symbol" aria-hidden="true">♫</span></div>
+      <div class="focus-panel-head"><div><p class="eyebrow">TRAINING MODE</p><h2>Find your rhythm.</h2></div><div class="focus-panel-tools"><span class="focus-symbol" aria-hidden="true">♫</span><button class="focus-panel-close" id="focus-dock-close" type="button" aria-label="Close Focus Audio" title="Close">×</button></div></div>
       <label class="focus-label" for="focus-audio-url">Find music or paste a link</label>
       <div class="focus-url-row"><input id="focus-audio-url" type="search" inputmode="search" placeholder="Song, artist, playlist or audio link" autocomplete="off"><button class="btn btn-primary btn-small" id="focus-load" type="button">YouTube</button></div>
       <div class="focus-actions focus-search-actions"><button class="btn btn-quiet btn-small" id="focus-spotify-search" type="button">Search Spotify</button><span class="focus-help">YouTube plays public videos here; Spotify opens on Spotify.</span></div>
