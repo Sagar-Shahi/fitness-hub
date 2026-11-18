@@ -201,6 +201,13 @@ class AffiliateStoreTests(Base):
         self.assertContains(response, 'FitHub is your guide, not the seller')
         self.assertContains(response, 'FitHub does not take payment')
 
+    def test_initial_gear_guide_products_are_published_without_stale_prices(self):
+        products = AffiliateProduct.objects.filter(is_active=True)
+        self.assertEqual(products.count(), 5)
+        self.assertTrue(products.filter(title='Pull Up Assist Band Set (4 Pieces)').exists())
+        self.assertTrue(products.filter(title='20 kg Adjustable Dumbbell Set with Barbell Connector').exists())
+        self.assertFalse(products.exclude(price_label='').exists())
+
     def test_store_search_and_category_filter(self):
         self.make_product()
         self.make_product(title='Yoga Mat', category='accessories')
