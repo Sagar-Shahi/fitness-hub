@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(blank=True, max_length=160, unique=True)),
                 ('category', models.CharField(choices=[('equipment', 'Gym equipment'), ('accessories', 'Accessories'), ('apparel', 'Fitness apparel'), ('recovery', 'Recovery'), ('nutrition', 'Nutrition'), ('other', 'Other')], default='equipment', max_length=20)),
                 ('description', models.TextField(max_length=1200)),
+                ('image_url', models.URLField(blank=True, default='', help_text='Optional product image URL. Use only images you have permission to display.', max_length=500)),
                 ('seller_name', models.CharField(max_length=100)),
                 ('seller_url', models.URLField(max_length=500, help_text='HTTPS product page on the seller website.')),
                 ('affiliate_url', models.URLField(blank=True, max_length=500, help_text='Optional tracked link supplied by an affiliate programme. Leave blank to use seller URL.')),
