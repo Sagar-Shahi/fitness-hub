@@ -163,6 +163,7 @@
     var results = panel.querySelector('[data-tutorial-results]');
     var frameWrap = panel.querySelector('[data-video-frame-wrap]');
     var frame = panel.querySelector('[data-video-frame]');
+    var closeButton = panel.querySelector('[data-video-close]');
     var status = panel.querySelector('[data-video-status]');
     var endpoint = panel.getAttribute('data-tutorial-url');
 
@@ -190,6 +191,11 @@
       if (!frameWrap.hidden && frame.getAttribute('src')) {
         status.textContent = 'Video player loaded. Press play to start.';
       }
+    });
+    closeButton.addEventListener('click', function () {
+      frame.removeAttribute('src');
+      frameWrap.hidden = true;
+      status.textContent = 'Video closed. Choose another demonstration whenever you are ready.';
     });
     function renderVideos(videos) {
       results.textContent = '';
