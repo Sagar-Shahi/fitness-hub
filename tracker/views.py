@@ -12,8 +12,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from . import analytics
-from .forms import ExerciseForm, MealForm, ProfileForm, WeightForm, WorkoutForm
-from .models import BodyMetric, Exercise, Meal, Workout, profile_for
+from .forms import ExerciseForm, ExerciseSetAddForm, ExerciseSetForm, MealForm, ProfileForm, WeightForm, WorkoutForm
+from .models import BodyMetric, Exercise, ExerciseSet, Meal, Workout, profile_for
 
 PAGE_SIZE = 15
 PERIODS = (7, 30, 90)
@@ -28,7 +28,7 @@ def _days(request, default=30):
 
 
 def _own_workout(request, pk):
-    return get_object_or_404(Workout.objects.filter(owner=request.user).prefetch_related('exercises'), pk=pk)
+    return get_object_or_404(Workout.objects.filter(owner=request.user).prefetch_related('exercises__set_entries'), pk=pk)
 
 
 def _csv_safe(value):
@@ -43,7 +43,7 @@ def dashboard(request):
     data = analytics.dashboard(request.user, profile)
     data['week_percent'] = analytics.percent(data['week_done'], data['week_target'])
     data['calorie_percent'] = analytics.percent(data['today']['calories'], data['calorie_target'])
-    recent = (Workout.objects.filter(owner=request.user).prefetch_related('exercises')[:5])
+    recent = (Workout.objects.filter(owner=request.user).prefetch_related('exercises__set_entries')[:5])
     return render(request, 'tracker/dashboard.html', {
         'days': days, 'periods': PERIODS, 'd': data,
         'workout_chart': analytics.bar_chart(analytics.workouts_per_day(request.user, days), 'workouts'),
@@ -89,7 +89,13 @@ def workout_create(request):
 def workout_detail(request, pk):
     workout = _own_workout(request, pk)
     form = ExerciseForm(workout=workout)
-    return render(request, 'tracker/workout_detail.html', {'workout': workout, 'form': form})
+    return render(request, 'tracker/workout_detail.html', {
+        'workout': workout,
+        'form': form,
+        'set_add_form': ExerciseSetAddForm(),
+        'set_forms': {entry.pk: ExerciseSetForm(instance=entry)
+                      for exercise in workout.exercises.all() for entry in exercise.set_entries.all()},
+    })
 
 
 @login_required
@@ -122,9 +128,23 @@ def exercise_add(request, pk):
         exercise = form.save(commit=False)
         exercise.workout = workout
         exercise.save()
-        messages.success(request, f'Added {exercise.name}.')
+        ExerciseSet.objects.bulk_create([
+            ExerciseSet(
+                exercise=exercise,
+                set_number=number,
+                reps=exercise.reps,
+                weight_kg=exercise.weight_kg,
+                is_completed=False,
+            )
+            for number in range(1, exercise.sets + 1)
+        ])
+        messages.success(request, f'Added {exercise.name}. Complete each set as you train.')
         return redirect('tracker:workout-detail', pk=workout.pk)
-    return render(request, 'tracker/workout_detail.html', {'workout': workout, 'form': form}, status=400)
+    return render(request, 'tracker/workout_detail.html', {
+        'workout': workout, 'form': form, 'set_add_form': ExerciseSetAddForm(),
+        'set_forms': {entry.pk: ExerciseSetForm(instance=entry)
+                      for exercise in workout.exercises.all() for entry in exercise.set_entries.all()},
+    }, status=400)
 
 
 @login_required
@@ -132,6 +152,67 @@ def exercise_add(request, pk):
 def exercise_delete(request, pk, exercise_pk):
     workout = _own_workout(request, pk)
     get_object_or_404(Exercise, pk=exercise_pk, workout=workout).delete()
+    return redirect('tracker:workout-detail', pk=workout.pk)
+
+
+@login_required
+@require_POST
+def exercise_set_add(request, pk, exercise_pk):
+    workout = _own_workout(request, pk)
+    exercise = get_object_or_404(Exercise, pk=exercise_pk, workout=workout)
+    form = ExerciseSetAddForm(request.POST)
+    if exercise.set_entries.count() >= 50:
+        messages.error(request, 'An exercise can have at most 50 sets.')
+        return redirect('tracker:workout-detail', pk=workout.pk)
+    if form.is_valid():
+        entry = form.save(commit=False)
+        entry.exercise = exercise
+        entry.set_number = (exercise.set_entries.order_by('-set_number').values_list('set_number', flat=True).first() or 0) + 1
+        if entry.set_number > 50:
+            messages.error(request, 'No more set numbers are available for this exercise.')
+        else:
+            entry.save()
+            messages.success(request, f'Set {entry.set_number} added.')
+    else:
+        messages.error(request, 'Please check the set details and try again.')
+    return redirect('tracker:workout-detail', pk=workout.pk)
+
+
+@login_required
+@require_POST
+def exercise_set_edit(request, pk, exercise_pk, set_pk):
+    workout = _own_workout(request, pk)
+    exercise = get_object_or_404(Exercise, pk=exercise_pk, workout=workout)
+    entry = get_object_or_404(ExerciseSet, pk=set_pk, exercise=exercise)
+    form = ExerciseSetForm(request.POST, instance=entry)
+    if form.is_valid():
+        form.save()
+        messages.success(request, f'Set {entry.set_number} updated.')
+        return redirect('tracker:workout-detail', pk=workout.pk)
+    set_forms = {item.pk: ExerciseSetForm(instance=item)
+                 for item in ExerciseSet.objects.filter(exercise__workout=workout).select_related('exercise')}
+    set_forms[entry.pk] = form
+    return render(request, 'tracker/workout_detail.html', {
+        'workout': workout,
+        'form': ExerciseForm(workout=workout),
+        'set_add_form': ExerciseSetAddForm(),
+        'set_forms': set_forms,
+    }, status=400)
+
+
+@login_required
+@require_POST
+def exercise_set_delete(request, pk, exercise_pk, set_pk):
+    workout = _own_workout(request, pk)
+    exercise = get_object_or_404(Exercise, pk=exercise_pk, workout=workout)
+    entry = get_object_or_404(ExerciseSet, pk=set_pk, exercise=exercise)
+    entry.delete()
+    # Keep visible set numbering contiguous after a removal.
+    for number, item in enumerate(exercise.set_entries.order_by('set_number', 'id'), start=1):
+        if item.set_number != number:
+            item.set_number = number
+            item.save(update_fields=['set_number'])
+    messages.success(request, 'Set removed.')
     return redirect('tracker:workout-detail', pk=workout.pk)
 
 
