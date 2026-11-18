@@ -2556,3 +2556,118 @@ input[type="datetime-local"], select, textarea {
 @media (prefers-reduced-motion: reduce) {
   .ambient-workout-video { display: none; }
 }
+
+
+/* True tinted-glass UI: translucent colour, edge reflections and layered depth */
+:root {
+  --surface: rgba(22, 25, 38, .42);
+  --surface-2: rgba(44, 49, 72, .48);
+  --line: rgba(225, 232, 255, .20);
+  --accent: #b9a5ff;
+  --accent-hover: #d0c3ff;
+  --accent-ink: #171326;
+  --accent-soft: rgba(161, 135, 255, .19);
+  --focus: #8deaff;
+  --shadow: 0 18px 50px rgba(0,0,0,.24);
+}
+body {
+  color: #f4f3fb;
+  background-color: #080a12;
+  background-image:
+    linear-gradient(180deg, rgba(7,9,17,.24), rgba(7,9,17,.56)),
+    radial-gradient(60rem 32rem at 12% -8%, rgba(135,105,255,.16), transparent 70%),
+    radial-gradient(48rem 30rem at 100% 0%, rgba(76,190,255,.12), transparent 70%);
+}
+.ambient-workout-video {
+  z-index: -1;
+  filter: blur(4px) brightness(.48) saturate(.92);
+  opacity: .9;
+}
+.topbar, .card, .stat, .hero-demo, .nav-more-menu, .menu,
+.focus-panel, .account-menu summary, .nutrition-recommendation,
+.nutrition-target-card, .meal-live-preview, .message,
+.segmented, .demo-url {
+  -webkit-backdrop-filter: blur(24px) saturate(155%);
+  backdrop-filter: blur(24px) saturate(155%);
+  border: 1px solid rgba(226,232,255,.19);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 16px 42px rgba(0,0,0,.20);
+}
+.topbar {
+  background: linear-gradient(115deg, rgba(25,29,48,.62), rgba(18,24,38,.48));
+  border-bottom-color: rgba(225,232,255,.16);
+}
+.card, .stat, .hero-demo, .nutrition-recommendation, .nutrition-target-card {
+  background:
+    linear-gradient(135deg, rgba(145,125,255,.105), transparent 48%),
+    linear-gradient(315deg, rgba(83,194,255,.075), transparent 50%),
+    rgba(22,25,38,.43);
+  border-color: rgba(225,232,255,.20);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16),
+              inset 0 -1px 0 rgba(255,255,255,.035),
+              0 18px 48px rgba(0,0,0,.24);
+}
+.card:hover, .stat:hover {
+  border-color: rgba(202,190,255,.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.19), 0 22px 55px rgba(0,0,0,.27);
+}
+.nav a, .nav-more summary, .account-menu summary {
+  transition: background .22s ease, border-color .22s ease, transform .22s ease;
+}
+.nav a[aria-current="page"] {
+  background: linear-gradient(135deg, rgba(162,137,255,.27), rgba(91,183,255,.13));
+  border: 1px solid rgba(202,190,255,.27);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+}
+.nav a:hover, .nav-more summary:hover {
+  background: rgba(153,139,255,.16);
+}
+.btn-primary, button.btn-primary, input[type="submit"].btn-primary {
+  color: #f8f6ff;
+  background: linear-gradient(135deg, rgba(157,132,255,.78), rgba(93,165,255,.66));
+  border: 1px solid rgba(224,217,255,.48);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 24px rgba(115,94,255,.22);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.btn-primary:hover, button.btn-primary:hover, input[type="submit"].btn-primary:hover {
+  color: #fff;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+.btn-quiet, .btn-danger-quiet {
+  background: linear-gradient(135deg, rgba(255,255,255,.105), rgba(126,145,210,.08));
+  color: #f0eff9;
+  border-color: rgba(225,232,255,.22);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+}
+input[type="text"], input[type="url"], input[type="email"], input[type="password"],
+input[type="search"], input[type="number"], input[type="date"], input[type="datetime-local"],
+input[type="time"], select, textarea {
+  color: #f4f3fb;
+  background: rgba(12,15,27,.48);
+  border-color: rgba(225,232,255,.20);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+input::placeholder, textarea::placeholder { color: rgba(224,225,241,.54); }
+select option { color: #f4f3fb; background: #171a29; }
+label, .card-title, .page-head, .meal-history-heading { color: #f4f3fb; }
+.muted, .page-head p, .lead, .features p { color: rgba(226,228,244,.72); }
+a { color: #c7b9ff; }
+a:hover { color: #e0d8ff; }
+.meal-live-preview, .nutrition-target-grid>div {
+  background: rgba(115,129,190,.12);
+  border-color: rgba(225,232,255,.17);
+}
+.message-success { background: rgba(75,205,157,.16); }
+.message-error { background: rgba(255,113,128,.16); }
+.message-warning { background: rgba(255,196,91,.15); }
+:focus-visible { outline-color: #a9eaff; }
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+  .card, .stat, .btn { transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease; }
+  .btn:hover { transform: translateY(-2px); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .ambient-workout-video { filter: brightness(.40); }
+  .card, .stat, .btn { transition: none !important; }
+}
