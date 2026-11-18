@@ -427,6 +427,29 @@ input[type="datetime-local"], input[type="number"], input[type="date"], select, 
 .focus-local-file::file-selector-button { margin-right: 10px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-2); color: var(--ink); font: inherit; cursor: pointer; }
 
 
+
+/* Data-first chart motion: animate presentation, never alter plotted values. */
+.chart-svg .chart-grid { opacity: .35; }
+.chart-svg .chart-label { opacity: .82; }
+.chart-svg .chart-bar { transform-box: fill-box; transform-origin: center bottom; }
+.chart-svg[data-animate-chart]:not(.is-visible) .chart-bar:not(.is-empty) { transform: scaleY(.04); opacity: .35; }
+.chart-svg[data-animate-chart].is-visible .chart-bar:not(.is-empty) {
+  animation: chart-bar-rise .72s cubic-bezier(.2,.75,.25,1) both;
+  animation-delay: calc(var(--bar-index, 0) * 38ms);
+}
+.chart-svg .chart-line { stroke-linecap: round; stroke-linejoin: round; transition: stroke-dashoffset 1.15s cubic-bezier(.22,.72,.2,1); }
+.chart-svg[data-animate-chart]:not(.is-visible) .chart-dot { opacity: 0; transform: scale(.5); transform-box: fill-box; transform-origin: center; }
+.chart-svg[data-animate-chart].is-visible .chart-dot { animation: chart-dot-pop .32s ease-out both; }
+.chart-svg[data-animate-chart].is-visible .chart-label { animation: chart-label-in .45s ease both; }
+@keyframes chart-bar-rise { from { transform:scaleY(.04); opacity:.45; } to { transform:scaleY(1); opacity:1; } }
+@keyframes chart-dot-pop { from { opacity:0; transform:scale(.5); } to { opacity:1; transform:scale(1); } }
+@keyframes chart-label-in { from { opacity:.35; } to { opacity:.82; } }
+@media (prefers-reduced-motion: reduce) {
+  .chart-svg[data-animate-chart]:not(.is-visible) .chart-bar:not(.is-empty) { transform:none; opacity:1; }
+  .chart-svg .chart-line { transition:none; stroke-dasharray:none !important; stroke-dashoffset:0 !important; }
+  .chart-svg[data-animate-chart]:not(.is-visible) .chart-dot { opacity:1; transform:none; }
+}
+
 /* FIT HUB / warm standard — balanced neutral surfaces and restrained fitness accents. */
 :root {
   color-scheme: light;
