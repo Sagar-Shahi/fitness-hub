@@ -211,6 +211,70 @@ def exercise_tutorials(request, exercise_pk):
     return JsonResponse({'videos': videos})
 
 
+
+@login_required
+@require_GET
+def focus_music_search(request):
+    """Search public, embeddable YouTube videos for the signed-in user's Focus Audio player."""
+    query = (request.GET.get('q') or '').strip()
+    if len(query) < 2 or len(query) > 100:
+        return JsonResponse({'error': 'Enter a song or artist name between 2 and 100 characters.'}, status=400)
+    api_key = os.environ.get('YOUTUBE_API_KEY', '').strip()
+    if not api_key:
+        return JsonResponse({'error': 'In-app YouTube search is not configured yet. You can still paste a YouTube video link.'}, status=503)
+
+    cache_key = 'fithub:youtube:music:' + hashlib.sha256(query.casefold().encode('utf-8')).hexdigest()
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return JsonResponse({'videos': cached})
+
+    rate_key = f'fithub:youtube:music:rate:{request.user.pk}'
+    count = cache.get(rate_key, 0)
+    if count >= 8:
+        return JsonResponse({'error': 'Please wait a minute before searching again.'}, status=429)
+    cache.set(rate_key, count + 1, 60)
+
+    params = urlencode({
+        'part': 'snippet',
+        'type': 'video',
+        'maxResults': 8,
+        'safeSearch': 'strict',
+        'videoEmbeddable': 'true',
+        'q': query,
+        'key': api_key,
+    })
+    req = Request(
+        'https://www.googleapis.com/youtube/v3/search?' + params,
+        headers={'Accept': 'application/json', 'User-Agent': 'FitHub/1.0'},
+    )
+    try:
+        with urlopen(req, timeout=8) as response:  # nosec
+            payload = json.loads(response.read().decode('utf-8'))
+    except HTTPError as exc:
+        if exc.code == 403:
+            return JsonResponse({'error': 'YouTube search quota or access is unavailable. Please try again later.'}, status=503)
+        return JsonResponse({'error': 'Could not search YouTube right now.'}, status=502)
+    except (URLError, TimeoutError, ValueError):
+        return JsonResponse({'error': 'Could not connect to YouTube. Please try again.'}, status=502)
+
+    videos = []
+    for item in payload.get('items', []):
+        video_id = item.get('id', {}).get('videoId', '')
+        snippet = item.get('snippet', {})
+        if not video_id or len(video_id) != 11:
+            continue
+        thumbnails = snippet.get('thumbnails', {})
+        thumbnail = (thumbnails.get('medium') or thumbnails.get('default') or {}).get('url', '')
+        videos.append({
+            'id': video_id,
+            'title': snippet.get('title', 'YouTube video'),
+            'channel': snippet.get('channelTitle', ''),
+            'thumbnail': thumbnail,
+        })
+    cache.set(cache_key, videos, 60 * 60 * 12)
+    return JsonResponse({'videos': videos})
+
+
 @login_required
 def workout_detail(request, pk):
     workout = _attach_set_forms(_own_workout(request, pk))
