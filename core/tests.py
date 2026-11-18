@@ -27,7 +27,7 @@ class ClientIpTests(TestCase):
     @override_settings(TRUSTED_PROXY_COUNT=1)
     def test_with_one_proxy_the_last_forwarded_address_is_used(self):
         request = self._request(REMOTE_ADDR='10.0.0.1', HTTP_X_FORWARDED_FOR='6.6.6.6, 198.51.100.7')
-        self.assertEqual(throttle.client_ip(request), '198.51.100.7')  # a visitor-supplied 6.6.6.6 is ignored
+        self.assertEqual(throttle.client_ip(request), '198.51.100.7')
 
     @override_settings(TRUSTED_PROXY_COUNT=2)
     def test_with_two_proxies_the_second_from_the_right_is_used(self):
@@ -73,10 +73,18 @@ class SecurityHeaderTests(TestCase):
         csp = response['Content-Security-Policy']
         self.assertIn("script-src 'self'", csp)
         self.assertIn("style-src 'self';", csp)
+        self.assertIn("media-src 'self' https: blob: data:", csp)
         self.assertNotIn('unsafe-inline', csp)
         self.assertNotIn('unsafe-eval', csp)
         self.assertIn("frame-ancestors 'none'", csp)
         self.assertIn("object-src 'none'", csp)
+
+    def test_focus_player_is_only_rendered_for_signed_in_users(self):
+        self.assertNotContains(self.client.get('/'), 'Focus audio')
+        user = get_user_model().objects.create_user(username='focus-user', password='Safe-password-123')
+        self.client.force_login(user)
+        self.assertContains(self.client.get(reverse('tracker:dashboard')), 'Focus audio')
+        self.assertContains(self.client.get(reverse('tracker:dashboard')), 'focus-audio-url')
 
     def test_other_security_headers(self):
         response = self.client.get('/')
@@ -164,8 +172,6 @@ class AdminLoginThrottleTests(TestCase):
 
 
 class ProductionSettingsTests(TestCase):
-    """Starts a fresh Python process, because settings are read once when it starts."""
-
     GOOD_KEY = 'k8#vQ2mZp!xR7tLw9sYb4nHc6Ed1JfGuA3oXiKq5VzMrTyWBPe0'
 
     def _manage(self, *args, **env):
@@ -201,8 +207,6 @@ class ProductionSettingsTests(TestCase):
 
 
 class RepositoryHygieneTests(TestCase):
-    """Cheap checks that run on every push, so a secret or a local file is never committed by accident."""
-
     SECRET_PATTERNS = {
         'Stripe key': r'sk_(?:live|test)_[A-Za-z0-9]{16,}',
         'AWS access key': r'AKIA[0-9A-Z]{16}',
@@ -245,3 +249,4 @@ class RepositoryHygieneTests(TestCase):
         text = (Path(settings.BASE_DIR) / '.env.example').read_text()
         active = [line for line in text.splitlines() if line.strip() and not line.lstrip().startswith('#')]
         self.assertEqual(active, ['DJANGO_DEBUG=True'])
+}
