@@ -36,7 +36,7 @@
 </section>
 
 <div class="two-col">
-  <form class="card form-card meal-entry-card" method="post" novalidate id="meal-entry-form">
+  <form class="card form-card meal-entry-card" method="post" novalidate id="meal-entry-form" data-current-calories="{{ totals.calories }}" data-current-protein="{{ totals.protein }}" data-current-carbs="{{ totals.carbs }}" data-current-fat="{{ totals.fat }}" data-calorie-target="{{ target }}">
     <h2 class="card-title">Log a meal</h2>
     <p class="muted meal-form-intro">Enter the nutrition from your food label or estimate. Your totals update as you type.</p>
     <div class="meal-kind-shortcuts" aria-label="Choose meal type"><button type="button" data-meal-kind="breakfast">☀ Breakfast</button><button type="button" data-meal-kind="lunch">◷ Lunch</button><button type="button" data-meal-kind="dinner">☾ Dinner</button><button type="button" data-meal-kind="snack">＋ Snack</button></div>
