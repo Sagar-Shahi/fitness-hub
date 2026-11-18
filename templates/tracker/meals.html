@@ -68,7 +68,7 @@
       <div><strong>{{ nutrition_plan.carbs_g }} g</strong><span>Carbs target</span></div>
       <div><strong>{{ nutrition_plan.fat_g }} g</strong><span>Fat target</span></div>
     </div>
-    <p class="nutrition-plan-note">Remaining today: {{ nutrition_plan.protein_g|add:"-"|add:totals.protein }} g protein · {{ nutrition_plan.carbs_g|add:"-"|add:totals.carbs }} g carbs · {{ nutrition_plan.fat_g|add:"-"|add:totals.fat }} g fat. Use your <a href="{% url 'tracker:goals' %}">fitness profile</a> to update these estimates.</p>
+    <p class="nutrition-plan-note">Remaining today: {{ macro_remaining.protein }} g protein · {{ macro_remaining.carbs }} g carbs · {{ macro_remaining.fat }} g fat. Use your <a href="{% url 'tracker:goals' %}">fitness profile</a> to update these estimates.</p>
   </section>
   {% else %}
   <section class="nutrition-target-card nutrition-target-incomplete"><strong>Want personalized targets?</strong><p>Complete your body and training details to get estimated calorie and macro goals.</p><a class="btn btn-quiet btn-small" href="{% url 'tracker:goals' %}">Set up nutrition profile</a></section>
