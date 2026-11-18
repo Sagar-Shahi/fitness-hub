@@ -1,6 +1,7 @@
 import re
 import csv
 import io
+from unittest.mock import patch
 from datetime import timedelta
 from decimal import Decimal
 
@@ -20,6 +21,7 @@ class LoginRequiredTests(TestCase):
         exercise = workout.exercises.first()
         urls = [
             reverse('tracker:dashboard'), reverse('tracker:goals'), reverse('tracker:workout-list'), reverse('tracker:workout-create'),
+            reverse('tracker:exercise-library'),
             reverse('tracker:export'), reverse('tracker:weight'), reverse('tracker:meals'),
             reverse('tracker:workout-detail', args=[workout.pk]), reverse('tracker:workout-edit', args=[workout.pk]),
             reverse('tracker:workout-delete', args=[workout.pk]), reverse('tracker:exercise-add', args=[workout.pk]),
@@ -388,3 +390,50 @@ class ExportTests(Base):
         self.assertEqual(formula['is_completed'], 'True')
         self.assertTrue(formula['workout'].startswith("'"))
         self.assertTrue(formula['exercise'].startswith("'"))
+
+
+class ExerciseLibraryTests(Base):
+    EXERCISES = [
+        {
+            "name": "Dumbbell Curl", "level": "beginner", "category": "strength",
+            "equipment": "dumbbell", "primaryMuscles": ["biceps"],
+            "secondaryMuscles": ["forearms"], "instructions": ["Curl the weight."],
+            "mechanic": "isolation",
+        },
+        {
+            "name": "Barbell Squat", "level": "intermediate", "category": "strength",
+            "equipment": "barbell", "primaryMuscles": ["quadriceps"],
+            "secondaryMuscles": ["glutes"], "instructions": ["Squat with control."],
+            "mechanic": "compound",
+        },
+        {
+            "name": "Hamstring Stretch", "level": "beginner", "category": "stretching",
+            "equipment": "body only", "primaryMuscles": ["hamstrings"],
+            "secondaryMuscles": ["calves"], "instructions": ["Stretch gently."],
+            "mechanic": None,
+        },
+    ]
+
+    @patch("tracker.library._catalog", return_value=(EXERCISES, None))
+    def test_search_includes_secondary_muscles(self, catalog):
+        response = self.client.get(reverse("tracker:exercise-library"), {"q": "forearms"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([item["name"] for item in response.context["exercises"]], ["Dumbbell Curl"])
+
+    @patch("tracker.library._catalog", return_value=(EXERCISES, None))
+    def test_filters_by_level_and_movement_type(self, catalog):
+        response = self.client.get(reverse("tracker:exercise-library"), {
+            "level": "beginner", "category": "stretching",
+        })
+        self.assertEqual([item["name"] for item in response.context["exercises"]], ["Hamstring Stretch"])
+        self.assertEqual(response.context["level"], "beginner")
+        self.assertEqual(response.context["category"], "stretching")
+
+    @patch("tracker.library._catalog", return_value=(EXERCISES, None))
+    def test_only_my_workouts_can_be_selected_for_quick_add(self, catalog):
+        mine = make_workout(self.user, name="My workout", exercises=())
+        other = make_user("other")
+        theirs = make_workout(other, name="Private workout", exercises=())
+        response = self.client.get(reverse("tracker:exercise-library"), {"workout": theirs.pk})
+        self.assertIsNone(response.context["selected_workout"])
+        self.assertEqual(list(response.context["workouts"]), [mine])
