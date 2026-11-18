@@ -1694,3 +1694,19 @@ main.container { gap: 22px; }
   }
   .exercise-video-close { top:8px; right:8px; }
 }
+
+
+/* Shared video playback inside Focus Audio: square YouTube-style viewing area. */
+.focus-dock.has-video { width:min(560px,calc(100vw - 28px)); }
+.focus-dock.has-video .focus-panel { max-height:calc(100vh - 92px); overflow-y:auto; }
+.focus-video-stage { margin:14px 0 4px; padding:12px; border:1px solid #514538; border-radius:14px; background:linear-gradient(145deg,#211d19,#30271f); }
+.focus-video-stage[hidden] { display:none; }
+.focus-video-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; color:#f5eee4; }
+.focus-video-heading strong { min-width:0; overflow-wrap:anywhere; font-size:.88rem; }
+.focus-video-square { position:relative; width:100%; aspect-ratio:1/1; overflow:hidden; border-radius:11px; background:#080808; box-shadow:0 10px 28px rgba(0,0,0,.28); }
+.focus-video-square iframe { position:absolute; left:50%; top:0; display:block; width:177.7778%; max-width:none; height:100%; transform:translateX(-50%); border:0; background:#080808; }
+.focus-video-stage .focus-help { color:#d0c3b3; margin:9px 0 0; }
+@media(max-width:620px) {
+  .focus-dock.has-video { right:12px; width:calc(100vw - 24px); }
+  .focus-video-stage { padding:9px; }
+}
