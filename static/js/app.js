@@ -35,14 +35,26 @@
     if (message && !window.confirm(message)) event.preventDefault();
   });
 
-  // Close Explore after choosing a destination, and keep Escape consistent with the account menu.
+  // Keep the Explore menu predictable: close it after a choice, when another
+  // navigation control is used, on outside click, or when Escape is pressed.
+  function closeExploreMenu() {
+    document.querySelectorAll('details.nav-more[open]').forEach(function (menu) {
+      menu.removeAttribute('open');
+    });
+  }
 
   document.addEventListener('click', function (event) {
+    var exploreMenu = event.target.closest('details.nav-more');
     var exploreLink = event.target.closest('.nav-more-menu a');
     if (exploreLink) {
-      var exploreMenu = exploreLink.closest('details.nav-more');
-      if (exploreMenu) exploreMenu.removeAttribute('open');
+      closeExploreMenu();
+      return;
     }
+    if (!exploreMenu && event.target.closest('.nav, .topbar-actions, .account-menu, .brand')) {
+      closeExploreMenu();
+      return;
+    }
+    if (!exploreMenu) closeExploreMenu();
   });
 
   document.addEventListener('click', function (event) {
@@ -52,6 +64,7 @@
   });
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
+      closeExploreMenu();
       document.querySelectorAll('details.account-menu[open]').forEach(function (menu) { menu.removeAttribute('open'); });
       var dock = document.getElementById('focus-dock');
       if (dock) dock.removeAttribute('open');
