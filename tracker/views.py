@@ -166,7 +166,6 @@ def exercise_delete(request, pk, exercise_pk):
 @require_POST
 def exercise_set_add(request, pk, exercise_pk):
     workout = _own_workout(request, pk)
-    exercise = get_object_or_404(Exercise, pk=exercise_pk, workout=workout)
     form = ExerciseSetAddForm(request.POST, prefix=f'add-set-{exercise_pk}')
     with transaction.atomic():
         exercise = get_object_or_404(Exercise.objects.select_for_update(), pk=exercise_pk, workout=workout)
@@ -202,7 +201,6 @@ def exercise_set_edit(request, pk, exercise_pk, set_pk):
     return render(request, 'tracker/workout_detail.html', {
         'workout': workout,
         'form': ExerciseForm(workout=workout),
-        'set_add_form': ExerciseSetAddForm(),
     }, status=400)
 
 
@@ -289,10 +287,22 @@ def export_csv(request):
     response = HttpResponse(content_type='text/csv; charset=utf-8')
     response['Content-Disposition'] = 'attachment; filename="fithub-workouts.csv"'
     writer = csv.writer(response)
-    writer.writerow(['date', 'workout', 'minutes', 'exercise', 'sets', 'reps', 'weight_kg'])
-    for w in Workout.objects.filter(owner=request.user).prefetch_related('exercises').order_by('date', 'id'):
-        rows = list(w.exercises.all()) or [None]
-        for e in rows:
-            writer.writerow([w.date, _csv_safe(w.name), w.duration_min,
-                             _csv_safe(e.name) if e else '', e.sets if e else '', e.reps if e else '', e.weight_kg if e else ''])
+    writer.writerow(['date', 'workout', 'minutes', 'exercise', 'set_number', 'reps', 'weight_kg', 'is_completed', 'is_warmup'])
+    workouts = Workout.objects.filter(owner=request.user).prefetch_related('exercises__set_entries').order_by('date', 'id')
+    for workout in workouts:
+        exercises = list(workout.exercises.all())
+        if not exercises:
+            writer.writerow([workout.date, _csv_safe(workout.name), workout.duration_min, '', '', '', '', '', ''])
+            continue
+        for exercise in exercises:
+            sets = list(exercise.set_entries.all())
+            if not sets:
+                writer.writerow([workout.date, _csv_safe(workout.name), workout.duration_min,
+                                 _csv_safe(exercise.name), '', '', '', '', ''])
+                continue
+            for entry in sets:
+                writer.writerow([
+                    workout.date, _csv_safe(workout.name), workout.duration_min, _csv_safe(exercise.name),
+                    entry.set_number, entry.reps, entry.weight_kg, entry.is_completed, entry.is_warmup,
+                ])
     return response
