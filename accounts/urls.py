@@ -10,6 +10,7 @@ urlpatterns = [
     path('login/', views.ThrottledLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),  # POST only
     path('password/', views.PasswordChange.as_view(), name='password-change'),
+    path('delete/', views.delete_account, name='delete'),
     path('api-keys/', views.api_keys, name='api-keys'),
     path('api-keys/new/', views.api_key_create, name='api-key-create'),
     path('api-keys/<int:pk>/revoke/', views.api_key_revoke, name='api-key-revoke'),

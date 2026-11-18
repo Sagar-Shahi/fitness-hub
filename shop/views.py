@@ -52,7 +52,8 @@ def my_plans(request):
 
 
 def _cart(user):
-    items = list(CartItem.objects.filter(owner=user, plan__is_active=True).select_related('plan'))
+    owned = _owned_plan_ids(user)  # a plan you already own is never charged twice, so it is not counted
+    items = [i for i in CartItem.objects.filter(owner=user, plan__is_active=True).select_related('plan') if i.plan_id not in owned]
     total = sum((i.plan.price for i in items), Decimal('0')).quantize(MONEY)
     return items, total
 

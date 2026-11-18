@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.http import HttpResponse
@@ -113,3 +113,21 @@ def api_key_revoke(request, pk):
         key.revoke()
         messages.success(request, f'The key "{key.name}" was revoked. It no longer works.')
     return redirect('accounts:api-keys')
+
+
+@login_required
+def delete_account(request):
+    """Let a person erase their account and everything in it. The password is asked for again first."""
+    if request.method == 'POST':
+        key = throttle.make_key('delete-account', request.user.pk)
+        if throttle.exceeded(key, 5, 3600):
+            return HttpResponse('Too many attempts. Please try again later.', status=429, content_type='text/plain')
+        if not request.user.check_password(request.POST.get('password', '')):
+            messages.error(request, 'That password is not correct, so nothing was deleted.')
+            return render(request, 'accounts/delete_account.html', status=400)
+        user = request.user
+        logout(request)
+        user.delete()  # workouts, meals, weights, orders, cart and API keys are removed with it
+        messages.success(request, 'Your account and all of its data were deleted.')
+        return redirect('home')
+    return render(request, 'accounts/delete_account.html')

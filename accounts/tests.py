@@ -239,3 +239,33 @@ class ApiKeyPageTests(TestCase):
     def test_nobody_sees_another_users_keys(self):
         ApiKey.issue(make_user('other'), 'THEIRS-KEY')
         self.assertNotContains(self.client.get(reverse('accounts:api-keys')), 'THEIRS-KEY')
+
+
+class DeleteAccountTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.user = make_user('gone')
+        self.other = make_user('stays')
+        self.client.force_login(self.user)
+
+    def test_wrong_password_deletes_nothing(self):
+        response = self.client.post(reverse('accounts:delete'), {'password': 'wrong'})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+    def test_correct_password_deletes_the_account_and_its_data_only(self):
+        from tracker.testutils import make_workout
+        make_workout(self.user)
+        make_workout(self.other)
+        response = self.client.post(reverse('accounts:delete'), {'password': PASSWORD})
+        self.assertRedirects(response, reverse('home'), fetch_redirect_response=False)
+        self.assertFalse(User.objects.filter(pk=self.user.pk).exists())
+        self.assertEqual(self.other.workouts.count(), 1)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    def test_it_needs_a_login_and_ignores_get_side_effects(self):
+        self.client.logout()
+        self.assertEqual(self.client.get(reverse('accounts:delete')).status_code, 302)
+        self.client.force_login(self.user)
+        self.assertEqual(self.client.get(reverse('accounts:delete')).status_code, 200)
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())

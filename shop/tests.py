@@ -166,3 +166,14 @@ class OrderPrivacyTests(Base):
         self.assertEqual(self.client.get(reverse('shop:order-detail', args=[order.reference])).status_code, 404)
         self.assertNotContains(self.client.get(reverse('shop:orders')), order.reference)
         self.assertEqual(self.client.get(reverse('shop:order-detail', args=['FH-NOPE'])).status_code, 404)
+
+
+class CartTotalTests(Base):
+    def test_cart_does_not_count_or_charge_a_plan_you_already_own(self):
+        order = Order.objects.create(owner=self.user, total=Decimal('9.00'))
+        OrderItem.objects.create(order=order, plan=self.a, title=self.a.title, price=self.a.price)
+        CartItem.objects.create(owner=self.user, plan=self.a)  # e.g. added in another tab before buying
+        CartItem.objects.create(owner=self.user, plan=self.b)
+        response = self.client.get(reverse('shop:cart'))
+        self.assertEqual(response.context['total'], Decimal('14.50'))
+        self.assertEqual([i.plan for i in response.context['items']], [self.b])
