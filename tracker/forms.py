@@ -39,6 +39,9 @@ class ProfileForm(forms.ModelForm):
             'calorie_target': 'Used until your profile has enough details for a personalized estimate.',
         }
 
+    def clean_nutrition_goal(self):
+        return self.cleaned_data.get('nutrition_goal') or 'maintain'
+
 
 class WorkoutForm(forms.ModelForm):
     class Meta:

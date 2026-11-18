@@ -553,4 +553,44 @@
     var saved = window.localStorage.getItem(storageKey);
     if (saved) loadUrl(saved, false);
   } catch (error) { /* storage may be disabled */ }
+
+  // Meal entry preview and meal-type shortcuts (kept external for the strict CSP).
+(function () {
+  var form = document.getElementById('meal-entry-form');
+  if (!form) return;
+  var fields = {
+    calories: form.querySelector('[name="calories"]'),
+    protein: form.querySelector('[name="protein_g"]'),
+    carbs: form.querySelector('[name="carbs_g"]'),
+    fat: form.querySelector('[name="fat_g"]')
+  };
+  var current = {
+    calories: {{ totals.calories|default:0 }},
+    protein: {{ totals.protein|default:0 }},
+    carbs: {{ totals.carbs|default:0 }},
+    fat: {{ totals.fat|default:0 }}
+  };
+  function value(field) { return Math.max(0, Number(field && field.value) || 0); }
+  function update() {
+    Object.keys(fields).forEach(function (key) {
+      var amount = value(fields[key]);
+      var node = document.getElementById('meal-preview-' + key);
+      if (node) node.textContent = amount;
+    });
+    var after = current.calories + value(fields.calories);
+    var note = document.getElementById('meal-after-add');
+    if (note) note.textContent = 'After adding: ' + after + ' / {{ target }} kcal today (' + Math.round(after / Math.max(1, {{ target }}) * 100) + '%).';
+  }
+  Object.keys(fields).forEach(function (key) {
+    if (fields[key]) fields[key].addEventListener('input', update);
+  });
+  form.querySelectorAll('[data-meal-kind]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var select = form.querySelector('[name="kind"]');
+      if (select) { select.value = button.getAttribute('data-meal-kind'); select.dispatchEvent(new Event('change', {bubbles:true})); }
+      form.querySelectorAll('[data-meal-kind]').forEach(function (item) { item.setAttribute('aria-pressed', item === button ? 'true' : 'false'); });
+    });
+  });
+  update();
+})();
 })();

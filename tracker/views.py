@@ -123,7 +123,7 @@ def goals(request):
             profile.calorie_target = nutrition_plan['calories']
             profile.save(update_fields=['calorie_target'])
         messages.success(request, 'Your fitness profile and nutrition targets have been saved.')
-        return redirect('tracker:goals')
+        return redirect('tracker:dashboard')
     items = (OrderItem.objects.filter(order__owner=request.user).select_related('plan', 'order')
              .order_by('-order__created_at'))
     seen, my_plans = set(), []
