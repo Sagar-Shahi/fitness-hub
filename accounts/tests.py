@@ -160,6 +160,49 @@ class PasswordChangeTests(TestCase):
         self.assertTrue(self.user.check_password(PASSWORD))
 
 
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+                   DEFAULT_FROM_EMAIL='FitHub <noreply@example.com>')
+class PasswordResetTests(TestCase):
+    def setUp(self):
+        self.user = make_user('resetperson')
+        self.url = reverse('accounts:password-reset')
+
+    def test_request_page_is_available(self):
+        self.assertEqual(self.client.get(self.url).status_code, 200)
+
+    def test_existing_account_receives_a_reset_link(self):
+        from django.core import mail
+        response = self.client.post(self.url, {'email': self.user.email})
+        self.assertRedirects(response, reverse('accounts:password-reset-done'))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('/accounts/password-reset/', mail.outbox[0].body)
+        self.assertIn('resetperson@example.com', mail.outbox[0].to)
+
+    def test_unknown_email_gets_the_same_confirmation_without_an_email(self):
+        from django.core import mail
+        response = self.client.post(self.url, {'email': 'unknown@example.com'})
+        self.assertRedirects(response, reverse('accounts:password-reset-done'))
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_valid_token_changes_password_and_invalidates_old_credentials(self):
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        token = default_token_generator.make_token(self.user)
+        confirm_url = reverse('accounts:password-reset-confirm', kwargs={'uidb64': uid, 'token': token})
+        self.assertEqual(self.client.get(confirm_url).status_code, 200)
+        new_password = 'A-New-Strong-Passphrase-2026'
+        response = self.client.post(confirm_url, {
+            'new_password1': new_password,
+            'new_password2': new_password,
+        })
+        self.assertRedirects(response, reverse('accounts:password-reset-complete'))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password(new_password))
+        self.assertFalse(self.user.check_password(PASSWORD))
+
 class ApiKeyModelTests(TestCase):
     def test_issue_returns_the_raw_key_once_and_stores_only_a_hash(self):
         user = make_user()
