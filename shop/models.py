@@ -89,6 +89,7 @@ class AffiliateProduct(models.Model):
     slug = models.SlugField(max_length=160, unique=True, blank=True)
     category = models.CharField(max_length=20, choices=CATEGORIES, default='equipment')
     description = models.TextField(max_length=1200)
+    image_url = models.URLField(max_length=500, blank=True, default='', help_text='Optional product image URL. Use only images you have permission to display.')
     seller_name = models.CharField(max_length=100)
     seller_url = models.URLField(max_length=500, help_text='HTTPS product page on the seller website.')
     affiliate_url = models.URLField(max_length=500, blank=True, help_text='Optional tracked link supplied by an affiliate programme. Leave blank to use seller URL.')
