@@ -27,7 +27,7 @@
 <div class="store-grid">
   {% for product in products %}
   <article class="card store-product">
-    {% if product.image_url %}<img class="store-product-image" src="{{ product.image_url }}" alt="{{ product.title }}" loading="lazy" referrerpolicy="no-referrer">{% else %}<div class="store-product-placeholder" aria-hidden="true">FH</div>{% endif %}
+    <div class="store-product-placeholder" aria-hidden="true">FH</div>
     <div class="store-product-body">
       <span class="store-category">{{ product.get_category_display }}</span>
       <h2>{{ product.title }}</h2>
