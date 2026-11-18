@@ -157,66 +157,89 @@
     paintRest();
   }
 
-  // Discover and play public YouTube exercise tutorials through FitHub's server-side API proxy.
+  // Shared YouTube player lives in the existing Focus Audio panel.
+  function showFocusVideo(id, title) {
+    id = String(id || '');
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return false;
+    var dock = document.getElementById('focus-dock');
+    var stage = document.getElementById('focus-video-stage');
+    var frame = document.getElementById('focus-video-frame');
+    var heading = document.getElementById('focus-video-title');
+    var videoStatus = document.getElementById('focus-video-status');
+    var audio = document.getElementById('focus-audio');
+    if (!dock || !stage || !frame) return false;
+    if (audio) audio.pause();
+    dock.classList.add('has-video');
+    dock.open = true;
+    stage.hidden = false;
+    if (heading) heading.textContent = title || 'Now playing';
+    if (videoStatus) videoStatus.textContent = 'Starting video… Use the YouTube controls to pause or turn sound on.';
+    frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0&autoplay=1&mute=1&controls=1&playsinline=1';
+    window.setTimeout(function () {
+      stage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 80);
+    return true;
+  }
+
+  function closeFocusVideo() {
+    var dock = document.getElementById('focus-dock');
+    var stage = document.getElementById('focus-video-stage');
+    var frame = document.getElementById('focus-video-frame');
+    if (frame) frame.removeAttribute('src');
+    if (stage) stage.hidden = true;
+    if (dock) dock.classList.remove('has-video');
+  }
+
+  var focusVideoClose = document.getElementById('focus-video-close');
+  var focusVideoFrame = document.getElementById('focus-video-frame');
+  var focusVideoStatus = document.getElementById('focus-video-status');
+  if (focusVideoClose) focusVideoClose.addEventListener('click', closeFocusVideo);
+  if (focusVideoFrame) focusVideoFrame.addEventListener('load', function () {
+    var stage = document.getElementById('focus-video-stage');
+    if (stage && !stage.hidden && focusVideoFrame.getAttribute('src') && focusVideoStatus) {
+      focusVideoStatus.textContent = 'Player ready. Use the YouTube controls to pause or turn sound on.';
+    }
+  });
+
+  // Exercise tutorials reuse Focus Audio instead of creating a second player.
   document.querySelectorAll('[data-exercise-tutorial]').forEach(function (panel) {
     var searchButton = panel.querySelector('[data-tutorial-search]');
     var results = panel.querySelector('[data-tutorial-results]');
-    var frameWrap = panel.querySelector('[data-video-frame-wrap]');
-    var frame = panel.querySelector('[data-video-frame]');
-    var closeButton = panel.querySelector('[data-video-close]');
     var status = panel.querySelector('[data-video-status]');
     var endpoint = panel.getAttribute('data-tutorial-url');
 
-    function playVideo(id) {
-      id = String(id || '');
-      if (!/^[A-Za-z0-9_-]{11}$/.test(id)) {
-        status.textContent = 'This video link is invalid. Please choose another result.';
+    function playVideo(id, title) {
+      if (!showFocusVideo(id, title)) {
+        status.textContent = 'The video could not be opened. Please try another tutorial.';
         return;
       }
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0&autoplay=1&mute=1&controls=1&playsinline=1';
-      frameWrap.hidden = false;
-      status.textContent = 'Starting video inside FitHub… It starts muted; use the player controls to turn sound on or pause.';
+      status.textContent = 'Playing in the Focus Audio player below.';
     }
 
-    // Delegate selection from the results container so clicks on the thumbnail,
-    // title, or channel all reliably select the same video.
     results.addEventListener('click', function (event) {
       var card = event.target.closest('.tutorial-result[data-video-id]');
       if (!card || !results.contains(card)) return;
       event.preventDefault();
-      playVideo(card.getAttribute('data-video-id'));
+      playVideo(card.getAttribute('data-video-id'), card.getAttribute('data-title') || 'Exercise tutorial');
     });
 
-    frame.addEventListener('load', function () {
-      if (!frameWrap.hidden && frame.getAttribute('src')) {
-        status.textContent = 'Video player ready. Use the controls to pause or turn sound on.';
-      }
-    });
-    closeButton.addEventListener('click', function () {
-      frame.removeAttribute('src');
-      frameWrap.hidden = true;
-      status.textContent = 'Video closed. Choose another demonstration whenever you are ready.';
-    });
     function renderVideos(videos) {
       results.textContent = '';
       if (!videos.length) {
         status.textContent = 'No suitable video found. Try again later.';
         return;
       }
-      // YouTube returns relevance-ranked results; use its top embeddable match only.
       var video = videos[0];
       var recommendation = document.createElement('p');
       recommendation.className = 'tutorial-recommendation';
       recommendation.textContent = 'Recommended tutorial: ' + video.title + (video.channel ? ' · ' + video.channel : '');
       results.appendChild(recommendation);
-      playVideo(video.id);
+      playVideo(video.id, video.title || 'Exercise tutorial');
     }
     searchButton.addEventListener('click', function () {
       searchButton.disabled = true;
       status.textContent = 'Finding exercise tutorials…';
       results.textContent = '';
-      frame.removeAttribute('src');
-      frameWrap.hidden = true;
       fetch(endpoint, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
         .then(function (response) {
           return response.json().then(function (data) {
@@ -303,8 +326,25 @@
     openLink.hidden = false;
     var provider = providerName(url);
     download.hidden = true;
-    if (provider) {
-      showStatus(provider + ' link detected. Open it on ' + provider + ' to listen; FitHub cannot extract or download protected streams.');
+    var youtubeId = '';
+    if (provider === 'YouTube') {
+      if (url.hostname.toLowerCase().replace(/^www\\./, '') === 'youtu.be') {
+        youtubeId = url.pathname.split('/').filter(Boolean)[0] || '';
+      } else {
+        youtubeId = url.searchParams.get('v') || '';
+        if (!youtubeId) {
+          var parts = url.pathname.split('/').filter(Boolean);
+          var marker = parts.findIndex(function (part) { return part === 'embed' || part === 'shorts' || part === 'live'; });
+          if (marker >= 0) youtubeId = parts[marker + 1] || '';
+        }
+      }
+      if (youtubeId && showFocusVideo(youtubeId, 'YouTube video')) {
+        showStatus('YouTube video is playing in this Focus Audio panel.');
+      } else {
+        showStatus('YouTube link detected, but its video ID could not be read. Paste a standard YouTube video link.');
+      }
+    } else if (provider === 'Spotify') {
+      showStatus('Spotify links open on Spotify. FitHub does not extract or download protected streams.');
     } else if (looksLikeAudio(url)) {
       audio.src = url.href;
       audio.load();
@@ -355,6 +395,7 @@
 
   clear.addEventListener('click', function () {
     clearAudioSource();
+    closeFocusVideo();
     localFile.value = '';
     input.value = '';
     openLink.hidden = true;
