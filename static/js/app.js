@@ -164,6 +164,29 @@
     } catch (error) { /* storage may be disabled */ }
   });
 
+
+  // Workout quick controls: adjust reps/weight with taps; completing a set saves it immediately.
+  document.querySelectorAll('[data-set-form]').forEach(function (form) {
+    form.querySelectorAll('[data-step]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var input = button.parentElement.querySelector('input[type="number"]');
+        if (!input) return;
+        var step = Number(button.getAttribute('data-step'));
+        var current = Number(input.value || 0);
+        var min = Number(input.min || 0);
+        var max = Number(input.max || 999999);
+        var decimals = (input.step || '1').indexOf('.') >= 0 ? 1 : 0;
+        input.value = String(Math.min(max, Math.max(min, current + step)).toFixed(decimals));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+    var completed = form.querySelector('input[type="checkbox"][name$="-is_completed"]');
+    if (completed) completed.addEventListener('change', function () {
+      if (form.requestSubmit) form.requestSubmit();
+      else form.submit();
+    });
+  });
+
   // Focus player deliberately plays direct audio URLs only. It never scrapes provider pages.
   var input = document.getElementById('focus-audio-url');
   if (!input) return;
