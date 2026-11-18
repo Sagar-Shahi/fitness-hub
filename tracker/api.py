@@ -176,7 +176,7 @@ class WorkoutViewSet(OwnedViewSet):
     serializer_class = WorkoutSerializer
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('exercises')
+        return super().get_queryset().prefetch_related('exercises__set_entries')
 
 
 class MealViewSet(OwnedViewSet):
