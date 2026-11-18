@@ -23,6 +23,7 @@
       <nav class="nav" aria-label="Main">
         <a href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
         <a href="{% url 'tracker:workout-list' %}" {% if 'workout' in view %}aria-current="page"{% endif %}>Workouts</a>
+        <a href="{% url 'tracker:progress' %}" {% if view == 'tracker:progress' %}aria-current="page"{% endif %}>Progress</a>
         <a href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>Exercise Library</a>
         <a href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>Meals</a>
         <a href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>Weight</a>
