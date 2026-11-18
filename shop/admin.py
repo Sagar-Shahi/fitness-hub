@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Order, OrderItem, Plan
+from .models import AffiliateProduct, Order, OrderItem, Plan
 
 
 @admin.register(Plan)
@@ -28,3 +28,16 @@ class OrderAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(AffiliateProduct)
+class AffiliateProductAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'seller_name', 'price_label', 'is_active', 'featured')
+    list_filter = ('category', 'is_active', 'featured')
+    search_fields = ('title', 'seller_name', 'description')
+    prepopulated_fields = {'slug': ('title',)}
+    fieldsets = (
+        ('Product', {'fields': ('title', 'slug', 'category', 'description', 'image_url', 'price_label')}),
+        ('Seller links', {'fields': ('seller_name', 'seller_url', 'affiliate_url')}),
+        ('Publishing', {'fields': ('is_active', 'featured')}),
+    )
