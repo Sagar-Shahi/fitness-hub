@@ -57,7 +57,20 @@
   var download = document.getElementById('focus-download');
   var load = document.getElementById('focus-load');
   var clear = document.getElementById('focus-clear');
+  var localFile = document.getElementById('focus-local-file');
+  var stopVoice = document.getElementById('focus-stop-speak');
+  var activeObjectUrl = null;
   var storageKey = 'fithub.focusAudioUrl.v1';
+
+  function clearAudioSource() {
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.load();
+    if (activeObjectUrl) {
+      URL.revokeObjectURL(activeObjectUrl);
+      activeObjectUrl = null;
+    }
+  }
 
   function safeUrl(value) {
     try {
@@ -79,13 +92,12 @@
   function loadUrl(value, save) {
     var url = safeUrl(value);
     if (!url) { showStatus('Enter a complete http or https link.'); return; }
+    clearAudioSource();
+    localFile.value = '';
     input.value = url.href;
     openLink.href = url.href;
     openLink.hidden = false;
     var provider = providerName(url);
-    audio.pause();
-    audio.removeAttribute('src');
-    audio.load();
     download.hidden = true;
     if (provider) {
       showStatus(provider + ' link detected. Open it on ' + provider + ' to listen; FitHub cannot extract or download protected streams.');
@@ -110,10 +122,36 @@
   openLink.addEventListener('click', function (event) {
     if (openLink.hidden || !openLink.href || openLink.getAttribute('href') === '#') event.preventDefault();
   });
+  localFile.addEventListener('change', function () {
+    var file = localFile.files && localFile.files[0];
+    if (!file) return;
+    if (!(file.type && file.type.indexOf('audio/') === 0) &&
+        !/\.(mp3|m4a|aac|ogg|oga|opus|wav|flac|webm)$/i.test(file.name)) {
+      localFile.value = '';
+      showStatus('Choose a recognised audio file (MP3, M4A, WAV, OGG, FLAC or WebM).');
+      return;
+    }
+    clearAudioSource();
+    input.value = '';
+    openLink.hidden = true;
+    download.hidden = true;
+    try {
+      activeObjectUrl = URL.createObjectURL(file);
+      audio.src = activeObjectUrl;
+      audio.load();
+      showStatus('Local audio ready: ' + file.name + '. It stays on this device and is not uploaded.');
+    } catch (error) {
+      showStatus('This browser could not open the selected local file.');
+    }
+  });
+
+  audio.addEventListener('error', function () {
+    if (audio.src) showStatus('Could not play this audio source. It may be unavailable, blocked, or use an unsupported format.');
+  });
+
   clear.addEventListener('click', function () {
-    audio.pause();
-    audio.removeAttribute('src');
-    audio.load();
+    clearAudioSource();
+    localFile.value = '';
     input.value = '';
     openLink.hidden = true;
     download.hidden = true;
@@ -138,7 +176,11 @@
     utterance.rate = 0.96;
     utterance.pitch = 1;
     window.speechSynthesis.speak(utterance);
-    showStatus('Coach voice is on. You can stop it with your browser controls.');
+    showStatus('Coach voice is on. Use Stop voice whenever you want.');
+  });
+  stopVoice.addEventListener('click', function () {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    showStatus('Coach voice stopped.');
   });
 
   try {
