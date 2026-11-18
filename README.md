@@ -1,5 +1,6 @@
 # FitHub
 
+**Live demo:** [https://fitness-hub-tz2k.onrender.com](https://fitness-hub-tz2k.onrender.com) (free hosting, the first visit can take about a minute to wake up)  
 **Portfolio:** [https://sagar-shahi.github.io/](https://sagar-shahi.github.io/)
 
 A private fitness tracker with a plan shop, built from scratch with Django 5.2 and Django REST Framework.
