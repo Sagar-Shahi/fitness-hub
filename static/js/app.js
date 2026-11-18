@@ -167,11 +167,30 @@
     var endpoint = panel.getAttribute('data-tutorial-url');
 
     function playVideo(id) {
-      if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return;
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?rel=0';
+      id = String(id || '');
+      if (!/^[A-Za-z0-9_-]{11}$/.test(id)) {
+        status.textContent = 'This video link is invalid. Please choose another result.';
+        return;
+      }
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0';
       frameWrap.hidden = false;
-      status.textContent = 'Playing inside FitHub. Some creators may disable embedding.';
+      status.textContent = 'Loading video inside FitHub…';
     }
+
+    // Delegate selection from the results container so clicks on the thumbnail,
+    // title, or channel all reliably select the same video.
+    results.addEventListener('click', function (event) {
+      var card = event.target.closest('.tutorial-result[data-video-id]');
+      if (!card || !results.contains(card)) return;
+      event.preventDefault();
+      playVideo(card.getAttribute('data-video-id'));
+    });
+
+    frame.addEventListener('load', function () {
+      if (!frameWrap.hidden && frame.getAttribute('src')) {
+        status.textContent = 'Video player loaded. Press play to start.';
+      }
+    });
     function renderVideos(videos) {
       results.textContent = '';
       if (!videos.length) {
@@ -182,6 +201,7 @@
         var card = document.createElement('button');
         card.type = 'button';
         card.className = 'tutorial-result';
+        card.setAttribute('data-video-id', String(video.id || ''));
         card.setAttribute('aria-label', 'Play ' + video.title);
         var image = document.createElement('img');
         image.src = video.thumbnail;
@@ -196,7 +216,6 @@
         details.appendChild(channel);
         card.appendChild(image);
         card.appendChild(details);
-        card.addEventListener('click', function () { playVideo(video.id); });
         results.appendChild(card);
       });
       status.textContent = 'Choose a video to play it here.';
