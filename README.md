@@ -3,7 +3,7 @@
 **Live demo:** [https://fitness-hub-tz2k.onrender.com](https://fitness-hub-tz2k.onrender.com) (free hosting, the first visit can take about a minute to wake up)  
 **Portfolio:** [https://sagar-shahi.github.io/](https://sagar-shahi.github.io/)
 
-**Built with AI assistance (Claude).** I designed the features, reviewed and tested the code, and deployed it.
+**Built with AI assistance.** I designed the features, reviewed and tested the code, and deployed it.
 
 A private fitness tracker with a plan shop, built with Django 5.2 and Django REST Framework.
 Log workouts, meals and body weight, see your weekly progress on a dashboard, and pick up training and diet plans.
