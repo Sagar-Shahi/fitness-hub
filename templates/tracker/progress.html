@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Progress · FitHub{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div><p class="eyebrow">YOUR TRAINING, MEASURED</p><h1>Progress</h1><p class="muted">See how your strength changes across completed workout sets.</p></div>
+  <a class="btn btn-primary" href="{% url 'tracker:workout-create' %}">＋ Log workout</a>
+</section>
+
+{% if exercise_names %}
+<section class="card">
+  <form method="get" class="form-row" aria-label="Choose an exercise to track">
+    <label for="progress-exercise">Track exercise</label>
+    <select id="progress-exercise" name="exercise" onchange="this.form.submit()">
+      {% for name in exercise_names %}<option value="{{ name }}" {% if name == selected %}selected{% endif %}>{{ name }}</option>{% endfor %}
+    </select>
+    <noscript><button class="btn btn-quiet btn-small" type="submit">Show progress</button></noscript>
+  </form>
+</section>
+
+<dl class="stats dashboard-stats">
+  <div class="stat"><dt>PERSONAL RECORD</dt><dd>{% if personal_record != None %}{{ personal_record }} <span class="stat-denom">kg</span>{% else %}&ndash;{% endif %}</dd><dd class="stat-note">Heaviest completed set for {{ selected }}.</dd></div>
+  <div class="stat"><dt>SESSIONS LOGGED</dt><dd>{{ session_count }}</dd><dd class="stat-note">Sessions with completed sets.</dd></div>
+  <div class="stat"><dt>COMPLETED SETS</dt><dd>{{ total_sets }}</dd><dd class="stat-note">Sets included in this exercise history.</dd></div>
+</dl>
+
+<section class="card dashboard-chart-card">
+  <div class="card-head"><div><p class="eyebrow">STRENGTH TREND</p><h2 class="card-title">{{ selected }} · heaviest set</h2></div></div>
+  {% if sessions %}{% include 'partials/chart.html' with chart=chart %}{% else %}<p class="muted empty-state">No completed sets yet. Finish a set in a workout to start your strength history.</p>{% endif %}
+  <p class="muted">Only completed sets count. Warm-up sets are included if marked completed; compare like-for-like technique and equipment.</p>
+</section>
+
+<section class="card flush">
+  <div class="card-head card-pad"><div><p class="eyebrow">SESSION HISTORY</p><h2 class="card-title">Your logged sets</h2></div></div>
+  {% if sessions %}
+  <div class="table-wrap"><table class="table"><thead><tr><th scope="col">Date</th><th scope="col" class="num">Heaviest set</th><th scope="col" class="num">Sets</th><th scope="col" class="num">Total reps</th></tr></thead>
+  <tbody>{% for item in sessions %}<tr><td>{{ item.date|date:"D, M j, Y" }}</td><td class="num">{{ item.max_weight }} kg</td><td class="num">{{ item.sets }}</td><td class="num">{{ item.reps }}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<p class="muted empty-state">Your completed sessions will appear here.</p>{% endif %}
+</section>
+{% else %}
+<section class="card empty-state"><h2 class="card-title">Your strength story starts with a workout.</h2><p class="muted">Log a workout, add an exercise and mark its sets complete. FitHub will build your progress history automatically.</p><a class="btn btn-primary" href="{% url 'tracker:workout-create' %}">Log your first workout</a></section>
+{% endif %}
+{% endblock %}
