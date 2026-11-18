@@ -22,6 +22,12 @@
 <div class="plan-grid">
 {% for item in exercises %}
   <article class="card plan-card library-exercise-card">
+    {% if item.image_url %}
+    <div class="library-exercise-image-wrap"><img class="library-exercise-image" src="{{ item.image_url }}" alt="{{ item.name }} demonstration" loading="lazy" decoding="async"></div>
+    {% else %}
+    <div class="library-exercise-image-placeholder" aria-hidden="true"><span>FIT</span><strong>Movement guide</strong></div>
+    {% endif %}
+    <div class="library-exercise-content">
     <div class="exercise-heading"><span class="badge">{{ item.level|default:"All levels"|title }}</span><span class="muted">{{ item.category|default:"Training"|title }}</span></div>
     <h2 class="card-title">{{ item.name }}</h2>
     <p class="muted">{{ item.primaryMuscles|join:", "|title }}{% if item.equipment %} · {{ item.equipment|title }}{% endif %}</p>
@@ -35,6 +41,7 @@
       <button class="btn btn-primary btn-small" type="submit">＋ Add to workout</button>
     </form>
     {% endif %}
+    </div>
   </article>
 {% endfor %}
 </div>
