@@ -85,6 +85,41 @@ ARTICLES = [
         ],
     },
     {
+        "slug": "major-muscle-groups",
+        "title": "Your major muscle groups, explained",
+        "category": "Anatomy",
+        "read_time": "5 min",
+        "summary": "A gym-friendly map of the main skeletal muscle groups and the movements that train them.",
+        "exercise_query": "dumbbell",
+        "sections": [
+            {"heading": "Upper body", "bullets": ["Chest (pectorals): pressing movements such as push-ups and bench presses.", "Back (latissimus dorsi, trapezius and other muscles): pulling movements such as rows and pulldowns.", "Shoulders (deltoids and rotator-cuff muscles): pressing, raising and stabilising the arm.", "Arms: biceps help bend the elbow; triceps help straighten it."]},
+            {"heading": "Lower body and trunk", "bullets": ["Quadriceps at the front of the thigh help extend the knee.", "Hamstrings at the back of the thigh help bend the knee and extend the hip.", "Gluteal muscles contribute to hip extension and stabilisation.", "Calf muscles contribute to ankle movement and pushing off the ground.", "Trunk muscles help brace and control the spine and pelvis during movement."]},
+            {"heading": "Train movements, not just muscle names", "body": "Most exercises involve several muscles working together. A balanced programme includes pushing, pulling, squatting, hinging, single-leg work and trunk control rather than trying to isolate every muscle in every session."},
+            {"heading": "A useful distinction", "body": "These are broad training groups, not a complete anatomy chart. Muscles overlap in function, and the exact contribution depends on the exercise, technique and individual anatomy."},
+        ],
+        "sources": [
+            {"label": "OpenStax — Skeletal muscle", "url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/10-2-skeletal-muscle"},
+            {"label": "NCBI Bookshelf — Anatomy of the muscular system", "url": "https://www.ncbi.nlm.nih.gov/books/NBK607446/"},
+        ],
+    },
+    {
+        "slug": "how-muscles-work",
+        "title": "How muscles work: the simple science",
+        "category": "Anatomy",
+        "read_time": "4 min",
+        "summary": "Understand skeletal muscle, tendons and how the body turns a training signal into movement.",
+        "sections": [
+            {"heading": "Three types of muscle", "body": "The body has skeletal, cardiac and smooth muscle. Skeletal muscle is the type most directly involved in voluntary gym movements. Cardiac muscle powers the heart, while smooth muscle helps move substances through organs and blood vessels."},
+            {"heading": "How a muscle moves a joint", "body": "Skeletal muscles generate force and usually transfer it to bones through tendons. When a muscle develops tension, it can move a joint, resist movement or help stabilise posture. Many everyday and gym movements involve several muscles coordinating together."},
+            {"heading": "What happens inside", "body": "At a simplified level, signals from the nervous system trigger processes that allow the proteins actin and myosin inside muscle fibres to interact and generate force. Repeated training provides a stimulus; recovery and adaptation help the body respond over time."},
+            {"heading": "Takeaway for training", "body": "You do not need to memorise every anatomical detail to train well. Learn the main movement, understand which muscles contribute, use controlled technique and progress at a manageable pace."},
+        ],
+        "sources": [
+            {"label": "OpenStax — Overview of muscle tissues", "url": "https://openstax.org/books/anatomy-and-physiology/pages/10-1-overview-of-muscle-tissues"},
+            {"label": "NCBI Bookshelf — Physiology of skeletal muscle", "url": "https://www.ncbi.nlm.nih.gov/books/NBK537139/"},
+        ],
+    },
+    {
         "slug": "strength-vs-muscle-growth",
         "title": "Strength vs muscle growth: train with a purpose",
         "category": "Programming",
