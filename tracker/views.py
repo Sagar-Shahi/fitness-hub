@@ -427,7 +427,14 @@ def weight(request):
     if request.method == 'POST' and form.is_valid():
         BodyMetric.objects.update_or_create(
             owner=request.user, date=form.cleaned_data['date'], defaults={'weight_kg': form.cleaned_data['weight_kg']})
-        messages.success(request, 'Weight saved.')
+        profile = profile_for(request.user)
+        latest_weight = BodyMetric.objects.filter(owner=request.user).first()
+        from .nutrition import calculate_nutrition_targets
+        nutrition_plan = calculate_nutrition_targets(profile, latest_weight.weight_kg if latest_weight else None)
+        if nutrition_plan and nutrition_plan.get('calories'):
+            profile.calorie_target = nutrition_plan['calories']
+            profile.save(update_fields=['calorie_target'])
+        messages.success(request, 'Weight saved. Your nutrition estimates have been refreshed when your profile is complete.')
         return redirect('tracker:weight')
     days = _days(request, 90)
     profile = profile_for(request.user)
