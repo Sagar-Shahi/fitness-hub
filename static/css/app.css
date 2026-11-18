@@ -2371,3 +2371,71 @@ input:focus,select:focus,textarea:focus {
   .account-menu>summary { padding-right:7px; }
   .account-menu>summary .account-name { max-width:70px; }
 }
+
+
+/* Homepage performance graph, icon system and motion polish. */
+.home-performance { padding:clamp(30px,4vw,52px) 0 clamp(44px,5vw,64px); border-top:1px solid #ded5ca; border-bottom:1px solid #ded5ca; }
+.home-performance-heading { display:flex; justify-content:space-between; align-items:end; gap:24px; margin-bottom:22px; }
+.home-performance-heading h2 { margin:7px 0 0; color:#352b25; font-size:clamp(2rem,4.4vw,3.35rem); line-height:.98; letter-spacing:-.07em; }
+.home-performance-heading h2 em { color:#986d52; font-style:normal; }
+.home-performance-heading>p { max-width:43ch; margin:0 0 3px; color:#786d63; line-height:1.75; }
+.home-performance-grid { display:grid; grid-template-columns:minmax(0,1.8fr) minmax(230px,.8fr); gap:15px; }
+.home-chart-panel { min-width:0; padding:20px 22px 15px; border:1px solid #ded5ca; border-radius:20px; background:#fcfaf6; box-shadow:0 12px 28px rgba(65,48,36,.055); }
+.home-chart-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.home-chart-head>div { display:grid; gap:3px; }
+.home-chart-kicker { color:#897b70; font-size:.62rem; font-weight:850; letter-spacing:.12em; }
+.home-chart-head strong { color:#352b25; font-size:1.08rem; letter-spacing:-.03em; }
+.home-demo-tag { padding:6px 9px; border-radius:999px; background:#eee6dc; color:#76543f; font-size:.57rem; font-weight:850; letter-spacing:.08em; white-space:nowrap; }
+.home-chart-wrap { width:100%; margin-top:12px; }
+.home-line-chart { display:block; width:100%; height:auto; overflow:visible; }
+.home-chart-grid path { fill:none; stroke:#e8e0d6; stroke-width:1; stroke-dasharray:3 6; }
+.home-chart-ylabels text,.home-chart-xlabels text { fill:#93877d; font-family:inherit; font-size:11px; }
+.home-chart-xlabels text { text-anchor:middle; font-size:10px; font-weight:800; letter-spacing:.08em; }
+.home-chart-area { fill:url(#homeChartFill); opacity:0; animation:home-chart-fill .9s .2s ease forwards; }
+.home-chart-line { fill:none; stroke:#986d52; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1000; stroke-dashoffset:1000; animation:home-chart-draw 1.5s .12s cubic-bezier(.2,.7,.2,1) forwards; }
+.home-chart-points circle { fill:#fcfaf6; stroke:#986d52; stroke-width:3; transform-box:fill-box; transform-origin:center; animation:home-point-pop .35s ease both; }
+.home-chart-points circle:nth-child(2) { animation-delay:.25s; } .home-chart-points circle:nth-child(3) { animation-delay:.4s; } .home-chart-points circle:nth-child(4) { animation-delay:.55s; } .home-chart-points circle:nth-child(5) { animation-delay:.7s; } .home-chart-points circle:nth-child(6) { animation-delay:.85s; } .home-chart-points circle:nth-child(7) { animation-delay:1s; }
+.home-chart-foot { display:flex; justify-content:space-between; gap:10px; padding-top:9px; border-top:1px solid #eee8df; color:#8b8076; font-size:.68rem; }
+.home-chart-foot>span:first-child { display:flex; align-items:center; gap:7px; color:#76695f; font-weight:700; }
+.home-legend-dot { width:8px; height:8px; border-radius:50%; background:#986d52; }
+.home-insight-stack { display:grid; gap:11px; }
+.home-insight-card { display:flex; align-items:center; gap:12px; min-width:0; padding:16px; border:1px solid #ded5ca; border-radius:17px; background:#fcfaf6; transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease; }
+.home-insight-card:hover { transform:translateY(-3px); border-color:#b99b83; box-shadow:0 12px 24px rgba(65,48,36,.08); }
+.home-insight-icon { display:grid; place-items:center; flex:0 0 42px; width:42px; height:42px; border-radius:13px; background:#eee6dc; color:#76543f; }
+.home-insight-icon svg,.tile-symbol svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.home-insight-card>div { display:grid; gap:3px; min-width:0; }
+.home-insight-card strong { color:#352b25; font-size:.9rem; }
+.home-insight-card small { color:#84776d; font-size:.75rem; }
+.home-insight-arrow { margin-left:auto; color:#9a765b; font-size:1rem; transition:transform .2s ease; }
+.home-insight-card:hover .home-insight-arrow { transform:translate(3px,-2px); }
+.home-section-athletic .tile-symbol { display:grid; place-items:center; width:42px; height:42px; border-radius:13px; background:#eee6dc; color:#76543f; }
+.home-section-athletic .tile-symbol svg { width:22px; height:22px; }
+.home-section-athletic .feature-tile { animation:home-rise .6s both; }
+.home-section-athletic .feature-tile:nth-child(2) { animation-delay:.1s; }
+.home-section-athletic .feature-tile:nth-child(3) { animation-delay:.2s; }
+@keyframes home-chart-draw { to { stroke-dashoffset:0; } }
+@keyframes home-chart-fill { to { opacity:1; } }
+@keyframes home-point-pop { from { opacity:0; transform:scale(.25); } to { opacity:1; transform:scale(1); } }
+@keyframes home-rise { from { opacity:0; transform:translateY(13px); } to { opacity:1; transform:translateY(0); } }
+@media(max-width:800px) {
+  .home-performance-heading { align-items:flex-start; flex-direction:column; gap:12px; }
+  .home-performance-grid { grid-template-columns:1fr; }
+  .home-insight-stack { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .home-insight-card { align-items:flex-start; flex-direction:column; }
+  .home-insight-arrow { display:none; }
+}
+@media(max-width:620px) {
+  .home-performance { padding:30px 0 38px; }
+  .home-chart-panel { padding:15px 12px 12px; }
+  .home-chart-head strong { font-size:.96rem; }
+  .home-chart-foot { flex-direction:column; font-size:.63rem; }
+  .home-insight-stack { grid-template-columns:1fr; }
+  .home-insight-card { align-items:center; flex-direction:row; }
+  .home-insight-arrow { display:block; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .home-chart-area,.home-chart-line,.home-chart-points circle,.home-section-athletic .feature-tile { animation:none !important; }
+  .home-chart-area { opacity:1; }
+  .home-chart-line { stroke-dashoffset:0; }
+  .home-insight-card,.home-insight-arrow { transition:none; }
+}
