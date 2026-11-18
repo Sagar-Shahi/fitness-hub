@@ -36,43 +36,25 @@
 </section>
 
 
-<section class="home-performance" aria-labelledby="home-performance-title">
+<section class="home-performance home-real-tools" aria-labelledby="home-performance-title">
   <div class="home-performance-heading">
-    <div><p class="eyebrow"><span class="eyebrow-mark"></span> PROGRESS YOU CAN SEE</p><h2 id="home-performance-title">Small wins.<br><em>Stronger weeks.</em></h2></div>
-    <p>FitHub turns your training log into a clear picture of consistency, workload and progress. Your own dashboard uses your saved workouts.</p>
+    <div><p class="eyebrow"><span class="eyebrow-mark"></span> YOUR TRAINING, NOT GUESSED NUMBERS</p><h2 id="home-performance-title">Real records.<br><em>Useful progress.</em></h2></div>
+    <p>When you sign in, FitHub shows graphs built from your saved workouts, completed sets, meals and weigh-ins. No generated stats.</p>
   </div>
-  <div class="home-performance-grid">
-    <article class="home-chart-panel">
-      <div class="home-chart-head"><div><span class="home-chart-kicker">TRAINING LOAD</span><strong>Weekly activity trend</strong></div><span class="home-demo-tag">SAMPLE VIEW</span></div>
-      <div class="home-chart-wrap">
-        <svg class="home-line-chart" viewBox="0 0 720 250" role="img" aria-labelledby="home-chart-title home-chart-desc">
-          <title id="home-chart-title">Illustrative weekly training activity chart</title>
-          <desc id="home-chart-desc">A sample line graph rising and dipping across Monday to Sunday. It is a design preview, not personal workout data.</desc>
-          <defs><linearGradient id="homeChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#a87958" stop-opacity=".27"/><stop offset="100%" stop-color="#a87958" stop-opacity="0"/></linearGradient></defs>
-          <g class="home-chart-grid"><path d="M48 35H696M48 83H696M48 131H696M48 179H696"/></g>
-          <g class="home-chart-ylabels"><text x="8" y="39">High</text><text x="8" y="87">75</text><text x="8" y="135">50</text><text x="8" y="183">25</text></g>
-          <path class="home-chart-area" d="M48 169 C85 158 100 145 155 148 S220 112 263 120 S330 83 372 101 S438 69 480 83 S548 52 588 66 S650 42 696 48 L696 195 L48 195Z"/>
-          <path class="home-chart-line" d="M48 169 C85 158 100 145 155 148 S220 112 263 120 S330 83 372 101 S438 69 480 83 S548 52 588 66 S650 42 696 48"/>
-          <g class="home-chart-points"><circle cx="48" cy="169" r="5"/><circle cx="155" cy="148" r="5"/><circle cx="263" cy="120" r="5"/><circle cx="372" cy="101" r="5"/><circle cx="480" cy="83" r="5"/><circle cx="588" cy="66" r="5"/><circle cx="696" cy="48" r="5"/></g>
-          <g class="home-chart-xlabels"><text x="48" y="224">MON</text><text x="155" y="224">TUE</text><text x="263" y="224">WED</text><text x="372" y="224">THU</text><text x="480" y="224">FRI</text><text x="588" y="224">SAT</text><text x="696" y="224">SUN</text></g>
-        </svg>
-      </div>
-      <div class="home-chart-foot"><span><i class="home-legend-dot"></i> Training activity</span><span>Illustrative preview · not live data</span></div>
-    </article>
-    <aside class="home-insight-stack" aria-label="FitHub tracking features">
-      <div class="home-insight-card"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18V6m0 12h16M7 15l4-4 3 2 5-6"/></svg></span><div><strong>Spot your patterns</strong><small>See consistency over time.</small></div><span class="home-insight-arrow" aria-hidden="true">↗</span></div>
-      <div class="home-insight-card"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></span><div><strong>Track every set</strong><small>Reps, weight and completion.</small></div><span class="home-insight-arrow" aria-hidden="true">↗</span></div>
-      <div class="home-insight-card"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><strong>Build consistency</strong><small>Keep your routine moving.</small></div><span class="home-insight-arrow" aria-hidden="true">↗</span></div>
-    </aside>
+  <div class="home-real-tools-grid">
+    <a class="home-real-tool" href="{% url 'accounts:login' %}"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 18h18M5 15l4-5 4 3 6-8"/></svg></span><span><strong>Workout analytics</strong><small>Sessions, training volume and trends from your logs.</small></span><span class="home-insight-arrow" aria-hidden="true">↗</span></a>
+    <a class="home-real-tool" href="{% url 'accounts:login' %}"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span><span><strong>Nutrition tracking</strong><small>Meals, calories and macros you actually enter.</small></span><span class="home-insight-arrow" aria-hidden="true">↗</span></a>
+    <a class="home-real-tool" href="{% url 'accounts:login' %}"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></span><span><strong>Body-weight history</strong><small>Follow your recorded weigh-ins over time.</small></span><span class="home-insight-arrow" aria-hidden="true">↗</span></a>
   </div>
+  <p class="home-real-tools-note">Already have an account? <a href="{% url 'accounts:login' %}">Sign in to see your real dashboard</a>.</p>
 </section>
 
 <section class="home-section home-section-athletic">
   <div class="section-heading"><div><p class="eyebrow">ONE PLATFORM. EVERY REP.</p><h2>Everything that moves<br><em>your training forward.</em></h2></div><p>Spend less time guessing and more time training. Keep your sessions, food and progress connected.</p></div>
   <div class="home-features">
-    <article class="feature-tile"><span class="tile-index">01 / TRAIN</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h18M7 7l-4 5 4 5M17 7l4 5-4 5"/></svg></div><h3>Track every working set.</h3><p>Log reps, weight, warm-ups and completed sets. Know exactly what you did last session.</p></article>
-    <article class="feature-tile"><span class="tile-index">02 / FUEL</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg></div><h3>Keep nutrition in check.</h3><p>Track meals, calories and macros alongside the work you put in at the gym.</p></article>
-    <article class="feature-tile"><span class="tile-index">03 / PROGRESS</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 3 8-9"/><path d="M15 5h6v6"/></svg></div><h3>See strength add up.</h3><p>Follow training consistency, body-weight trends and your personal goals over time.</p></article>
+    <a class="feature-tile" href="{% url 'accounts:login' %}"><span class="tile-index">01 / TRAIN</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h18M7 7l-4 5 4 5M17 7l4 5-4 5"/></svg></div><h3>Track every working set.</h3><p>Log reps, weight, warm-ups and completed sets. Know exactly what you did last session.</p><span class="home-feature-link">Open workout tracking ↗</span></a>
+    <a class="feature-tile" href="{% url 'accounts:login' %}"><span class="tile-index">02 / FUEL</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg></div><h3>Keep nutrition in check.</h3><p>Track meals, calories and macros alongside the work you put in at the gym.</p><span class="home-feature-link">Open meal tracking ↗</span></a>
+    <a class="feature-tile" href="{% url 'accounts:login' %}"><span class="tile-index">03 / PROGRESS</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 3 8-9"/><path d="M15 5h6v6"/></svg></div><h3>See strength add up.</h3><p>Follow training consistency, body-weight trends and your personal goals over time.</p><span class="home-feature-link">Open progress tracking ↗</span></a>
   </div>
 </section>
 {% endblock %}
