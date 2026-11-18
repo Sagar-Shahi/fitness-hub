@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}About FitHub · Train with purpose{% endblock %}
+{% block description %}Learn about FitHub, a practical fitness platform for tracking workouts, nutrition and progress in one place.{% endblock %}
+{% block content %}
+<div class="about-page">
+  <section class="about-hero">
+    <p class="about-kicker">ABOUT FITHUB / BUILT FOR THE WORK</p>
+    <h1>Progress isn't a guess.<br><em>It's built, rep by rep.</em></h1>
+    <p class="about-lead">FitHub brings your training, nutrition and progress together, so you can spend less time trying to remember what you did and more time moving forward.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Start training free <span aria-hidden="true">↗</span></a>
+      <a class="btn btn-quiet" href="{% url 'home' %}">Back to home</a>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div><p class="about-kicker">THE IDEA</p><h2>A clearer way to stay consistent.</h2></div>
+    <div class="about-section-copy">
+      <p>Every training session tells a story: the exercises you chose, the weight you lifted, the reps you completed and the effort you put in. FitHub gives those details a home.</p>
+      <p>It is designed for everyday gym-goers who want a straightforward place to record their work, understand their habits and see progress over time. No complicated setup is needed to get started.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="about-kicker">WHAT YOU CAN DO</p>
+    <div class="about-values">
+      <article class="about-value"><span class="about-value-index">01 / TRAIN</span><h3>Record every set.</h3><p>Save exercises, reps, weight, warm-up sets and completion so your workout history stays useful.</p></article>
+      <article class="about-value"><span class="about-value-index">02 / FUEL</span><h3>Keep an eye on nutrition.</h3><p>Log meals and follow calories and macros alongside your training routine.</p></article>
+      <article class="about-value"><span class="about-value-index">03 / GROW</span><h3>Make progress visible.</h3><p>Use your workout history, weight entries, charts and goals to understand how things change.</p></article>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div><p class="about-kicker">OUR APPROACH</p><h2>Useful first. Yours always.</h2></div>
+    <div class="about-section-copy">
+      <p>Fitness is personal, and your records should be too. FitHub is built around practical tracking, clear information and giving you control of your own data.</p>
+      <p>FitHub is a training and wellness tracking tool, not a medical service. Use it to support your routine, and speak with a qualified professional for medical or nutrition advice.</p>
+    </div>
+  </section>
+
+  <section class="about-cta">
+    <div><h2>Ready to put your work on record?</h2><p>Start with one workout. Build from there.</p></div>
+    <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create your free account ↗</a>
+  </section>
+</div>
+{% endblock %}
