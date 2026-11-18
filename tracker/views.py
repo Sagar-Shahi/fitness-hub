@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 from . import analytics
 from .forms import ExerciseForm, ExerciseSetAddForm, ExerciseSetForm, MealForm, ProfileForm, WeightForm, WorkoutForm
 from .models import BodyMetric, Exercise, ExerciseSet, Meal, Workout, profile_for
+from shop.models import OrderItem
 
 PAGE_SIZE = 15
 PERIODS = (7, 30, 90)
@@ -78,7 +79,14 @@ def goals(request):
         form.save()
         messages.success(request, 'Goals saved.')
         return redirect('tracker:dashboard')
-    return render(request, 'tracker/goals.html', {'form': form})
+    items = (OrderItem.objects.filter(order__owner=request.user).select_related('plan', 'order')
+             .order_by('-order__created_at'))
+    seen, my_plans = set(), []
+    for item in items:
+        if item.plan_id not in seen:
+            seen.add(item.plan_id)
+            my_plans.append(item)
+    return render(request, 'tracker/goals.html', {'form': form, 'my_plans': my_plans})
 
 
 @login_required
