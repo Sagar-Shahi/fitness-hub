@@ -20,7 +20,7 @@ class LoginRequiredTests(TestCase):
         workout, meal, weight = make_workout(owner), make_meal(owner), make_weight(owner)
         exercise = workout.exercises.first()
         urls = [
-            reverse('tracker:dashboard'), reverse('tracker:goals'), reverse('tracker:workout-list'), reverse('tracker:workout-create'),
+            reverse('tracker:dashboard'), reverse('tracker:share-progress'), reverse('tracker:goals'), reverse('tracker:workout-list'), reverse('tracker:workout-create'),
             reverse('tracker:exercise-library'),
             reverse('tracker:export'), reverse('tracker:weight'), reverse('tracker:meals'),
             reverse('tracker:workout-detail', args=[workout.pk]), reverse('tracker:workout-edit', args=[workout.pk]),
@@ -72,6 +72,25 @@ class DashboardTests(Base):
             with self.subTest(days=junk):
                 self.assertEqual(self.client.get(reverse('tracker:dashboard'), {'days': junk}).context['days'], 30)
         self.assertEqual(self.client.get(reverse('tracker:dashboard'), {'days': '7'}).context['days'], 7)
+
+
+
+class ShareProgressTests(Base):
+    def test_summary_only_counts_the_signed_in_users_last_30_days(self):
+        make_workout(self.user, name='My workout')
+        other = make_user('another')
+        make_workout(other, name='Private other workout')
+        response = self.client.get(reverse('tracker:share-progress'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['workouts'], 1)
+        self.assertEqual(response.context['completed_sets'], 4)
+        self.assertContains(response, 'My FitHub progress')
+        self.assertNotContains(response, 'Private other workout')
+
+    def test_summary_is_empty_for_a_new_account(self):
+        response = self.client.get(reverse('tracker:share-progress'))
+        self.assertEqual(response.context['workouts'], 0)
+        self.assertEqual(response.context['completed_sets'], 0)
 
 
 class GoalsTests(Base):
