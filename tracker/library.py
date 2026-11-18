@@ -2,6 +2,7 @@
 import json
 from urllib.error import URLError
 from urllib.request import Request, urlopen
+from urllib.parse import quote
 
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -66,6 +67,13 @@ def exercise_library(request):
             continue
         if category and item_category != category:
             continue
+        image_paths = item.get("images") or []
+        image_path = image_paths[0] if image_paths and isinstance(image_paths[0], str) else ""
+        exercise_id = str(item.get("id") or "")
+        if image_path and exercise_id and image_path.startswith(exercise_id + "/") and ".." not in image_path.split("/"):
+            item["image_url"] = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/" + quote(image_path, safe="/")
+        else:
+            item["image_url"] = ""
         filtered.append(item)
 
     page = max(1, int(request.GET.get("page", "1"))) if request.GET.get("page", "1").isdigit() else 1
