@@ -1617,3 +1617,20 @@ main.container { gap: 22px; }
 .store-empty h2 { color:#44362a; }
 .store-empty-mark { display:grid; place-items:center; width:46px; height:46px; margin:0 auto 14px; border-radius:14px; background:#eee2d2; color:#a76a32; font-size:1.4rem; }
 @media(max-width:600px) { .store-filters { display:grid; grid-template-columns:1fr; } .store-filters select { width:100%; } .store-grid { grid-template-columns:1fr; } }
+
+
+/* Exercise library image cards */
+.library-exercise-card { padding:0; overflow:hidden; display:flex; flex-direction:column; background:linear-gradient(155deg,#fffdf9,#f7f1e8); border-color:#e2d8cb; }
+.library-exercise-image-wrap { width:100%; aspect-ratio:16/10; overflow:hidden; background:#eee6da; }
+.library-exercise-image { display:block; width:100%; height:100%; object-fit:cover; object-position:center 38%; transition:transform .35s ease; }
+.library-exercise-card:hover .library-exercise-image { transform:scale(1.035); }
+.library-exercise-image-placeholder { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:7px; aspect-ratio:16/10; background:radial-gradient(circle at 50% 35%,#f8f0e5,#e9dece); color:#a18464; }
+.library-exercise-image-placeholder span { display:grid; place-items:center; width:52px; height:52px; border:1px solid #cdb99f; border-radius:16px; font-size:.78rem; font-weight:950; letter-spacing:.1em; }
+.library-exercise-image-placeholder strong { color:#8c765f; font-size:.76rem; letter-spacing:.04em; }
+.library-exercise-content { display:flex; flex:1; flex-direction:column; padding:17px; color:#44362a; }
+.library-exercise-content h2 { color:#403126; margin:8px 0; }
+.library-exercise-content .form-actions { margin-top:auto; padding-top:14px; }
+.library-exercise-content details { margin-top:12px; }
+.library-exercise-content details summary { color:#8d5d34; font-weight:750; cursor:pointer; }
+.library-exercise-content details ol { padding-left:20px; color:#76695c; font-size:.86rem; }
+@media(prefers-reduced-motion:reduce) { .library-exercise-image { transition:none; } .library-exercise-card:hover .library-exercise-image { transform:none; } }
