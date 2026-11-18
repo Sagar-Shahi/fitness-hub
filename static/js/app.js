@@ -111,6 +111,51 @@
     });
   }
 
+  // Live session progress and built-in rest timer.
+  var sessionSets = document.querySelectorAll('[data-workout-set]');
+  var progressBar = document.querySelector('[data-progress-bar]');
+  var progressLabel = document.querySelector('[data-progress-label]');
+  var completedCount = document.querySelector('[data-completed-count]');
+  function refreshSessionProgress() {
+    if (!sessionSets.length) return;
+    var done = document.querySelectorAll('[data-workout-set].is-complete').length;
+    var percent = Math.round(done * 100 / sessionSets.length);
+    if (completedCount) completedCount.textContent = String(done);
+    if (progressLabel) progressLabel.textContent = percent + '%';
+    if (progressBar) progressBar.style.width = percent + '%';
+  }
+  document.querySelectorAll('[data-set-form]').forEach(function (form) {
+    var checkbox = form.querySelector('input[type="checkbox"][name$="-is_completed"]');
+    if (checkbox) checkbox.addEventListener('change', function () {
+      var card = form.closest('[data-workout-set]');
+      if (card) card.classList.toggle('is-complete', checkbox.checked);
+      refreshSessionProgress();
+    });
+  });
+  var restDisplay = document.querySelector('[data-rest-display]');
+  var restStart = document.querySelector('[data-rest-start]');
+  var restReset = document.querySelector('[data-rest-reset]');
+  if (restDisplay && restStart) {
+    var restSeconds = 90, restInterval = null;
+    function paintRest() {
+      restDisplay.textContent = String(Math.floor(restSeconds / 60)).padStart(2, '0') + ':' + String(restSeconds % 60).padStart(2, '0');
+    }
+    function stopRest() { if (restInterval) window.clearInterval(restInterval); restInterval = null; }
+    restStart.addEventListener('click', function () {
+      if (restInterval) { stopRest(); restStart.textContent = 'Resume'; return; }
+      restStart.textContent = 'Pause';
+      if (restReset) restReset.hidden = false;
+      restInterval = window.setInterval(function () {
+        restSeconds = Math.max(0, restSeconds - 1); paintRest();
+        if (!restSeconds) { stopRest(); restStart.textContent = 'Again'; }
+      }, 1000);
+    });
+    if (restReset) restReset.addEventListener('click', function () {
+      stopRest(); restSeconds = 90; paintRest(); restStart.textContent = 'Start rest'; restReset.hidden = true;
+    });
+    paintRest();
+  }
+
   // Exercise tutorials: accept standard YouTube video links and play through YouTube's official embed.
   // The video stays hosted by YouTube; FitHub never downloads or rehosts it.
   document.querySelectorAll('[data-exercise-tutorial]').forEach(function (panel) {
