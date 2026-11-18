@@ -1710,3 +1710,33 @@ main.container { gap: 22px; }
   .focus-dock.has-video { right:12px; width:calc(100vw - 24px); }
   .focus-video-stage { padding:9px; }
 }
+
+/* --- Learn: curated fitness knowledge ----------------------------------------------------- */
+.learn-intro { display:flex; justify-content:space-between; align-items:center; gap:20px; background:linear-gradient(135deg,var(--surface),var(--surface-2)); }
+.learn-intro h2 { margin-bottom:8px; font-size:1.35rem; }
+.learn-intro p:last-child { margin-bottom:0; max-width:68ch; }
+.learn-filters { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(180px,.8fr) auto; align-items:end; gap:12px; }
+.learn-filters .field { margin:0; }
+.learn-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.learn-card { display:flex; flex-direction:column; gap:12px; }
+.learn-card h2 { font-size:1.12rem; }
+.learn-card > p { margin:0; }
+.learn-card-meta { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.learn-details { border-top:1px solid var(--line); padding-top:12px; margin-top:auto; }
+.learn-details summary { display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:650; list-style:none; }
+.learn-details summary::-webkit-details-marker { display:none; }
+.learn-details summary span { color:var(--accent); font-size:1.2rem; }
+.learn-details[open] summary span { transform:rotate(45deg); }
+.learn-article-body { padding-top:16px; }
+.learn-article-body section { margin:0 0 16px; }
+.learn-article-body h3 { font-size:1rem; margin-bottom:7px; }
+.learn-article-body p { color:var(--muted); }
+.learn-article-body ul { margin:8px 0 0; padding-left:22px; color:var(--muted); }
+.learn-article-body li { margin:5px 0; }
+.learn-sources { border-top:1px solid var(--line); padding-top:12px; font-size:.9rem; }
+.learn-sources ul { margin-top:6px; }
+@media(max-width:720px) {
+  .learn-filters { grid-template-columns:1fr; }
+  .learn-grid { grid-template-columns:1fr; }
+  .learn-intro { align-items:flex-start; flex-direction:column; }
+}
