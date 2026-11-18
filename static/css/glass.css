@@ -523,3 +523,44 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
   .nav-more-menu .explore-icon,
   .nav-more-menu .explore-arrow { transition: none; }
 }
+
+
+/* Keep the open Explore dropdown above neighboring navigation pills. */
+.nav {
+  position: relative;
+  isolation: auto;
+  overflow: visible;
+}
+.nav > .nav-more {
+  position: relative;
+  z-index: 1;
+}
+.nav > .nav-more[open] {
+  z-index: 60;
+}
+.nav > .nav-more[open] > .nav-more-menu {
+  position: absolute;
+  z-index: 61;
+  top: calc(100% + 12px);
+  left: 0;
+}
+.nav > .nav-link,
+.nav > .nav-more:not([open]) {
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 1000px) {
+  .nav {
+    overflow-x: visible;
+    overflow-y: visible;
+  }
+}
+@media (max-width: 760px) {
+  .nav > .nav-more[open] > .nav-more-menu {
+    position: fixed;
+    z-index: 100;
+    top: 118px;
+    left: 12px;
+    right: 12px;
+  }
+}
