@@ -1890,3 +1890,26 @@ main.container { gap: 22px; }
 .about-cta p { margin:0; color:#e0d0bd; line-height:1.6; }
 .about-cta .btn { flex:none; }
 @media(max-width:760px) { .about-section { grid-template-columns:1fr; gap:14px; } .about-values { grid-template-columns:1fr; } .about-cta { align-items:flex-start; flex-direction:column; } }
+
+
+/* Private progress-sharing card */
+.share-progress-page { display:grid; gap:20px; max-width:900px; margin:0 auto; padding:28px 0 48px; }
+.share-progress-card { overflow:hidden; padding:clamp(24px,5vw,48px); border:1px solid #dfd4c5; border-radius:24px; background:radial-gradient(circle at 90% 5%,rgba(190,145,99,.22),transparent 32%),linear-gradient(135deg,#fffdf8,#f0e7da); color:#433629; box-shadow:0 18px 48px rgba(56,42,29,.08); }
+.share-progress-brand { display:flex; align-items:center; justify-content:space-between; gap:12px; color:#94704f; font-size:.75rem; font-weight:850; letter-spacing:.16em; }
+.share-progress-card h1 { margin:32px 0 10px; color:#433629; font-size:clamp(2.4rem,7vw,4.8rem); line-height:.98; letter-spacing:-.065em; }
+.share-progress-card h1 em { color:#a2744d; font-style:normal; }
+.share-progress-period { color:#796b5c; }
+.share-progress-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:34px 0; }
+.share-progress-stat { padding:20px; border:1px solid #e2d7c8; border-radius:16px; background:rgba(255,255,255,.72); }
+.share-progress-stat strong { display:block; color:#513d2c; font-size:clamp(2rem,5vw,3.2rem); line-height:1.1; font-variant-numeric:tabular-nums; }
+.share-progress-stat span { display:block; margin-top:8px; color:#8b735c; font-size:.72rem; font-weight:800; letter-spacing:.1em; }
+.share-progress-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; border-top:1px solid #ded1c0; padding-top:18px; color:#8b735c; font-size:.8rem; }
+.share-progress-actions { display:flex; flex-wrap:wrap; gap:10px; }
+@media(max-width:560px) { .share-progress-stats { grid-template-columns:1fr; } .share-progress-stat { display:flex; align-items:center; justify-content:space-between; } .share-progress-stat strong { font-size:2rem; } }
+@media print {
+  @page { size: A4 portrait; margin: 18mm; }
+  body * { visibility:hidden !important; }
+  .share-progress-card, .share-progress-card * { visibility:visible !important; }
+  .share-progress-card { position:absolute; left:0; top:0; width:100%; box-shadow:none; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .share-progress-page { max-width:none; padding:0; }
+}
