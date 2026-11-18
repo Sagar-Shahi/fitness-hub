@@ -21,6 +21,7 @@
   <article class="card learn-card">
     <div class="learn-card-meta"><span class="badge">{{ article.category }}</span><span class="small muted">{{ article.read_time }} read</span></div>
     <h2>{{ article.title }}</h2><p class="muted">{{ article.summary }}</p>
+    {% if article.exercise_query %}<a class="btn btn-quiet btn-small learn-practice-link" href="{% url 'tracker:exercise-library' %}?q={{ article.exercise_query|urlencode }}">Find related exercises ↗</a>{% endif %}
     <details class="learn-details"><summary>Read lesson <span aria-hidden="true">＋</span></summary>
       <div class="learn-article-body">
       {% for section in article.sections %}
