@@ -12,33 +12,64 @@
 
 <dl class="stats">
   <div class="stat"><dt>Exercises</dt><dd>{{ workout.exercises.all|length }}</dd></div>
-  <div class="stat"><dt>Total volume</dt><dd>{{ workout.volume_kg|floatformat:0 }} kg</dd><dd class="stat-note">Sets &times; reps &times; weight.</dd></div>
+  <div class="stat"><dt>Completed volume</dt><dd>{{ workout.volume_kg|floatformat:0 }} kg</dd><dd class="stat-note">Completed reps × weight.</dd></div>
 </dl>
 
-<section class="card flush">
-  {% if workout.exercises.all %}
-  <div class="table-wrap">
-    <table class="table">
-      <thead><tr><th scope="col">Exercise</th><th scope="col" class="num">Sets</th><th scope="col" class="num">Reps</th><th scope="col" class="num">Weight</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
-      <tbody>
-        {% for e in workout.exercises.all %}
-        <tr>
-          <td class="cell-title">{{ e.name }}</td><td class="num">{{ e.sets }}</td><td class="num">{{ e.reps }}</td><td class="num">{{ e.weight_kg }} kg</td>
-          <td class="actions-cell"><form method="post" action="{% url 'tracker:exercise-delete' workout.pk e.pk %}" data-confirm="Remove {{ e.name }}?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove</button></form></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% else %}
-  <p class="muted empty-state">No exercises yet. Add the first one below.</p>
-  {% endif %}
-</section>
+{% if workout.exercises.all %}
+  {% for e in workout.exercises.all %}
+  <section class="card form-card">
+    <div class="page-head compact">
+      <div><h2 class="card-title">{{ e.name }}</h2><p class="muted">{{ e.set_entries.all|length }} sets recorded</p></div>
+      <form method="post" action="{% url 'tracker:exercise-delete' workout.pk e.pk %}" data-confirm="Remove {{ e.name }} and all its sets?">
+        {% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove exercise</button>
+      </form>
+    </div>
+
+    {% for set in e.set_entries.all %}
+    <div class="card" style="margin-top: .75rem;">
+      <div class="page-head compact">
+        <strong>Set {{ set.set_number }}{% if set.is_warmup %} <span class="muted">· Warm-up</span>{% endif %}</strong>
+        {% if set.is_completed %}<span class="badge">Completed</span>{% else %}<span class="muted">Not completed</span>{% endif %}
+      </div>
+      <form method="post" action="{% url 'tracker:exercise-set-edit' workout.pk e.pk set.pk %}" class="form-card" style="padding: 0;">
+        {% csrf_token %}
+        <div class="form-grid">
+          {% include 'partials/field.html' with field=set.edit_form.reps %}
+          {% include 'partials/field.html' with field=set.edit_form.weight_kg %}
+          {% include 'partials/field.html' with field=set.edit_form.is_warmup %}
+          {% include 'partials/field.html' with field=set.edit_form.is_completed %}
+        </div>
+        <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">Save set</button></div>
+      </form>
+      <form method="post" action="{% url 'tracker:exercise-set-delete' workout.pk e.pk set.pk %}" data-confirm="Remove set {{ set.set_number }}?">
+        {% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove set</button>
+      </form>
+    </div>
+    {% empty %}
+      <p class="muted empty-state">No sets yet. Add the first set below.</p>
+    {% endfor %}
+
+    <form class="card form-card" method="post" action="{% url 'tracker:exercise-set-add' workout.pk e.pk %}" style="margin-top: .75rem;">
+      <h3 class="card-title">Add a set</h3>
+      {% csrf_token %}
+      <div class="form-grid">
+        {% include 'partials/field.html' with field=set_add_form.reps %}
+        {% include 'partials/field.html' with field=set_add_form.weight_kg %}
+        {% include 'partials/field.html' with field=set_add_form.is_warmup %}
+      </div>
+      <div class="form-actions"><button class="btn btn-quiet btn-small" type="submit">Add set</button></div>
+    </form>
+  </section>
+  {% endfor %}
+{% else %}
+  <section class="card"><p class="muted empty-state">No exercises yet. Add the first one below.</p></section>
+{% endif %}
 
 <form class="card form-card" method="post" action="{% url 'tracker:exercise-add' workout.pk %}" novalidate>
   <h2 class="card-title">Add an exercise</h2>
+  <p class="muted">Choose the exercise and your starting set details. You can adjust each set separately after adding it.</p>
   {% csrf_token %}
-  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
   <div class="form-grid">
     {% include 'partials/field.html' with field=form.name %}
     {% include 'partials/field.html' with field=form.sets %}
