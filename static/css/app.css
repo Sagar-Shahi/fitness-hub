@@ -1445,3 +1445,52 @@ main.container { gap: 22px; }
   .set-add-quick .set-quick-fields { flex-basis:100%; }
   .set-add-quick > .btn { width:100%; }
 }
+
+/* Live workout session experience */
+.session-hero { align-items:flex-end; }
+.session-command {
+  padding:clamp(18px,3vw,28px); border-radius:20px; color:#f8f3eb;
+  background:linear-gradient(120deg,#43372e 0%,#65503d 58%,#806044 100%);
+  box-shadow:0 18px 40px rgba(58,43,31,.16); position:relative; overflow:hidden;
+}
+.session-command:after { content:""; position:absolute; width:260px; height:260px; border:1px solid rgba(255,255,255,.12); border-radius:50%; right:-80px; top:-150px; box-shadow:0 0 0 24px rgba(255,255,255,.035),0 0 0 52px rgba(255,255,255,.025); pointer-events:none; }
+.session-command-top,.session-command-bottom { display:flex; justify-content:space-between; align-items:center; gap:14px; position:relative; z-index:1; }
+.session-command-top>div { display:flex; align-items:baseline; gap:14px; }
+.session-kicker,.rest-clock>span { font-size:.68rem; letter-spacing:.13em; font-weight:850; color:#d9c7b4; }
+.session-command-top strong { font-size:1.65rem; font-variant-numeric:tabular-nums; }
+.session-command-top strong small { font-size:.9rem; color:#d9c7b4; font-weight:550; }
+.session-percent { font-size:1.15rem; font-weight:850; color:#f5d3a6; }
+.session-progress-track { height:9px; border-radius:99px; background:rgba(255,255,255,.17); overflow:hidden; margin:14px 0 16px; position:relative; z-index:1; }
+.session-progress-track>span { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#e5bd8d,#f8e3c6); transition:width .45s cubic-bezier(.2,.8,.2,1); }
+.session-command-bottom { color:#e3d5c6; font-size:.82rem; }
+.rest-clock { display:flex; align-items:center; gap:9px; padding:7px 9px 7px 12px; border:1px solid rgba(255,255,255,.2); border-radius:12px; background:rgba(25,20,16,.18); }
+.rest-clock strong { font-size:1.05rem; font-variant-numeric:tabular-nums; color:#fff8ef; min-width:42px; }
+.rest-clock button { border:0; border-radius:8px; padding:7px 10px; background:#f0dfca; color:#4b392a; font:inherit; font-size:.75rem; font-weight:850; cursor:pointer; }
+.exercise-card.live-exercise-card { padding:clamp(16px,2.5vw,24px); }
+.live-exercise-card .exercise-heading { margin-bottom:20px; }
+.live-exercise-card .exercise-heading .card-title { font-size:clamp(1.35rem,2.5vw,1.8rem); }
+.live-exercise-card .set-list { gap:10px; }
+.live-exercise-card .set-card { padding:15px; border-radius:14px; }
+.live-exercise-card .set-card.is-complete { background:linear-gradient(130deg,#edf1e8,#e8eee3); border-color:#bdcbb4; }
+.set-index { display:inline-grid; place-items:center; width:29px; height:29px; border-radius:9px; margin-right:7px; background:#e7ded1; color:#5b4533; font-size:.9rem; }
+.set-status { font-size:.68rem; letter-spacing:.1em; font-weight:900; color:#55714f; }
+.set-status.pending { color:#a17a4d; }
+.warmup-chip { font-size:.62rem; letter-spacing:.08em; border-radius:99px; padding:4px 7px; background:#eee3d4; color:#806344; }
+.live-exercise-card .quick-metric input { min-height:54px; border-radius:11px; background:#fffdf9; border:1px solid #d8cebf; color:#44372d; font-size:1.2rem; }
+.live-exercise-card .stepper { grid-template-columns:42px minmax(56px,1fr) 42px; gap:7px; }
+.live-exercise-card .stepper button { min-height:54px; border-radius:11px; border-color:#d8cebf; background:#eee7dc; color:#584635; font-size:1.35rem; transition:transform .15s ease,background .15s ease; }
+.live-exercise-card .stepper button:active { transform:scale(.94); background:#dfd1bf; }
+.live-exercise-card .quick-metric>label { color:#806c59; font-size:.67rem; }
+.live-exercise-card .set-quick-footer { padding-top:12px; border-top:1px solid #e3dbcf; }
+.live-exercise-card .set-save-button { min-height:42px; padding-inline:18px; border-radius:10px; }
+.live-exercise-card .quick-done { color:#55714f; }
+.set-add-quick { margin-top:12px; border:1px dashed #cbbba0; border-radius:13px; padding:13px; background:#f8f4ed; }
+.add-set-label { color:#765b41; }
+@media(max-width:600px) {
+ .session-command-bottom { align-items:flex-start; flex-direction:column; }
+ .rest-clock { width:100%; justify-content:space-between; }
+ .session-command-top>div { gap:8px; flex-wrap:wrap; }
+ .live-exercise-card .set-quick-form { gap:12px; }
+ .live-exercise-card .set-quick-fields { flex-basis:100%; }
+}
+@media(prefers-reduced-motion:reduce) { .session-progress-track>span,.stepper button { transition:none; } }
