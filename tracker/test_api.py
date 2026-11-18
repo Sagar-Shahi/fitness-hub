@@ -7,7 +7,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import ApiKey
 
-from .models import BodyMetric, Meal, Workout
+from .models import BodyMetric, ExerciseSet, Meal, Workout
 from .testutils import PASSWORD, days_ago, make_meal, make_user, make_weight, make_workout
 
 WORKOUTS, MEALS, WEIGHT, SUMMARY = '/api/v1/workouts/', '/api/v1/meals/', '/api/v1/weight/', '/api/v1/summary/'
@@ -86,6 +86,48 @@ class WorkoutApiTests(ApiCase):
         self.assertEqual(len(data['exercises']), 2)
         self.assertEqual(Decimal(data['volume_kg']), Decimal('1920.0'))  # 4*8*60
         self.assertEqual(Workout.objects.get().owner, self.user)
+
+    def test_create_and_update_individual_set_details(self):
+        exercises = [{
+            'name': 'Bench press',
+            'sets': 2,
+            'reps': 10,
+            'weight_kg': '40.0',
+            'set_details': [
+                {'set_number': 1, 'reps': 12, 'weight_kg': '40.0', 'is_completed': True, 'is_warmup': False},
+                {'set_number': 2, 'reps': 8, 'weight_kg': '50.0', 'is_completed': True, 'is_warmup': False},
+            ],
+        }]
+        response = self.api.post(WORKOUTS, self.body(exercises=exercises), format='json')
+        self.assertEqual(response.status_code, 201, response.content)
+        data = response.json()
+        self.assertEqual(len(data['exercises'][0]['set_details']), 2)
+        self.assertEqual(Decimal(data['volume_kg']), Decimal('880.0'))
+        workout = Workout.objects.get()
+        self.assertEqual(ExerciseSet.objects.filter(exercise__workout=workout).count(), 2)
+
+        replacement = [{
+            'name': 'Incline press', 'sets': 1, 'reps': 6, 'weight_kg': '30.0',
+            'set_details': [
+                {'set_number': 1, 'reps': 6, 'weight_kg': '35.0', 'is_completed': False, 'is_warmup': True},
+            ],
+        }]
+        updated = self.api.patch(f'{WORKOUTS}{workout.pk}/', {'exercises': replacement}, format='json')
+        self.assertEqual(updated.status_code, 200, updated.content)
+        self.assertEqual(updated.json()['exercises'][0]['set_details'][0]['is_warmup'], True)
+        self.assertEqual(ExerciseSet.objects.filter(exercise__workout=workout).count(), 1)
+
+    def test_duplicate_nested_set_numbers_are_rejected(self):
+        exercises = [{
+            'name': 'Bench press', 'sets': 2, 'reps': 10, 'weight_kg': '40.0',
+            'set_details': [
+                {'set_number': 1, 'reps': 10, 'weight_kg': '40.0'},
+                {'set_number': 1, 'reps': 8, 'weight_kg': '50.0'},
+            ],
+        }]
+        response = self.api.post(WORKOUTS, self.body(exercises=exercises), format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Workout.objects.count(), 0)
 
     def test_server_owned_fields_cannot_be_set(self):
         other = make_user('victim')
