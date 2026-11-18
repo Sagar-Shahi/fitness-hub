@@ -45,8 +45,18 @@ class Workout(models.Model):
 
     @property
     def volume_kg(self):
-        """Total weight lifted: sets x reps x kilograms, summed over the exercises."""
-        return sum((e.sets * e.reps * e.weight_kg for e in self.exercises.all()), Decimal('0'))
+        """Completed-set volume, falling back to legacy exercise summaries."""
+        total = Decimal('0')
+        for exercise in self.exercises.all():
+            entries = list(exercise.set_entries.all())
+            if entries:
+                total += sum(
+                    (entry.reps * entry.weight_kg for entry in entries if entry.is_completed),
+                    Decimal('0'),
+                )
+            else:
+                total += exercise.sets * exercise.reps * exercise.weight_kg
+        return total
 
 
 class Exercise(models.Model):
@@ -62,6 +72,33 @@ class Exercise(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ExerciseSet(models.Model):
+    """One performed (or planned) set belonging to a workout exercise."""
+
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, related_name='set_entries')
+    set_number = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(50)]
+    )
+    reps = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(500)]
+    )
+    weight_kg = models.DecimalField(
+        max_digits=5, decimal_places=1, default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(1000)],
+    )
+    is_completed = models.BooleanField(default=False)
+    is_warmup = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['set_number', 'id']
+        constraints = [
+            models.UniqueConstraint(fields=['exercise', 'set_number'], name='unique_exercise_set_number'),
+        ]
+
+    def __str__(self):
+        return f'{self.exercise.name} · set {self.set_number}'
 
 
 class BodyMetric(models.Model):
