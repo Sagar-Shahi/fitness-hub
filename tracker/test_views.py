@@ -8,7 +8,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import BodyMetric, Exercise, Meal, Profile, Workout
+from .models import BodyMetric, Exercise, ExerciseSet, Meal, Profile, Workout
 from .testutils import days_ago, make_meal, make_user, make_weight, make_workout
 
 
@@ -174,6 +174,65 @@ class ExerciseTests(Base):
 
     def test_get_is_not_allowed_for_changes(self):
         self.assertEqual(self.client.get(self.url).status_code, 405)
+
+
+class ExerciseSetTests(Base):
+    def setUp(self):
+        super().setUp()
+        self.workout = make_workout(self.user, exercises=())
+        self.exercise = Exercise.objects.create(
+            workout=self.workout, name='Bench press', sets=2, reps=10, weight_kg=Decimal('40.0')
+        )
+        self.first = ExerciseSet.objects.create(
+            exercise=self.exercise, set_number=1, reps=10, weight_kg=Decimal('40.0')
+        )
+        self.second = ExerciseSet.objects.create(
+            exercise=self.exercise, set_number=2, reps=8, weight_kg=Decimal('50.0')
+        )
+
+    def test_completed_set_volume(self):
+        self.assertEqual(self.workout.volume_kg, Decimal('0'))
+        self.first.is_completed = True
+        self.first.save()
+        self.assertEqual(self.workout.volume_kg, Decimal('400.0'))
+        self.second.is_completed = True
+        self.second.save()
+        self.assertEqual(self.workout.volume_kg, Decimal('800.0'))
+
+    def test_add_edit_and_delete_sets(self):
+        add_url = reverse('tracker:exercise-set-add', args=[self.workout.pk, self.exercise.pk])
+        response = self.client.post(add_url, {'reps': 6, 'weight_kg': '60.0', 'is_warmup': False})
+        self.assertRedirects(response, reverse('tracker:workout-detail', args=[self.workout.pk]))
+        third = self.exercise.set_entries.get(set_number=3)
+        self.assertEqual((third.reps, third.weight_kg, third.is_completed), (6, Decimal('60.0'), False))
+
+        edit_url = reverse('tracker:exercise-set-edit', args=[self.workout.pk, self.exercise.pk, third.pk])
+        response = self.client.post(edit_url, {
+            'reps': 5, 'weight_kg': '65.0', 'is_warmup': False, 'is_completed': True,
+        })
+        self.assertRedirects(response, reverse('tracker:workout-detail', args=[self.workout.pk]))
+        third.refresh_from_db()
+        self.assertEqual((third.reps, third.weight_kg, third.is_completed), (5, Decimal('65.0'), True))
+
+        delete_url = reverse('tracker:exercise-set-delete', args=[self.workout.pk, self.exercise.pk, self.second.pk])
+        self.client.post(delete_url)
+        self.assertEqual(list(self.exercise.set_entries.values_list('set_number', flat=True)), [1, 2])
+
+    def test_set_endpoints_are_post_only_and_owner_scoped(self):
+        edit_url = reverse('tracker:exercise-set-edit', args=[self.workout.pk, self.exercise.pk, self.first.pk])
+        self.assertEqual(self.client.get(edit_url).status_code, 405)
+        other = make_user('other')
+        other_workout = make_workout(other, exercises=())
+        other_exercise = Exercise.objects.create(
+            workout=other_workout, name='Private lift', sets=1, reps=1, weight_kg=Decimal('10.0')
+        )
+        other_set = ExerciseSet.objects.create(
+            exercise=other_exercise, set_number=1, reps=1, weight_kg=Decimal('10.0')
+        )
+        foreign_url = reverse('tracker:exercise-set-edit', args=[self.workout.pk, self.exercise.pk, other_set.pk])
+        self.assertEqual(self.client.post(foreign_url, {
+            'reps': 1, 'weight_kg': '1.0', 'is_warmup': False, 'is_completed': True,
+        }).status_code, 404)
 
 
 class WeightTests(Base):
