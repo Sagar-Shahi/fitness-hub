@@ -1,33 +1,43 @@
 {% extends 'base.html' %}
-{% block title %}FitHub{% endblock %}
+{% block title %}FitHub · Train with purpose{% endblock %}
+{% block description %}A focused home for your training, nutrition and progress. Track every set, build consistency and understand what is working.{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-text">
-    <p class="eyebrow">Private fitness tracking</p>
-    <h1>Train, eat and weigh in. See what is actually working.</h1>
-    <p class="lead">FitHub keeps your workouts, meals and body weight in one place, turns them into clear weekly progress, and offers training and diet plans when you want a head start. Your data is yours: export it any time.</p>
+<section class="home-hero">
+  <div class="home-copy">
+    <p class="eyebrow"><span class="eyebrow-mark"></span> YOUR TRAINING, IN FOCUS</p>
+    <h1>Make every<br><em>rep count.</em></h1>
+    <p class="home-lead">A clearer way to build strength, stay consistent and see your progress. Your workouts, nutrition and milestones — together in one place.</p>
     <div class="hero-actions">
       {% if user.is_authenticated %}
-      <a class="btn btn-primary" href="{% url 'tracker:dashboard' %}">Open your dashboard</a>
+      <a class="btn btn-primary" href="{% url 'tracker:dashboard' %}">Go to your dashboard <span aria-hidden="true">↗</span></a>
       {% else %}
-      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create a free account</a>
-      <a class="btn btn-quiet" href="{% url 'accounts:login' %}">Log in</a>
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Start tracking for free <span aria-hidden="true">↗</span></a>
+      <a class="btn btn-quiet" href="{% url 'accounts:login' %}">I have an account</a>
       {% endif %}
     </div>
+    <div class="home-proof"><span class="proof-dot"></span> PRIVATE BY DESIGN <span class="proof-sep">/</span> YOUR DATA, ALWAYS YOURS</div>
   </div>
-  <figure class="hero-demo" aria-label="Example week">
-    <p class="demo-label">This week</p>
-    <p class="demo-url">3 of 4 workouts &middot; 2 h 40 min</p>
-    <p class="demo-label">Today</p>
-    <p class="demo-url demo-short">1,840 of 2,200 kcal &middot; <strong>142 g</strong> protein</p>
-    <p class="demo-label">Last 30 days</p>
-    <p class="demo-url">Weight <span class="t1">82.4 &rarr; 80.9 kg</span> &middot; streak <span class="t2">5 days</span></p>
-  </figure>
+  <div class="home-visual" aria-label="Illustrative FitHub training dashboard">
+    <div class="visual-topline"><span>FITNESS OVERVIEW</span><span class="visual-live"><i></i> YOUR NEXT SESSION STARTS HERE</span></div>
+    <div class="visual-card visual-feature">
+      <div class="visual-feature-head"><div><span class="visual-kicker">WEEKLY CONSISTENCY</span><strong>Show up. Get stronger.</strong></div><span class="visual-count">03<span> / 04</span></span></div>
+      <div class="week-track" aria-label="Three of four weekly workouts"><i class="done"></i><i class="done"></i><i class="done"></i><i></i></div>
+      <div class="week-labels"><span>MON</span><span>WED</span><span>FRI</span><span>SUN</span></div>
+    </div>
+    <div class="visual-lower">
+      <div class="visual-card visual-volume"><span class="visual-kicker">TRAINING VOLUME</span><strong>Progress, <em>measured.</em></strong><div class="mini-bars" aria-hidden="true"><i style="height:32%"></i><i style="height:48%"></i><i style="height:40%"></i><i style="height:68%"></i><i style="height:56%"></i><i style="height:82%"></i><i style="height:100%"></i></div><div class="mini-bars-label"><span>LAST 7 SESSIONS</span><span>CONSISTENCY BUILDS</span></div></div>
+      <div class="visual-card visual-focus"><span class="visual-kicker">THE BASICS</span><div class="focus-row"><span class="focus-icon">01</span><span>Workouts</span><b>↗</b></div><div class="focus-row"><span class="focus-icon">02</span><span>Nutrition</span><b>↗</b></div><div class="focus-row"><span class="focus-icon">03</span><span>Progress</span><b>↗</b></div></div>
+    </div>
+    <div class="visual-caption"><span>BUILT FOR THE LONG GAME</span><span>FITNESS, WITHOUT THE NOISE.</span></div>
+  </div>
 </section>
 
-<section class="features">
-  <div class="card"><h2 class="card-title">Log in seconds</h2><p class="muted">Workouts with sets, reps and weights. Meals with calories and macros. One weight entry per day.</p></div>
-  <div class="card"><h2 class="card-title">See the trend</h2><p class="muted">Weekly goal progress, calories against your target, workout streak and a weight chart with your goal line.</p></div>
-  <div class="card"><h2 class="card-title">Built to be safe</h2><p class="muted">Argon2 passwords, per-account data isolation, strict browser security headers and rate-limited logins.</p></div>
+<section class="home-section">
+  <div class="section-heading"><div><p class="eyebrow">ONE PLACE. THE FULL PICTURE.</p><h2>Train with intention.<br><em>Track what matters.</em></h2></div><p>Less guesswork, more momentum. Keep the details that matter close and your progress easy to understand.</p></div>
+  <div class="home-features">
+    <article class="feature-tile"><span class="tile-index">01 / TRAIN</span><div class="tile-symbol">↗</div><h3>Every set has a story.</h3><p>Record reps, weight and completed sets. See the work behind your progress, one session at a time.</p></article>
+    <article class="feature-tile"><span class="tile-index">02 / FUEL</span><div class="tile-symbol">◒</div><h3>Fuel your effort.</h3><p>Keep meals, calories and macros together with the training you are putting in.</p></article>
+    <article class="feature-tile"><span class="tile-index">03 / GROW</span><div class="tile-symbol">⌁</div><h3>See the bigger picture.</h3><p>Follow your workout consistency, weight trends and goals without losing sight of the journey.</p></article>
+  </div>
 </section>
 {% endblock %}
