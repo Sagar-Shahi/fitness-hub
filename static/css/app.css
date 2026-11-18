@@ -1742,3 +1742,125 @@ main.container { gap: 22px; }
 }
 
 .learn-practice-link { align-self:flex-start; margin-top:2px; }
+
+
+/* FitHub UX refinement — calm navigation, clearer next steps, and touch-friendly controls. */
+.topbar { backdrop-filter:saturate(135%) blur(16px); background:rgba(33,31,27,.96); }
+.topbar-inner { gap:clamp(12px,1.5vw,22px); }
+.nav { align-items:center; min-width:0; gap:clamp(2px,.35vw,6px); }
+.nav>a { padding:9px clamp(9px,.9vw,13px); white-space:nowrap; }
+.nav-more { position:relative; flex:none; }
+.nav-more>summary {
+  display:inline-flex; align-items:center; gap:7px; padding:9px 12px;
+  border-radius:9px; color:#b9b4aa; cursor:pointer; list-style:none;
+  font-size:.9rem; font-weight:550; white-space:nowrap;
+}
+.nav-more>summary::-webkit-details-marker { display:none; }
+.nav-more>summary span { color:#d59a61; transition:transform .18s ease; }
+.nav-more[open]>summary span { transform:rotate(180deg); }
+.nav-more>summary:hover,.nav-more[open]>summary { color:#fffaf2; background:#34312b; }
+.nav-more-menu {
+  position:absolute; top:calc(100% + 12px); left:0; z-index:40;
+  display:grid; gap:3px; min-width:220px; padding:8px;
+  border:1px solid #4b4338; border-radius:14px;
+  background:#292620; box-shadow:0 18px 44px rgba(20,17,13,.28);
+}
+.nav-more-menu a {
+  display:block; padding:10px 12px; border-radius:8px; color:#d4cec3;
+  text-decoration:none; font-size:.9rem;
+}
+.nav-more-menu a:hover,.nav-more-menu a[aria-current="page"] {
+  color:#fffaf2; background:#41392f;
+}
+.nav-more-menu a[aria-current="page"] { box-shadow:inset 2px 0 #d58b45; }
+.topbar-actions { flex:none; }
+.account-menu summary { white-space:nowrap; }
+.dashboard-hero { align-items:flex-end; gap:24px; }
+.dashboard-hero h1 { font-size:clamp(2.15rem,1.55rem + 2vw,3.25rem); line-height:1.02; letter-spacing:-.055em; }
+.dashboard-hero .muted { max-width:48ch; line-height:1.65; }
+.dashboard-hero .head-actions { align-items:center; }
+.dashboard-next-steps {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px;
+}
+.dashboard-action {
+  display:flex; align-items:center; gap:12px; min-width:0; min-height:88px;
+  padding:16px; border:1px solid #ded6c9; border-radius:15px;
+  background:linear-gradient(145deg,#fffefa,#f7f2e9);
+  color:#44372c; text-decoration:none;
+  box-shadow:0 5px 16px rgba(56,42,29,.035);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.dashboard-action:hover {
+  color:#3d3025; border-color:#c99a6a; transform:translateY(-2px);
+  box-shadow:0 12px 24px rgba(56,42,29,.075);
+}
+.dashboard-action-primary {
+  background:linear-gradient(125deg,#4a3a2d,#6b5039); border-color:#6b5039; color:#fff8ef;
+}
+.dashboard-action-primary:hover { background:linear-gradient(125deg,#564333,#76583e); color:#fff8ef; border-color:#9b704a; }
+.dashboard-action-icon {
+  display:grid; place-items:center; flex:none; width:42px; height:42px;
+  border-radius:12px; background:#eee4d6; color:#9a6338; font-size:1.35rem; font-weight:750;
+}
+.dashboard-action-primary .dashboard-action-icon { background:rgba(255,255,255,.13); color:#f4c18f; }
+.dashboard-action>span:nth-child(2) { display:grid; gap:4px; min-width:0; }
+.dashboard-action strong { font-size:.94rem; letter-spacing:-.015em; }
+.dashboard-action small { color:#817466; font-size:.78rem; line-height:1.4; }
+.dashboard-action-primary small { color:#e2cdb8; }
+.dashboard-action-arrow { margin-left:auto; color:#a47b55; font-size:1rem; }
+.dashboard-action-primary .dashboard-action-arrow { color:#f0c18f; }
+.dashboard-chart-card { padding:clamp(18px,2.5vw,26px); }
+.dashboard-grid>.card { min-width:0; }
+.dashboard-stats .stat { min-width:0; }
+.dashboard-stats .stat dd { font-variant-numeric:tabular-nums; }
+.session-command { border:1px solid rgba(255,255,255,.08); }
+.session-command-top>div strong { font-variant-numeric:tabular-nums; }
+.live-exercise-card { scroll-margin-top:100px; }
+.live-exercise-card .set-card { border-radius:14px; }
+.live-exercise-card .set-quick-form { align-items:end; }
+.live-exercise-card .quick-metric input { min-height:44px; }
+.live-exercise-card .set-save-button { min-height:42px; }
+.live-exercise-card .set-quick-footer { gap:10px; }
+.live-exercise-card .set-quick-footer .quick-toggle { min-height:40px; }
+.btn,.nav a,.nav-more>summary,.account-menu summary { -webkit-tap-highlight-color:transparent; }
+:where(a,button,input,select,textarea,summary):focus-visible {
+  outline:3px solid rgba(200,121,50,.62); outline-offset:3px;
+}
+@media(max-width:1100px) {
+  .topbar-inner { gap:10px; }
+  .nav>a { padding-inline:9px; }
+  .topbar-actions { gap:7px; }
+}
+@media(max-width:900px) {
+  .dashboard-next-steps { grid-template-columns:1fr; }
+  .dashboard-action { min-height:76px; }
+}
+@media(max-width:760px) {
+  .topbar-inner { gap:8px 12px; }
+  .nav { order:3; flex:1 0 100%; overflow-x:auto; overflow-y:visible; padding:3px 0 5px; scrollbar-width:thin; }
+  .nav>a,.nav-more>summary { min-height:40px; }
+  .nav-more-menu { position:fixed; top:auto; left:12px; right:12px; bottom:auto; width:auto; }
+  .topbar-actions { margin-left:auto; }
+  .dashboard-hero { align-items:flex-start; flex-direction:column; }
+  .dashboard-hero .head-actions { width:100%; justify-content:space-between; flex-wrap:wrap; }
+}
+@media(max-width:520px) {
+  main.container { gap:16px; }
+  .topbar-inner { padding-inline:14px; }
+  .brand { font-size:1.08rem; }
+  .account-menu summary { padding-right:6px; }
+  .account-menu summary:not(:has(.avatar)) { font-size:.85rem; }
+  .dashboard-hero h1 { font-size:2.35rem; }
+  .dashboard-next-steps { gap:9px; }
+  .dashboard-action { padding:13px; min-height:72px; }
+  .dashboard-action-icon { width:38px; height:38px; }
+  .dashboard-action small { font-size:.75rem; }
+  .session-command { padding:17px; }
+  .session-command-bottom { align-items:flex-start; flex-direction:column; }
+  .live-exercise-card .set-quick-footer { display:grid; grid-template-columns:1fr 1fr; }
+  .live-exercise-card .set-save-button { grid-column:1/-1; width:100%; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .dashboard-action,.nav-more>summary span { transition:none; }
+  .dashboard-action:hover { transform:none; }
+}
