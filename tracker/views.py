@@ -31,6 +31,13 @@ def _own_workout(request, pk):
     return get_object_or_404(Workout.objects.filter(owner=request.user).prefetch_related('exercises__set_entries'), pk=pk)
 
 
+def _attach_set_forms(workout, bound_form=None):
+    for exercise in workout.exercises.all():
+        for entry in exercise.set_entries.all():
+            entry.edit_form = bound_form if bound_form is not None and bound_form.instance.pk == entry.pk else ExerciseSetForm(instance=entry)
+    return workout
+
+
 def _csv_safe(value):
     text = str(value)
     return "'" + text if text[:1] in ('=', '+', '-', '@', '\t', '\r') else text
@@ -87,14 +94,12 @@ def workout_create(request):
 
 @login_required
 def workout_detail(request, pk):
-    workout = _own_workout(request, pk)
+    workout = _attach_set_forms(_own_workout(request, pk))
     form = ExerciseForm(workout=workout)
     return render(request, 'tracker/workout_detail.html', {
         'workout': workout,
         'form': form,
         'set_add_form': ExerciseSetAddForm(),
-        'set_forms': {entry.pk: ExerciseSetForm(instance=entry)
-                      for exercise in workout.exercises.all() for entry in exercise.set_entries.all()},
     })
 
 
@@ -140,10 +145,9 @@ def exercise_add(request, pk):
         ])
         messages.success(request, f'Added {exercise.name}. Complete each set as you train.')
         return redirect('tracker:workout-detail', pk=workout.pk)
+    workout = _attach_set_forms(workout)
     return render(request, 'tracker/workout_detail.html', {
         'workout': workout, 'form': form, 'set_add_form': ExerciseSetAddForm(),
-        'set_forms': {entry.pk: ExerciseSetForm(instance=entry)
-                      for exercise in workout.exercises.all() for entry in exercise.set_entries.all()},
     }, status=400)
 
 
@@ -189,14 +193,11 @@ def exercise_set_edit(request, pk, exercise_pk, set_pk):
         form.save()
         messages.success(request, f'Set {entry.set_number} updated.')
         return redirect('tracker:workout-detail', pk=workout.pk)
-    set_forms = {item.pk: ExerciseSetForm(instance=item)
-                 for item in ExerciseSet.objects.filter(exercise__workout=workout).select_related('exercise')}
-    set_forms[entry.pk] = form
+    workout = _attach_set_forms(workout, form)
     return render(request, 'tracker/workout_detail.html', {
         'workout': workout,
         'form': ExerciseForm(workout=workout),
         'set_add_form': ExerciseSetAddForm(),
-        'set_forms': set_forms,
     }, status=400)
 
 
