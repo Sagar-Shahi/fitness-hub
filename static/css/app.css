@@ -2455,3 +2455,24 @@ input:focus,select:focus,textarea:focus {
 .home-section-athletic .feature-tile:hover { color:inherit; }
 @media(max-width:760px) { .home-real-tools-grid { grid-template-columns:1fr; } }
 @media(prefers-reduced-motion:reduce) { .home-real-tool { transition:none; } }
+
+
+/* Practical meal logging: live, honest feedback without invented nutrition goals. */
+.meal-form-intro { margin: -.35rem 0 1rem; }
+.meal-kind-shortcuts { display:flex; flex-wrap:wrap; gap:.45rem; margin:0 0 1.1rem; }
+.meal-kind-shortcuts button { border:1px solid var(--line, #ded6ca); border-radius:999px; padding:.5rem .8rem; background:var(--surface, #faf7f1); color:inherit; font:inherit; cursor:pointer; transition:background .18s ease, transform .18s ease, border-color .18s ease; }
+.meal-kind-shortcuts button:hover { transform:translateY(-2px); border-color:var(--accent, #a65f43); }
+.meal-kind-shortcuts button[aria-pressed="true"] { background:var(--ink, #34271f); color:#fff; border-color:var(--ink, #34271f); }
+.meal-live-preview { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.65rem; padding:1rem; margin:1rem 0 .6rem; border:1px solid var(--line, #ded6ca); border-radius:14px; background:var(--surface, #faf7f1); }
+.meal-live-preview div { display:grid; gap:.2rem; min-width:0; }
+.meal-live-preview strong { font-size:1.05rem; font-variant-numeric:tabular-nums; }
+.meal-live-preview .muted { font-size:.76rem; }
+.meal-after-add { font-size:.83rem; margin:.4rem 0 1rem; font-variant-numeric:tabular-nums; }
+.meal-goal-note { display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin:.5rem 0 0; color:var(--muted, #766c61); font-size:.82rem; }
+.meal-history-heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.1rem 1.2rem .3rem; }
+.meal-history-heading .card-title { margin:0; }
+.meal-empty-state { text-align:center; padding:2.5rem 1.25rem; }
+.meal-empty-state > span { display:inline-grid; place-items:center; width:3rem; height:3rem; border-radius:50%; background:var(--surface, #faf7f1); font-size:1.5rem; }
+.meal-empty-state h3 { margin:.8rem 0 .25rem; }
+@media(max-width:560px) { .meal-live-preview { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(prefers-reduced-motion:reduce) { .meal-kind-shortcuts button { transition:none; } }
