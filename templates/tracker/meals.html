@@ -53,7 +53,7 @@
   <div class="progress-row">
     <div class="goal-ring"><strong>{{ totals.calories }} of {{ target }} kcal</strong><span class="muted">{{ percent }}%</span></div>
     <progress class="meter" max="100" value="{{ percent }}" aria-label="Calories against target">{{ percent }}%</progress>
-    <p class="meal-goal-note">{% if percent >= 100 %}Daily calorie target reached{% else %}{{ target|add:"-"|default:"" }}{% endif %}<span>{{ totals.calories }} / {{ target }} kcal logged</span></p>
+    <p class="meal-goal-note"><span>{% if percent >= 100 %}Daily calorie target reached{% else %}{{ target|add:"0" }} kcal daily goal{% endif %}</span><span>{{ totals.calories }} / {{ target }} kcal logged</span></p>
   </div>
   <dl class="macro-row meals-macros">
     <div><dt>Protein</dt><dd>{{ totals.protein }} g</dd></div>
