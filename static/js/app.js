@@ -360,9 +360,32 @@
     }
   }
 
-  load.addEventListener('click', function () { loadUrl(input.value, true); });
+  function searchMusic(provider) {
+    var query = input.value.trim();
+    if (!query) {
+      showStatus('Type a song, artist or playlist name first.');
+      input.focus();
+      return;
+    }
+    var target = provider === 'spotify'
+      ? 'https://open.spotify.com/search/' + encodeURIComponent(query)
+      : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
+    window.open(target, '_blank', 'noopener,noreferrer');
+    showStatus('Opened ' + (provider === 'spotify' ? 'Spotify' : 'YouTube') + ' search results in a new tab.');
+  }
+
+  load.addEventListener('click', function () {
+    if (safeUrl(input.value)) loadUrl(input.value, true);
+    else searchMusic('youtube');
+  });
+  var spotifySearch = document.getElementById('focus-spotify-search');
+  if (spotifySearch) spotifySearch.addEventListener('click', function () { searchMusic('spotify'); });
   input.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') { event.preventDefault(); loadUrl(input.value, true); }
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      if (safeUrl(input.value)) loadUrl(input.value, true);
+      else searchMusic('youtube');
+    }
   });
   openLink.addEventListener('click', function (event) {
     if (openLink.hidden || !openLink.href || openLink.getAttribute('href') === '#') event.preventDefault();
