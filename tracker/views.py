@@ -34,7 +34,11 @@ def _own_workout(request, pk):
 
 def _attach_set_forms(workout, bound_form=None):
     for exercise in workout.exercises.all():
-        exercise.add_set_form = ExerciseSetAddForm(prefix=f'add-set-{exercise.pk}')
+        last_entry = exercise.set_entries.order_by('-set_number').first()
+        defaults = {'reps': last_entry.reps, 'weight_kg': last_entry.weight_kg} if last_entry else {
+            'reps': exercise.reps, 'weight_kg': exercise.weight_kg,
+        }
+        exercise.add_set_form = ExerciseSetAddForm(prefix=f'add-set-{exercise.pk}', initial=defaults)
         for entry in exercise.set_entries.all():
             prefix = f'set-{entry.pk}'
             entry.edit_form = (bound_form if bound_form is not None and bound_form.instance.pk == entry.pk
