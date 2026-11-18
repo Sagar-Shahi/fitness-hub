@@ -18,12 +18,12 @@ Security and privacy are design constraints here, not an afterthought.
 | ![Dashboard on a phone](docs/screenshots/dashboard-phone.png) | ![Meals on a phone](docs/screenshots/meals-phone.png) |
 
 ## Features
-- **Workouts**: sessions with exercises (sets, reps, weight), automatic volume, edit and delete, CSV export.
+- **Workouts**: sessions with exercises and individually editable sets (reps, weight, completion, warm-up), completed-set volume, edit and delete, CSV export.
 - **Meals**: calories and protein/carbs/fat per meal, daily totals against your calorie target, day-by-day browsing.
 - **Weight**: one entry per day, chart with your target line.
 - **Dashboard**: weekly workout goal, calories left today, workout streak, 7/30/90-day charts. Charts are drawn as SVG on the server, so there is no chart library and no inline script.
 - **Plan shop**: training and diet plans, cart, orders, and a "My plans" page. The full plan text is only sent to people who bought it.
-- **REST API** with revocable API keys: workouts (with nested exercises), meals, weight and a summary.
+- **REST API** with revocable API keys: workouts with nested exercises and optional `set_details` arrays, meals, weight and a summary.
 - Light and dark theme, responsive layout, system fonts only.
 
 > **Checkout is a demo.** No payment provider is connected, so no money is ever taken. The cart, orders and access rules are real inside the app, and prices are always read from the database, never from the browser. Adding a real provider (for example Stripe) is the natural next step.
@@ -41,7 +41,7 @@ python manage.py runserver
 Then open http://127.0.0.1:8000/ and sign up, or log in with the demo account printed by `seed_demo`.
 To create the sample plans on a live site run `python manage.py seed_plans`; you can also manage plans in the admin.
 
-Run the tests with `python manage.py test` (162 tests, no setup needed).
+Run the tests with `python manage.py test` (170 tests, no setup needed).
 
 ## API
 Create a key on the **API keys** page (shown once, stored only as a SHA-256 hash) and send it as a Bearer token.
@@ -49,15 +49,15 @@ Responses are JSON only; lists are paginated (`page`, `page_size` up to 100).
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET / POST | `/api/v1/workouts/` | List / create workouts, optionally with `exercises` |
-| GET / PUT / PATCH / DELETE | `/api/v1/workouts/{id}/` | Sending `exercises` replaces them; leaving it out keeps them |
+| GET / POST | `/api/v1/workouts/` | List / create workouts, optionally with `exercises` and per-exercise `set_details` |
+| GET / PUT / PATCH / DELETE | `/api/v1/workouts/{id}/` | Sending `exercises` replaces them; leaving it out keeps them. Each exercise can include `set_details` with `set_number`, `reps`, `weight_kg`, `is_completed`, and `is_warmup`. Omit `set_details` for legacy summary behavior; send `[]` to represent no recorded sets. |
 | GET / POST | `/api/v1/meals/` (`?date=YYYY-MM-DD`) | Meals |
 | GET / POST | `/api/v1/weight/` | Weight; posting an existing day replaces its value |
 | GET | `/api/v1/summary/` | This week, today and latest weight in one call |
 
 ```bash
 curl -H "Authorization: Bearer fh_..." -H "Content-Type: application/json" \
-  -d '{"date":"2026-11-12","name":"Push day","duration_min":55,"exercises":[{"name":"Bench press","sets":4,"reps":8,"weight_kg":"60"}]}' \
+  -d '{"date":"2026-11-12","name":"Push day","duration_min":55,"exercises":[{"name":"Bench press","sets":4,"reps":8,"weight_kg":"60","set_details":[{"set_number":1,"reps":8,"weight_kg":"60","is_completed":true,"is_warmup":false}]}]}' \
   http://127.0.0.1:8000/api/v1/workouts/
 ```
 Fields the server owns (`owner`, `id`, `volume_kg`, timestamps) are ignored if sent. Other users' records return `404`.
