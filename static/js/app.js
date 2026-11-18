@@ -329,7 +329,7 @@
     var youtubeId = '';
     if (provider === 'YouTube') {
       openLink.hidden = true;
-      if (url.hostname.toLowerCase().replace(/^www\\./, '') === 'youtu.be') {
+      if (url.hostname.toLowerCase().replace(/^www\./, '') === 'youtu.be') {
         youtubeId = url.pathname.split('/').filter(Boolean)[0] || '';
       } else {
         youtubeId = url.searchParams.get('v') || '';
