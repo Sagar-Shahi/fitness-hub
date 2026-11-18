@@ -11,6 +11,7 @@
     <input type="hidden" name="next" value="{{ next }}">
     <button class="btn btn-primary btn-block" type="submit">Log in</button>
   </form>
+  <p class="muted auth-alt"><a href="{% url 'accounts:password-reset' %}">Forgot your password?</a></p>
   <p class="muted auth-alt">New here? <a href="{% url 'accounts:register' %}">Create an account</a></p>
 </section>
 {% endblock %}
