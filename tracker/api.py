@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from . import analytics
-from .models import BodyMetric, Exercise, Meal, Workout, profile_for
+from .models import BodyMetric, Exercise, ExerciseSet, Meal, Workout, profile_for
 
 
 def _not_future(value):
@@ -20,11 +20,40 @@ def _not_future(value):
     return value
 
 
+class ExerciseSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExerciseSet
+        fields = ['id', 'set_number', 'reps', 'weight_kg', 'is_completed', 'is_warmup']
+        read_only_fields = ['id']
+
+
 class ExerciseSerializer(serializers.ModelSerializer):
+    set_details = ExerciseSetSerializer(source='set_entries', many=True, required=False)
+
     class Meta:
         model = Exercise
-        fields = ['id', 'name', 'sets', 'reps', 'weight_kg']
+        fields = ['id', 'name', 'sets', 'reps', 'weight_kg', 'set_details']
         read_only_fields = ['id']
+
+    def create(self, validated):
+        set_details = validated.pop('set_entries', [])
+        exercise = Exercise.objects.create(**validated)
+        ExerciseSet.objects.bulk_create([
+            ExerciseSet(exercise=exercise, **entry) for entry in set_details
+        ])
+        return exercise
+
+    def update(self, instance, validated):
+        set_details = validated.pop('set_entries', None)
+        for key, value in validated.items():
+            setattr(instance, key, value)
+        instance.save()
+        if set_details is not None:
+            instance.set_entries.all().delete()
+            ExerciseSet.objects.bulk_create([
+                ExerciseSet(exercise=instance, **entry) for entry in set_details
+            ])
+        return instance
 
 
 class WorkoutSerializer(serializers.ModelSerializer):
@@ -54,7 +83,8 @@ class WorkoutSerializer(serializers.ModelSerializer):
     def create(self, validated):
         exercises = validated.pop('exercises', [])
         workout = Workout.objects.create(owner=self.context['request'].user, **validated)
-        Exercise.objects.bulk_create([Exercise(workout=workout, **e) for e in exercises])
+        for exercise_data in exercises:
+            ExerciseSerializer().create({'workout': workout, **exercise_data})
         return workout
 
     @transaction.atomic
@@ -65,7 +95,8 @@ class WorkoutSerializer(serializers.ModelSerializer):
         instance.save()
         if exercises is not None:  # sending a list replaces the exercises; leaving it out keeps them
             instance.exercises.all().delete()
-            Exercise.objects.bulk_create([Exercise(workout=instance, **e) for e in exercises])
+            for exercise_data in exercises:
+                ExerciseSerializer().create({'workout': instance, **exercise_data})
         return instance
 
 
