@@ -2439,3 +2439,19 @@ input:focus,select:focus,textarea:focus {
   .home-chart-line { stroke-dashoffset:0; }
   .home-insight-card,.home-insight-arrow { transition:none; }
 }
+
+
+/* Practical homepage links: each card opens a real authenticated feature. */
+.home-real-tools-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.home-real-tool { display:flex; align-items:center; gap:12px; min-width:0; padding:17px; border:1px solid #ded5ca; border-radius:17px; background:#fcfaf6; color:#352b25; text-decoration:none; transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease; }
+.home-real-tool:hover { color:#352b25; transform:translateY(-3px); border-color:#b99b83; box-shadow:0 12px 24px rgba(65,48,36,.08); }
+.home-real-tool>span:nth-child(2) { display:grid; gap:3px; min-width:0; }
+.home-real-tool strong { font-size:.9rem; }
+.home-real-tool small { color:#84776d; font-size:.75rem; line-height:1.5; }
+.home-real-tools-note { margin:14px 0 0; color:#84776d; font-size:.82rem; }
+.home-real-tools-note a,.home-feature-link { color:#986d52; font-weight:750; text-decoration:none; }
+.home-feature-link { display:inline-block; margin-top:14px; font-size:.78rem; }
+.home-section-athletic .feature-tile { display:block; color:inherit; text-decoration:none; }
+.home-section-athletic .feature-tile:hover { color:inherit; }
+@media(max-width:760px) { .home-real-tools-grid { grid-template-columns:1fr; } }
+@media(prefers-reduced-motion:reduce) { .home-real-tool { transition:none; } }
