@@ -11,6 +11,7 @@ app_name = 'tracker'
 urlpatterns = [
     path('app/', views.dashboard, name='dashboard'),
     path('app/progress/', progress, name='progress'),
+    path('app/share-progress/', views.share_progress, name='share-progress'),
     path('app/exercise-library/', exercise_library, name='exercise-library'),
     path('app/learn/', learn, name='learn'),
     path('app/exercise-library/tutorials/', exercise_library_tutorials, name='exercise-library-tutorials'),
