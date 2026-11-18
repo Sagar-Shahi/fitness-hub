@@ -67,8 +67,11 @@
       <div class="focus-url-row"><input id="focus-audio-url" type="url" inputmode="url" placeholder="Paste an MP3 or music link" autocomplete="url"><button class="btn btn-primary btn-small" id="focus-load" type="button">Load</button></div>
       <p class="focus-help" id="focus-status" role="status">Direct audio files can play here. Spotify and YouTube links open on their platforms.</p>
       <audio id="focus-audio" controls preload="none"></audio>
+      <label class="focus-label" for="focus-local-file">Or play an audio file already on this device</label>
+      <input class="focus-local-file" id="focus-local-file" type="file" accept="audio/*">
+      <p class="focus-help">Local files stay on your device; FitHub does not upload them.</p>
       <div class="focus-actions"><a class="btn btn-quiet btn-small" id="focus-open" href="#" target="_blank" rel="noopener noreferrer" hidden>Open link ↗</a><a class="btn btn-quiet btn-small" id="focus-download" href="#" download hidden>Download file</a><button class="btn btn-quiet btn-small" id="focus-clear" type="button">Clear</button></div>
-      <div class="focus-voice"><div><strong>Coach voice</strong><p class="focus-help">Optional spoken cues from your browser.</p></div><button class="btn btn-quiet btn-small" id="focus-speak" type="button">Motivate me</button></div>
+      <div class="focus-voice"><div><strong>Coach voice</strong><p class="focus-help">Optional spoken cues from your browser.</p></div><div class="focus-actions"><button class="btn btn-quiet btn-small" id="focus-speak" type="button">Motivate me</button><button class="btn btn-quiet btn-small" id="focus-stop-speak" type="button">Stop voice</button></div></div>
       <p class="focus-help focus-legal">Only download audio you own or are allowed to download. Streaming platforms may restrict playback or downloads; FitHub does not bypass those limits. Your saved link stays in this browser.</p>
     </section>
   </details>
