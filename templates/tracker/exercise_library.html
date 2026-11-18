@@ -34,6 +34,18 @@
     {% if item.secondaryMuscles %}<p class="small muted">Also works: {{ item.secondaryMuscles|join:", "|title }}</p>{% endif %}
     {% if item.mechanic %}<span class="small muted">{{ item.mechanic|title }} movement</span>{% endif %}
     {% if item.instructions %}<details><summary>How to perform</summary><ol>{% for step in item.instructions %}<li>{{ step }}</li>{% endfor %}</ol></details>{% endif %}
+    <details class="exercise-tutorial library-tutorial" data-exercise-tutorial="{{ forloop.counter }}" data-tutorial-url="{% url 'tracker:exercise-library-tutorials' %}?name={{ item.name|urlencode }}">
+      <summary>▶ Watch exercise video</summary>
+      <div class="exercise-tutorial-panel">
+        <p class="muted">Choose a demonstration to play it here in FitHub.</p>
+        <button class="btn btn-primary btn-small" type="button" data-tutorial-search>Find videos</button>
+        <p class="exercise-video-status" data-video-status role="status" aria-live="polite">Ready when you are.</p>
+        <div class="tutorial-results" data-tutorial-results></div>
+        <div class="exercise-video-frame" data-video-frame-wrap hidden>
+          <iframe data-video-frame title="{{ item.name }} exercise tutorial" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+    </details>
     {% if selected_workout %}
     <form method="post" action="{% url 'tracker:exercise-add' selected_workout.pk %}" class="form-actions">{% csrf_token %}
       <input type="hidden" name="name" value="{{ item.name|truncatechars:80 }}">
