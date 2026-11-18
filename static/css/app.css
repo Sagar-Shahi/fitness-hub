@@ -1704,7 +1704,7 @@ main.container { gap: 22px; }
 .focus-video-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; color:#f5eee4; }
 .focus-video-heading strong { min-width:0; overflow-wrap:anywhere; font-size:.88rem; }
 .focus-video-square { position:relative; width:100%; aspect-ratio:1/1; overflow:hidden; border-radius:11px; background:#080808; box-shadow:0 10px 28px rgba(0,0,0,.28); }
-.focus-video-square iframe { position:absolute; left:50%; top:0; display:block; width:177.7778%; max-width:none; height:100%; transform:translateX(-50%); border:0; background:#080808; }
+.focus-video-square iframe { position:absolute; left:0; top:50%; display:block; width:100%; max-width:100%; height:56.25%; transform:translateY(-50%); border:0; background:#080808; pointer-events:auto; }
 .focus-video-stage .focus-help { color:#d0c3b3; margin:9px 0 0; }
 @media(max-width:620px) {
   .focus-dock.has-video { right:12px; width:calc(100vw - 24px); }
