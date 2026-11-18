@@ -14,6 +14,11 @@ def home(request):
 
 
 @require_safe
+def about(request):
+    return render(request, 'about.html')
+
+
+@require_safe
 def health(request):
     """Used by hosting platforms to check the app is up. It says nothing about the system itself."""
     try:
