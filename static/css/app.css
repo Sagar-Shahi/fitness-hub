@@ -408,6 +408,8 @@ input[type="datetime-local"], input[type="number"], input[type="date"], select, 
 .focus-label { display: block; margin-bottom: 6px; font-size: .84rem; font-weight: 650; }
 .focus-url-row { display: flex; gap: 7px; }
 .focus-url-row input { min-width: 0; }
+.focus-search-actions { align-items: center; margin-top: 8px; }
+.focus-search-actions .focus-help { margin: 0; }
 .focus-help { margin: 7px 0 10px; color: var(--muted); font-size: .78rem; line-height: 1.45; }
 .focus-panel audio { display: block; width: 100%; min-height: 38px; margin: 10px 0; }
 .focus-actions { display: flex; flex-wrap: wrap; gap: 7px; }
