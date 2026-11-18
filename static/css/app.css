@@ -1636,18 +1636,20 @@ main.container { gap: 22px; }
 @media(prefers-reduced-motion:reduce) { .library-exercise-image { transition:none; } .library-exercise-card:hover .library-exercise-image { transform:none; } }
 
 
-/* Exercise tutorial: near-full-screen, centered in-app viewing mode */
+/* Exercise tutorial: square viewing stage; preserve the complete 16:9 video without cropping */
 .exercise-video-frame:not([hidden]) {
   position:fixed;
   z-index:2000;
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
-  width:min(1600px, 96vw, calc(88vh * 16 / 9));
-  aspect-ratio:16/9;
+  width:min(92vw, 88vh, 900px);
+  aspect-ratio:1 / 1;
   margin:0;
+  display:grid;
+  place-items:center;
   border:1px solid #cfc5b8;
-  border-radius:16px;
+  border-radius:18px;
   overflow:visible;
   background:#171512;
   box-shadow:0 0 0 100vmax rgba(22,18,14,.86), 0 24px 70px rgba(0,0,0,.42);
@@ -1655,10 +1657,11 @@ main.container { gap: 22px; }
 .exercise-video-frame iframe {
   display:block;
   width:100%;
-  height:100%;
+  height:auto;
+  aspect-ratio:16 / 9;
   border:0;
-  border-radius:15px;
-  overflow:hidden;
+  border-radius:12px;
+  background:#000;
 }
 .tutorial-recommendation {
   margin:12px 0;
@@ -1667,8 +1670,9 @@ main.container { gap: 22px; }
 }
 .exercise-video-close {
   position:absolute;
-  right:0;
-  top:-46px;
+  right:10px;
+  top:10px;
+  z-index:1;
   min-height:36px;
   padding:7px 13px;
   border:1px solid rgba(255,255,255,.35);
@@ -1682,8 +1686,8 @@ main.container { gap: 22px; }
 }
 @media(max-width:600px) {
   .exercise-video-frame:not([hidden]) {
-    width:96vw;
-    border-radius:11px;
+    width:min(92vw, 72vh);
+    border-radius:13px;
   }
-  .exercise-video-close { top:-43px; }
+  .exercise-video-close { top:8px; right:8px; }
 }
