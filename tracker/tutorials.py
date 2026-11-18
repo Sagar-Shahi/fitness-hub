@@ -38,7 +38,7 @@ def exercise_library_tutorials(request):
     params = urlencode({
         "part": "snippet",
         "type": "video",
-        "maxResults": 6,
+        "maxResults": 1,
         "safeSearch": "strict",
         "q": query,
         "videoEmbeddable": "true",
