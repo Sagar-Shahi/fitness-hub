@@ -1,11 +1,13 @@
 from django.urls import path
 
 from . import views
+from .library import exercise_library
 
 app_name = 'tracker'
 
 urlpatterns = [
     path('app/', views.dashboard, name='dashboard'),
+    path('app/exercise-library/', exercise_library, name='exercise-library'),
     path('app/goals/', views.goals, name='goals'),
     path('app/workouts/', views.workout_list, name='workout-list'),
     path('app/workouts/new/', views.workout_create, name='workout-create'),
