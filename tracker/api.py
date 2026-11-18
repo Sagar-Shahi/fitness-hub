@@ -35,6 +35,14 @@ class ExerciseSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'sets', 'reps', 'weight_kg', 'set_details']
         read_only_fields = ['id']
 
+    def validate_set_details(self, value):
+        if len(value) > 50:
+            raise serializers.ValidationError('At most 50 sets per exercise.')
+        numbers = [entry['set_number'] for entry in value]
+        if len(numbers) != len(set(numbers)):
+            raise serializers.ValidationError('Set numbers must be unique within an exercise.')
+        return value
+
     def create(self, validated):
         set_details = validated.pop('set_entries', [])
         exercise = Exercise.objects.create(**validated)
