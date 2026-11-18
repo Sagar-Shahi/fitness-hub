@@ -26,6 +26,7 @@ ARTICLES = [
         "category": "Strength",
         "read_time": "5 min",
         "summary": "Understand movement patterns, controlled repetitions and how to start a balanced routine.",
+        "exercise_query": "squat",
         "sections": [
             {"heading": "Train the whole body", "body": "A balanced strength routine includes movements for the legs, hips, back, abdomen, chest, shoulders and arms. You can organise these as full-body sessions or split them across the week."},
             {"heading": "Prioritise quality", "bullets": ["Choose a load you can control through a comfortable range of motion.", "Use steady repetitions instead of rushing or bouncing through them.", "Stop a set when you cannot maintain safe, consistent technique.", "Record sets, repetitions and load so you can understand what you actually did."]},
@@ -42,13 +43,14 @@ ARTICLES = [
         "category": "Programming",
         "read_time": "4 min",
         "summary": "Learn how to make training gradually more challenging while keeping technique in control.",
+        "exercise_query": "bench press",
         "sections": [
             {"heading": "The basic idea", "body": "To keep adapting, training usually needs a gradual and appropriate increase in challenge over time. That can mean adding a small amount of weight, performing an extra repetition, adding a set, improving control or using a more challenging variation."},
             {"heading": "A simple method", "bullets": ["Track the weight and repetitions for each working set.", "Repeat a load until you can complete your planned repetitions with consistent form.", "Change one training variable at a time, in small steps.", "If technique breaks down or recovery suffers, hold steady or reduce the challenge."]},
             {"heading": "Do not chase numbers", "body": "More weight is not automatically better. Pain, shortened range of motion and uncontrolled repetitions are not signs of productive progress."},
         ],
         "sources": [
-            {"label": "CDC — Adult activity guidelines", "url": "https://www.cdc.gov/physical-activity-basics/guidelines/adults.html"},
+            {"label": "ACSM — 2026 resistance training position stand", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12965823/"},
         ],
     },
     {
@@ -80,6 +82,37 @@ ARTICLES = [
         "sources": [
             {"label": "WHO — Physical activity and health", "url": "https://www.who.int/initiatives/behealthy/physical-activity/"},
             {"label": "CDC — Benefits of physical activity", "url": "https://www.cdc.gov/physical-activity-basics/benefits/index.html"},
+        ],
+    },
+    {
+        "slug": "strength-vs-muscle-growth",
+        "title": "Strength vs muscle growth: train with a purpose",
+        "category": "Programming",
+        "read_time": "5 min",
+        "summary": "Learn what training variables can influence strength, muscle size and power—and what matters most for beginners.",
+        "sections": [
+            {"heading": "Different outcomes, overlapping training", "body": "Strength, muscle size (hypertrophy) and power are related but distinct outcomes. Resistance training can improve all three. You do not need a complicated split or advanced techniques to begin making progress."},
+            {"heading": "What the 2026 ACSM review found", "bullets": ["For strength, heavier loads and full range of motion can help optimise results; the review identified 2–3 sets per exercise and at least two sessions per week as useful variables.", "For muscle growth, higher weekly training volume was associated with greater hypertrophy, with around 10 or more sets per muscle group per week highlighted in the review.", "For power, moderate loads and moving the weight quickly during the lifting phase were highlighted.", "These are optimisation findings for healthy adults—not mandatory targets or a beginner's one-size-fits-all plan."]},
+            {"heading": "What to do first", "body": "Choose a routine you can perform consistently with good technique. Track your individual sets, allow recovery and adjust the programme to your experience, goals and schedule. Consistency matters more than chasing perfect numbers."},
+        ],
+        "sources": [
+            {"label": "ACSM — 2026 resistance training position stand (full review)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12965823/"},
+            {"label": "ACSM — Summary of updated resistance training guidelines", "url": "https://acsm.org/resistance-training-guidelines-update-2026/"},
+        ],
+    },
+    {
+        "slug": "hydration-basics",
+        "title": "Hydration basics for training",
+        "category": "Recovery",
+        "read_time": "3 min",
+        "summary": "Simple hydration habits for ordinary workouts, warm weather and active days.",
+        "sections": [
+            {"heading": "Start with water", "body": "For most people, water is a practical first choice for everyday hydration. Hydration needs vary with body size, activity, climate, sweat rate and health circumstances; there is no single daily amount that fits everyone."},
+            {"heading": "Around your workout", "bullets": ["Arrive at exercise reasonably hydrated rather than trying to catch up all at once.", "Keep water accessible and drink during exercise, especially in hot or humid conditions.", "After training, drink and eat normally to replace fluids and support recovery.", "Long, vigorous sessions in very hot conditions may create different fluid and electrolyte needs than a short gym session."]},
+            {"heading": "Avoid rigid rules", "body": "Do not force excessive amounts of water. People with medical conditions or clinician-directed fluid restrictions should follow their individual medical advice."},
+        ],
+        "sources": [
+            {"label": "American Heart Association — Staying hydrated, staying healthy", "url": "https://www.heart.org/en/healthy-living/exercise-and-physical-activity/fitness-basics/staying-hydrated-staying-healthy"},
         ],
     },
     {
