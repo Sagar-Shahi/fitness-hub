@@ -1913,3 +1913,14 @@ main.container { gap: 22px; }
   .share-progress-card { position:absolute; left:0; top:0; width:100%; box-shadow:none; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   .share-progress-page { max-width:none; padding:0; }
 }
+
+
+/* Focus Audio: compact, accessible in-app YouTube search results. */
+.focus-music-results{display:grid;gap:8px;margin:10px 0 14px;max-height:260px;overflow:auto}
+.focus-music-result{display:flex;align-items:center;gap:12px;width:100%;padding:9px;border:1px solid var(--line,#ded6cb);border-radius:12px;background:var(--surface,#fff);color:inherit;text-align:left;cursor:pointer}
+.focus-music-result:hover,.focus-music-result:focus-visible{border-color:var(--accent,#987b5c);background:var(--surface-soft,#f7f2eb)}
+.focus-music-result:focus-visible{outline:2px solid var(--accent,#987b5c);outline-offset:2px}
+.focus-music-result img{width:88px;aspect-ratio:16/9;object-fit:cover;border-radius:7px;background:var(--surface-soft,#f7f2eb);flex:0 0 auto}
+.focus-music-result-copy{display:grid;gap:4px;min-width:0}
+.focus-music-result-copy strong{font-size:.9rem;line-height:1.35}
+.focus-music-result-copy small{color:var(--muted,#746c63);font-size:.78rem}
