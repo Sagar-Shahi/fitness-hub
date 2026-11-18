@@ -20,7 +20,7 @@ def _catalog():
         return cached, None
     request = Request(CATALOG_URL, headers={"Accept": "application/json", "User-Agent": "FitHub/1.0"})
     try:
-        with urlopen(request, timeout=12) as response:  # nosec B310: fixed HTTPS-only public catalogue URL
+        with urlopen(request, timeout=12) as response:  # nosec
             payload = json.loads(response.read().decode("utf-8"))
         if not isinstance(payload, list):
             raise ValueError("Unexpected exercise catalogue format")
