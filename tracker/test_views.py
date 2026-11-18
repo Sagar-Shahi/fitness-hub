@@ -84,7 +84,7 @@ class ShareProgressTests(Base):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['workouts'], 1)
         self.assertEqual(response.context['completed_sets'], 4)
-        self.assertContains(response, 'My FitHub progress')
+        self.assertContains(response, 'Share your progress')
         self.assertNotContains(response, 'Private other workout')
 
     def test_summary_is_empty_for_a_new_account(self):
