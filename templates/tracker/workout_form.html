@@ -1,19 +1,37 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }} · FitHub{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>{{ title }}</h1></div></div>
-<form class="card form-card" method="post" novalidate>
-  {% csrf_token %}
-  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
-  <div class="form-grid">
-    {% include 'partials/field.html' with field=form.name %}
-    {% include 'partials/field.html' with field=form.date %}
-    {% include 'partials/field.html' with field=form.duration_min %}
-    {% include 'partials/field.html' with field=form.notes %}
+<section class="workout-start-page">
+  <header class="workout-start-intro">
+    <span class="workout-start-kicker">{% if workout %}UPDATE YOUR SESSION{% else %}TRAINING STARTS HERE{% endif %}</span>
+    <h1>{% if workout %}Shape this session.{% else %}Let's get to work.{% endif %}</h1>
+    <p>{% if workout %}Adjust the details now. Your exercises and set history stay attached to this workout.{% else %}Give today's training a name. You can add exercises and track every set right after this.{% endif %}</p>
+  </header>
+  <div class="workout-start-layout">
+    <form class="workout-start-form" method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+      <div class="workout-form-heading"><span class="workout-form-mark" aria-hidden="true">↗</span><div><h2>Session details</h2><p>A few basics before you begin.</p></div></div>
+      <div class="workout-fields-grid">
+        <div class="workout-field-name">{% include 'partials/field.html' with field=form.name %}<span class="workout-field-tip">Example: Upper body, Leg day, Push session</span></div>
+        <div>{% include 'partials/field.html' with field=form.date %}<span class="workout-field-tip">Pick the day you trained.</span></div>
+        <div>{% include 'partials/field.html' with field=form.duration_min %}<span class="workout-field-tip">You can update this later.</span></div>
+        <div>{% include 'partials/field.html' with field=form.notes %}<span class="workout-field-tip">Optional — add a focus, mood, or note for next time.</span></div>
+      </div>
+      <div class="workout-form-actions"><button class="btn btn-primary workout-start-save" type="submit">{% if workout %}Save changes{% else %}Create workout <span aria-hidden="true">→</span>{% endif %}</button><a class="btn btn-quiet" href="{% if workout %}{% url 'tracker:workout-detail' workout.pk %}{% else %}{% url 'tracker:workout-list' %}{% endif %}">Cancel</a></div>
+    </form>
+    {% if not workout %}
+    <aside class="workout-next-panel">
+      <div class="workout-next-art" aria-hidden="true"><span>01</span><i>✳</i><b>GO</b></div>
+      <span class="workout-next-kicker">WHAT HAPPENS NEXT</span><h2>One session at a time.</h2>
+      <ol>
+        <li><span>1</span><div><strong>Create your session</strong><small>Name it and set the date.</small></div></li>
+        <li><span>2</span><div><strong>Add your exercises</strong><small>Choose movements and planned sets.</small></div></li>
+        <li><span>3</span><div><strong>Track every set</strong><small>Log reps, weight, and completion.</small></div></li>
+      </ol>
+      <p class="workout-next-note">No perfect plan needed. Just start.</p>
+    </aside>
+    {% endif %}
   </div>
-  <div class="form-actions">
-    <button class="btn btn-primary" type="submit">Save workout</button>
-    <a class="btn btn-quiet" href="{% if workout %}{% url 'tracker:workout-detail' workout.pk %}{% else %}{% url 'tracker:workout-list' %}{% endif %}">Cancel</a>
-  </div>
-</form>
+</section>
 {% endblock %}
