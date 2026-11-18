@@ -242,5 +242,8 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'FitHub <noreply@local
 EMAIL_TIMEOUT = 10
 EMAIL_BACKEND = (
     'django.core.mail.backends.smtp.EmailBackend' if EMAIL_HOST
-    else 'django.core.mail.backends.console.EmailBackend'
+    else (
+        'django.core.mail.backends.console.EmailBackend' if DEBUG or RUNNING_TESTS
+        else 'django.core.mail.backends.dummy.EmailBackend'
+    )
 )
