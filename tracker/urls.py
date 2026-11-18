@@ -4,6 +4,7 @@ from . import views
 from .tutorials import exercise_library_tutorials
 from .progress import progress
 from .library import exercise_library
+from .knowledge import learn
 
 app_name = 'tracker'
 
@@ -11,6 +12,7 @@ urlpatterns = [
     path('app/', views.dashboard, name='dashboard'),
     path('app/progress/', progress, name='progress'),
     path('app/exercise-library/', exercise_library, name='exercise-library'),
+    path('app/learn/', learn, name='learn'),
     path('app/exercise-library/tutorials/', exercise_library_tutorials, name='exercise-library-tutorials'),
     path('app/goals/', views.goals, name='goals'),
     path('app/workouts/', views.workout_list, name='workout-list'),
