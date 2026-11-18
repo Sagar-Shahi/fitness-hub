@@ -21,6 +21,16 @@
         {% include 'partials/field.html' with field=form.height_cm hide_required=True %}
         {% include 'partials/field.html' with field=form.starting_weight_kg hide_required=True %}
       </div>
+      <div class="body-profile-subsection">
+        <span class="goals-kicker">BODY TYPE & COMPOSITION · OPTIONAL</span>
+        <p class="goal-description">Choose a body-type description if it feels useful. Measurements are more informative for tracking changes; skip anything you don't know.</p>
+        <div class="form-grid">
+          {% include 'partials/field.html' with field=form.body_type hide_required=True %}
+          {% include 'partials/field.html' with field=form.body_fat_percentage hide_required=True %}
+          {% include 'partials/field.html' with field=form.waist_cm hide_required=True %}
+          {% include 'partials/field.html' with field=form.muscle_mass_kg hide_required=True %}
+        </div>
+      </div>
     </article>
     <article class="goal-card nutrition-profile-card">
       <div class="goal-card-top"><span class="goal-icon" aria-hidden="true">↗</span><span class="goal-step">02 / YOUR TRAINING</span></div>
@@ -53,7 +63,7 @@
         <div><strong>{{ nutrition_plan.carbs_g }} g</strong><span>Carbs</span></div>
         <div><strong>{{ nutrition_plan.fat_g }} g</strong><span>Fat</span></div>
       </div>
-      <small>These are estimates, not medical prescriptions. Adjust based on your progress, energy and professional advice.</small>
+      <small>These are estimates, not medical prescriptions. Adjust based on your progress, energy and professional advice. {% if nutrition_plan.body_composition_used %}Protein uses your estimated lean mass; calorie estimates still use the standard energy equation.{% endif %}</small>
     </section>
     {% elif nutrition_plan and nutrition_plan.reason %}
     <section class="goals-note"><span class="goals-note-mark" aria-hidden="true">i</span><p>{{ nutrition_plan.reason }}</p></section>

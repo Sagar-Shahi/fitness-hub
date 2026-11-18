@@ -46,6 +46,27 @@ class Profile(models.Model):
             ('very_active', 'Very active (6–7 days/week)'),
         ],
     )
+    body_type = models.CharField(
+        max_length=12, blank=True,
+        choices=[
+            ('ectomorph', 'Ectomorph / naturally lean'),
+            ('mesomorph', 'Mesomorph / naturally muscular'),
+            ('endomorph', 'Endomorph / naturally rounder build'),
+            ('unsure', 'Not sure'),
+        ],
+    )
+    body_fat_percentage = models.DecimalField(
+        max_digits=4, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(Decimal('2')), MaxValueValidator(Decimal('75'))],
+    )
+    waist_cm = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(Decimal('30')), MaxValueValidator(Decimal('200'))],
+    )
+    muscle_mass_kg = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(Decimal('10')), MaxValueValidator(Decimal('150'))],
+    )
     nutrition_goal = models.CharField(
         max_length=12, blank=True, default='maintain',
         choices=[('fat_loss', 'Fat loss'), ('maintain', 'Weight maintenance'), ('muscle_gain', 'Muscle gain')],

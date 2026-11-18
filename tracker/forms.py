@@ -18,6 +18,7 @@ class ProfileForm(forms.ModelForm):
         model = Profile
         fields = [
             'age', 'sex_for_calculation', 'height_cm', 'starting_weight_kg',
+            'body_type', 'body_fat_percentage', 'waist_cm', 'muscle_mass_kg',
             'activity_level', 'training_type', 'nutrition_goal', 'calorie_target',
             'weekly_workout_target', 'target_weight_kg',
         ]
@@ -26,6 +27,10 @@ class ProfileForm(forms.ModelForm):
             'sex_for_calculation': 'Sex used for the energy estimate',
             'height_cm': 'Height (cm)',
             'starting_weight_kg': 'Current weight (kg)',
+            'body_type': 'Traditional body type (optional)',
+            'body_fat_percentage': 'Body-fat percentage (optional)',
+            'waist_cm': 'Waist measurement (cm, optional)',
+            'muscle_mass_kg': 'Muscle mass (kg, optional)',
             'activity_level': 'Usual activity level',
             'training_type': 'Main training style',
             'nutrition_goal': 'Main fitness goal',
@@ -35,6 +40,10 @@ class ProfileForm(forms.ModelForm):
         }
         help_texts = {
             'starting_weight_kg': 'FitHub uses your latest Weight entry when one is available.',
+            'body_type': 'A self-description only. It does not determine calorie needs.',
+            'body_fat_percentage': 'Enter this only if you have a reasonably reliable measurement; it is never required.',
+            'waist_cm': 'Measure around your waist consistently to compare changes over time.',
+            'muscle_mass_kg': 'Optional; use a measurement from a body-composition scale or assessment.',
             'sex_for_calculation': 'Used only in the standard BMR equation; choose the average estimate if unsure.',
             'calorie_target': 'Used until your profile has enough details for a personalized estimate.',
         }
