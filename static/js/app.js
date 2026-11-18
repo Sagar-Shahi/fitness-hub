@@ -156,59 +156,68 @@
     paintRest();
   }
 
-  // Exercise tutorials: accept standard YouTube video links and play through YouTube's official embed.
-  // The video stays hosted by YouTube; FitHub never downloads or rehosts it.
+  // Discover and play public YouTube exercise tutorials through FitHub's server-side API proxy.
   document.querySelectorAll('[data-exercise-tutorial]').forEach(function (panel) {
-    var exerciseId = panel.getAttribute('data-exercise-tutorial');
-    var urlInput = panel.querySelector('[data-video-url]');
-    var playButton = panel.querySelector('[data-video-load]');
+    var searchButton = panel.querySelector('[data-tutorial-search]');
+    var results = panel.querySelector('[data-tutorial-results]');
     var frameWrap = panel.querySelector('[data-video-frame-wrap]');
     var frame = panel.querySelector('[data-video-frame]');
     var status = panel.querySelector('[data-video-status]');
-    var storageKey = 'fithub.exerciseVideo.' + exerciseId;
+    var endpoint = panel.getAttribute('data-tutorial-url');
 
-    function videoIdFrom(value) {
-      try {
-        var url = new URL(value.trim());
-        var host = url.hostname.toLowerCase().replace(/^www\./, '');
-        if (host === 'youtu.be') return url.pathname.split('/').filter(Boolean)[0] || '';
-        if (host !== 'youtube.com' && host !== 'm.youtube.com' && host !== 'youtube-nocookie.com') return '';
-        if (url.pathname === '/watch') return url.searchParams.get('v') || '';
-        var parts = url.pathname.split('/').filter(Boolean);
-        if (parts.length >= 2 && ['embed', 'shorts', 'live'].indexOf(parts[0]) !== -1) return parts[1];
-      } catch (error) { return ''; }
-      return '';
+    function playVideo(id) {
+      if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return;
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?rel=0';
+      frameWrap.hidden = false;
+      status.textContent = 'Playing inside FitHub. Some creators may disable embedding.';
     }
-
-    function playVideo(value, save) {
-      var id = videoIdFrom(value);
-      if (!/^[A-Za-z0-9_-]{11}$/.test(id)) {
-        status.textContent = 'Please paste a valid YouTube video link (not a channel or search-results link).';
-        frame.removeAttribute('src');
-        frameWrap.hidden = true;
+    function renderVideos(videos) {
+      results.textContent = '';
+      if (!videos.length) {
+        status.textContent = 'No suitable videos found. Try again later.';
         return;
       }
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?rel=0&modestbranding=1';
-      frameWrap.hidden = false;
-      status.textContent = 'Playing inside FitHub. If the creator has disabled embedding, use the YouTube link to watch there.';
-      if (save) {
-        try { window.localStorage.setItem(storageKey, value.trim()); } catch (error) { /* storage may be disabled */ }
-      }
+      videos.forEach(function (video) {
+        var card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'tutorial-result';
+        card.setAttribute('aria-label', 'Play ' + video.title);
+        var image = document.createElement('img');
+        image.src = video.thumbnail;
+        image.alt = '';
+        image.loading = 'lazy';
+        var details = document.createElement('span');
+        var title = document.createElement('strong');
+        title.textContent = video.title;
+        var channel = document.createElement('small');
+        channel.textContent = video.channel;
+        details.appendChild(title);
+        details.appendChild(channel);
+        card.appendChild(image);
+        card.appendChild(details);
+        card.addEventListener('click', function () { playVideo(video.id); });
+        results.appendChild(card);
+      });
+      status.textContent = 'Choose a video to play it here.';
     }
-
-    playButton.addEventListener('click', function () { playVideo(urlInput.value, true); });
-    urlInput.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') { event.preventDefault(); playVideo(urlInput.value, true); }
+    searchButton.addEventListener('click', function () {
+      searchButton.disabled = true;
+      status.textContent = 'Finding exercise tutorials…';
+      results.textContent = '';
+      frame.removeAttribute('src');
+      frameWrap.hidden = true;
+      fetch(endpoint, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            if (!response.ok) throw new Error(data.error || 'Could not load tutorials.');
+            return data;
+          });
+        })
+        .then(function (data) { renderVideos(data.videos || []); })
+        .catch(function (error) { status.textContent = error.message || 'Could not load tutorials. Please try again.'; })
+        .finally(function () { searchButton.disabled = false; });
     });
-    try {
-      var savedVideo = window.localStorage.getItem(storageKey);
-      if (savedVideo) {
-        urlInput.value = savedVideo;
-        playVideo(savedVideo, false);
-      }
-    } catch (error) { /* storage may be disabled */ }
   });
-
 
   // Workout quick controls: adjust reps/weight with taps; completing a set saves it immediately.
   document.querySelectorAll('[data-set-form]').forEach(function (form) {
