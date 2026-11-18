@@ -565,11 +565,12 @@
     fat: form.querySelector('[name="fat_g"]')
   };
   var current = {
-    calories: {{ totals.calories|default:0 }},
-    protein: {{ totals.protein|default:0 }},
-    carbs: {{ totals.carbs|default:0 }},
-    fat: {{ totals.fat|default:0 }}
+    calories: Math.max(0, Number(form.getAttribute('data-current-calories')) || 0),
+    protein: Math.max(0, Number(form.getAttribute('data-current-protein')) || 0),
+    carbs: Math.max(0, Number(form.getAttribute('data-current-carbs')) || 0),
+    fat: Math.max(0, Number(form.getAttribute('data-current-fat')) || 0)
   };
+  var target = Math.max(1, Number(form.getAttribute('data-calorie-target')) || 1);
   function value(field) { return Math.max(0, Number(field && field.value) || 0); }
   function update() {
     Object.keys(fields).forEach(function (key) {
@@ -579,7 +580,7 @@
     });
     var after = current.calories + value(fields.calories);
     var note = document.getElementById('meal-after-add');
-    if (note) note.textContent = 'After adding: ' + after + ' / {{ target }} kcal today (' + Math.round(after / Math.max(1, {{ target }}) * 100) + '%).';
+    if (note) note.textContent = 'After adding: ' + after + ' / ' + target + ' kcal today (' + Math.round(after / target * 100) + '%).';
   }
   Object.keys(fields).forEach(function (key) {
     if (fields[key]) fields[key].addEventListener('input', update);
