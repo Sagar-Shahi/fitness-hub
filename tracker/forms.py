@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.utils import timezone
 
-from .models import BodyMetric, Exercise, Meal, Profile, Workout
+from .models import BodyMetric, Exercise, ExerciseSet, Meal, Profile, Workout
 
 DATE = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
 
@@ -58,6 +58,24 @@ class ExerciseForm(forms.ModelForm):
         if self.workout is not None and self.workout.exercises.count() >= settings.MAX_EXERCISES_PER_WORKOUT:
             raise forms.ValidationError(f'A workout can have at most {settings.MAX_EXERCISES_PER_WORKOUT} exercises.')
         return data
+
+
+class ExerciseSetAddForm(forms.ModelForm):
+    class Meta:
+        model = ExerciseSet
+        fields = ['reps', 'weight_kg', 'is_warmup']
+        labels = {'weight_kg': 'Weight (kg)', 'is_warmup': 'Warm-up set'}
+
+
+class ExerciseSetForm(forms.ModelForm):
+    class Meta:
+        model = ExerciseSet
+        fields = ['reps', 'weight_kg', 'is_warmup', 'is_completed']
+        labels = {
+            'weight_kg': 'Weight (kg)',
+            'is_warmup': 'Warm-up',
+            'is_completed': 'Completed',
+        }
 
 
 class WeightForm(forms.ModelForm):
