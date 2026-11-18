@@ -1271,3 +1271,6 @@ main.container { max-width:1320px; padding-top:28px; padding-bottom:7rem; }
 @media(prefers-reduced-motion:reduce) {
   .athletic-preview,.athletic-preview:hover,.preview-set-button,.btn,.card,.stat,.feature-tile { transition:none; transform:none; }
 }
+
+.preview-exercise-copy { display:flex; flex-direction:column; min-width:0; }
+.preview-exercise-copy strong,.preview-exercise-copy small { display:block; }
