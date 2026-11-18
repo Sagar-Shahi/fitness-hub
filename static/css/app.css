@@ -1928,3 +1928,15 @@ main.container { gap: 22px; }
 .focus-music-result-copy{display:grid;gap:4px;min-width:0}
 .focus-music-result-copy strong{font-size:.9rem;line-height:1.35}
 .focus-music-result-copy small{color:var(--muted,#746c63);font-size:.78rem}
+
+
+/* Keep Focus Audio compact even while a video is playing. */
+.focus-dock.has-video { width: min(350px, calc(100vw - 28px)); }
+.focus-dock.has-video .focus-panel { max-height: min(430px, 62vh); overflow-y: auto; }
+.focus-dock.has-video .focus-video-stage { padding: 9px; }
+.focus-dock.has-video .focus-video-square { width: 100%; max-width: 300px; margin-inline: auto; aspect-ratio: 1 / 1; }
+.focus-dock.has-video .focus-video-heading { gap: 8px; }
+.focus-dock.has-video .focus-video-heading .btn { flex: 0 0 auto; }
+@media (max-width: 620px) {
+  .focus-dock.has-video { right: 12px; width: min(350px, calc(100vw - 24px)); }
+}
