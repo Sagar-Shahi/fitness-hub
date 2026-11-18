@@ -58,6 +58,22 @@
     {% block content %}{% endblock %}
   </main>
 
+  {% if user.is_authenticated %}
+  <details class="focus-dock" id="focus-dock">
+    <summary><span class="focus-indicator" aria-hidden="true"></span><span>Focus audio</span><span class="focus-hint">music · voice</span></summary>
+    <section class="focus-panel" aria-label="Focus audio player">
+      <div class="focus-panel-head"><div><p class="eyebrow">TRAINING MODE</p><h2>Find your rhythm.</h2></div><span class="focus-symbol" aria-hidden="true">♫</span></div>
+      <label class="focus-label" for="focus-audio-url">Audio file or music link</label>
+      <div class="focus-url-row"><input id="focus-audio-url" type="url" inputmode="url" placeholder="Paste an MP3 or music link" autocomplete="url"><button class="btn btn-primary btn-small" id="focus-load" type="button">Load</button></div>
+      <p class="focus-help" id="focus-status" role="status">Direct audio files can play here. Spotify and YouTube links open on their platforms.</p>
+      <audio id="focus-audio" controls preload="none"></audio>
+      <div class="focus-actions"><a class="btn btn-quiet btn-small" id="focus-open" href="#" target="_blank" rel="noopener noreferrer" hidden>Open link ↗</a><a class="btn btn-quiet btn-small" id="focus-download" href="#" download hidden>Download file</a><button class="btn btn-quiet btn-small" id="focus-clear" type="button">Clear</button></div>
+      <div class="focus-voice"><div><strong>Coach voice</strong><p class="focus-help">Optional spoken cues from your browser.</p></div><button class="btn btn-quiet btn-small" id="focus-speak" type="button">Motivate me</button></div>
+      <p class="focus-help focus-legal">Only download audio you own or are allowed to download. Streaming platforms may restrict playback or downloads; FitHub does not bypass those limits. Your saved link stays in this browser.</p>
+    </section>
+  </details>
+  {% endif %}
+
   <footer class="site-footer">
     <div class="container footer-inner">
       <span>FitHub. Your data stays yours: export it any time. Not medical advice.</span>
