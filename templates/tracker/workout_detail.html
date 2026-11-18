@@ -2,80 +2,34 @@
 {% block title %}{{ workout.name }} · FitHub{% endblock %}
 {% block content %}
 <nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'tracker:workout-list' %}">Workouts</a> / {{ workout.name }}</nav>
-<div class="page-head compact">
-  <div><h1>{{ workout.name }}</h1><p class="muted">{{ workout.date|date:"l, M j, Y" }} &middot; {{ workout.duration_min }} min{% if workout.notes %} &middot; {{ workout.notes }}{% endif %}</p></div>
-  <div class="head-actions">
-    <a class="btn btn-quiet" href="{% url 'tracker:workout-edit' workout.pk %}">Edit</a>
-    <a class="btn btn-danger-quiet" href="{% url 'tracker:workout-delete' workout.pk %}">Delete</a>
-  </div>
-</div>
+<section class="workout-hero">
+  <div><p class="eyebrow">SESSION DETAILS</p><h1>{{ workout.name }}</h1><p class="muted">{{ workout.date|date:"l, M j, Y" }} &middot; {{ workout.duration_min }} min{% if workout.notes %} &middot; {{ workout.notes }}{% endif %}</p></div>
+  <div class="head-actions"><a class="btn btn-quiet" href="{% url 'tracker:workout-edit' workout.pk %}">Edit workout</a><a class="btn btn-danger-quiet" href="{% url 'tracker:workout-delete' workout.pk %}">Delete</a></div>
+</section>
 
-<dl class="stats">
-  <div class="stat"><dt>Exercises</dt><dd>{{ workout.exercises.all|length }}</dd></div>
-  <div class="stat"><dt>Completed volume</dt><dd>{{ workout.volume_kg|floatformat:0 }} kg</dd><dd class="stat-note">Completed reps × weight.</dd></div>
-</dl>
+<dl class="stats workout-stats"><div class="stat"><dt>EXERCISES</dt><dd>{{ workout.exercises.all|length }}</dd></div><div class="stat"><dt>COMPLETED VOLUME</dt><dd>{{ workout.volume_kg|floatformat:0 }} <span class="stat-denom">kg</span></dd><dd class="stat-note">Completed reps × weight.</dd></div></dl>
 
 {% if workout.exercises.all %}
   {% for e in workout.exercises.all %}
-  <section class="card form-card">
-    <div class="page-head compact">
-      <div><h2 class="card-title">{{ e.name }}</h2><p class="muted">{{ e.set_entries.all|length }} sets recorded</p></div>
-      <form method="post" action="{% url 'tracker:exercise-delete' workout.pk e.pk %}" data-confirm="Remove {{ e.name }} and all its sets?">
-        {% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove exercise</button>
-      </form>
+  <section class="card form-card exercise-card">
+    <div class="exercise-heading"><div><p class="eyebrow">EXERCISE {{ forloop.counter|stringformat:"02d" }}</p><h2 class="card-title">{{ e.name }}</h2><p class="muted">{{ e.set_entries.all|length }} sets recorded</p></div>
+      <form method="post" action="{% url 'tracker:exercise-delete' workout.pk e.pk %}" data-confirm="Remove {{ e.name }} and all its sets?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove exercise</button></form>
     </div>
 
+    <div class="set-list">
     {% for set in e.set_entries.all %}
     <div class="card set-card">
-      <div class="page-head compact">
-        <strong>Set {{ set.set_number }}{% if set.is_warmup %} <span class="muted">· Warm-up</span>{% endif %}</strong>
-        {% if set.is_completed %}<span class="badge">Completed</span>{% else %}<span class="muted">Not completed</span>{% endif %}
-      </div>
-      <form method="post" action="{% url 'tracker:exercise-set-edit' workout.pk e.pk set.pk %}" class="form-card set-edit-form">
-        {% csrf_token %}
-        <div class="form-grid">
-          {% include 'partials/field.html' with field=set.edit_form.reps %}
-          {% include 'partials/field.html' with field=set.edit_form.weight_kg %}
-          {% include 'partials/field.html' with field=set.edit_form.is_warmup %}
-          {% include 'partials/field.html' with field=set.edit_form.is_completed %}
-        </div>
-        <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">Save set</button></div>
-      </form>
-      <form method="post" action="{% url 'tracker:exercise-set-delete' workout.pk e.pk set.pk %}" data-confirm="Remove set {{ set.set_number }}?">
-        {% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove set</button>
-      </form>
+      <div class="set-card-heading"><strong>SET {{ set.set_number }}{% if set.is_warmup %} <span class="muted">· WARM-UP</span>{% endif %}</strong>{% if set.is_completed %}<span class="badge">Completed</span>{% else %}<span class="muted">Not completed</span>{% endif %}</div>
+      <form method="post" action="{% url 'tracker:exercise-set-edit' workout.pk e.pk set.pk %}" class="form-card set-edit-form">{% csrf_token %}<div class="form-grid">{% include 'partials/field.html' with field=set.edit_form.reps %}{% include 'partials/field.html' with field=set.edit_form.weight_kg %}{% include 'partials/field.html' with field=set.edit_form.is_warmup %}{% include 'partials/field.html' with field=set.edit_form.is_completed %}</div><div class="form-actions"><button class="btn btn-primary btn-small" type="submit">Save set</button></div></form>
+      <form method="post" action="{% url 'tracker:exercise-set-delete' workout.pk e.pk set.pk %}" data-confirm="Remove set {{ set.set_number }}?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove set</button></form>
     </div>
-    {% empty %}
-      <p class="muted empty-state">No sets yet. Add the first set below.</p>
-    {% endfor %}
+    {% empty %}<p class="muted empty-state">No sets yet. Add the first set below.</p>{% endfor %}
+    </div>
 
-    <form class="card form-card set-add-form" method="post" action="{% url 'tracker:exercise-set-add' workout.pk e.pk %}">
-      <h3 class="card-title">Add a set</h3>
-      {% csrf_token %}
-      <div class="form-grid">
-        {% include 'partials/field.html' with field=e.add_set_form.reps %}
-        {% include 'partials/field.html' with field=e.add_set_form.weight_kg %}
-        {% include 'partials/field.html' with field=e.add_set_form.is_warmup %}
-      </div>
-      <div class="form-actions"><button class="btn btn-quiet btn-small" type="submit">Add set</button></div>
-    </form>
+    <form class="card form-card set-add-form" method="post" action="{% url 'tracker:exercise-set-add' workout.pk e.pk %}"><h3 class="card-title">＋ Add a set</h3>{% csrf_token %}<div class="form-grid">{% include 'partials/field.html' with field=e.add_set_form.reps %}{% include 'partials/field.html' with field=e.add_set_form.weight_kg %}{% include 'partials/field.html' with field=e.add_set_form.is_warmup %}</div><div class="form-actions"><button class="btn btn-quiet btn-small" type="submit">Add set</button></div></form>
   </section>
   {% endfor %}
-{% else %}
-  <section class="card"><p class="muted empty-state">No exercises yet. Add the first one below.</p></section>
-{% endif %}
+{% else %}<section class="card"><p class="muted empty-state">No exercises yet. Add the first one below.</p></section>{% endif %}
 
-<form class="card form-card" method="post" action="{% url 'tracker:exercise-add' workout.pk %}" novalidate>
-  <h2 class="card-title">Add an exercise</h2>
-  <p class="muted">Choose the exercise and your starting set details. You can adjust each set separately after adding it.</p>
-  {% csrf_token %}
-  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
-  <div class="form-grid">
-    {% include 'partials/field.html' with field=form.name %}
-    {% include 'partials/field.html' with field=form.sets %}
-    {% include 'partials/field.html' with field=form.reps %}
-    {% include 'partials/field.html' with field=form.weight_kg %}
-  </div>
-  <div class="form-actions"><button class="btn btn-primary" type="submit">Add exercise</button></div>
-</form>
+<form class="card form-card add-exercise-card" method="post" action="{% url 'tracker:exercise-add' workout.pk %}" novalidate><p class="eyebrow">BUILD YOUR SESSION</p><h2 class="card-title">Add an exercise</h2><p class="muted">Choose an exercise and starting set details. You can adjust every set separately after adding it.</p>{% csrf_token %}{% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}<div class="form-grid">{% include 'partials/field.html' with field=form.name %}{% include 'partials/field.html' with field=form.sets %}{% include 'partials/field.html' with field=form.reps %}{% include 'partials/field.html' with field=form.weight_kg %}</div><div class="form-actions"><button class="btn btn-primary" type="submit">Add exercise</button></div></form>
 {% endblock %}
