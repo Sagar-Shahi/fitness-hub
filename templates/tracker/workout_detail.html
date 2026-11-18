@@ -13,7 +13,22 @@
   {% for e in workout.exercises.all %}
   <section class="card form-card exercise-card">
     <div class="exercise-heading"><div><p class="eyebrow">EXERCISE {{ forloop.counter|stringformat:"02d" }}</p><h2 class="card-title">{{ e.name }}</h2><p class="muted">{{ e.set_entries.all|length }} sets recorded</p>
-        <a class="btn btn-quiet btn-small" href="https://www.youtube.com/results?search_query={{ e.name|urlencode }}+exercise+tutorial" target="_blank" rel="noopener noreferrer">▶ Watch exercise tutorial</a></div>
+        <details class="exercise-tutorial" data-exercise-tutorial="{{ e.pk }}">
+          <summary>▶ Watch tutorial in FitHub</summary>
+          <div class="exercise-tutorial-panel">
+            <p class="muted">Find a tutorial, paste its YouTube video link, and play it here without leaving your workout.</p>
+            <label class="visually-hidden" for="exercise-video-{{ e.pk }}">YouTube video link for {{ e.name }}</label>
+            <div class="exercise-video-input">
+              <input id="exercise-video-{{ e.pk }}" type="url" inputmode="url" placeholder="Paste a YouTube video link" autocomplete="url" data-video-url>
+              <button class="btn btn-primary btn-small" type="button" data-video-load>Play here</button>
+            </div>
+            <a class="exercise-video-search" href="https://www.youtube.com/results?search_query={{ e.name|urlencode }}+exercise+tutorial" target="_blank" rel="noopener noreferrer">Find a {{ e.name }} tutorial on YouTube ↗</a>
+            <p class="exercise-video-status" data-video-status role="status">Videos play inside FitHub when embedding is allowed. Your selected link is saved in this browser.</p>
+            <div class="exercise-video-frame" data-video-frame-wrap hidden>
+              <iframe data-video-frame title="{{ e.name }} exercise tutorial" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+          </div>
+        </details></div>
       <form method="post" action="{% url 'tracker:exercise-delete' workout.pk e.pk %}" data-confirm="Remove {{ e.name }} and all its sets?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Remove exercise</button></form>
     </div>
 
