@@ -19,6 +19,7 @@ Security and privacy are design constraints here, not an afterthought.
 
 ## Features
 - **Workouts**: sessions with exercises and individually editable sets (reps, weight, completion, warm-up), completed-set volume, edit and delete, CSV export.
+- **Focus audio**: optional in-app playback for direct audio-file links, saved link in this browser, and browser-based spoken motivation. Spotify and YouTube links open on their own platforms; protected streams are never extracted. Downloads depend on the source's permission and browser support.
 - **Meals**: calories and protein/carbs/fat per meal, daily totals against your calorie target, day-by-day browsing.
 - **Weight**: one entry per day, chart with your target line.
 - **Dashboard**: weekly workout goal, calories left today, workout streak, 7/30/90-day charts. Charts are drawn as SVG on the server, so there is no chart library and no inline script.
