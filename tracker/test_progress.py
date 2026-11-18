@@ -30,10 +30,11 @@ class ProgressPageTests(TestCase):
         self.assertEqual(response.context['session_count'], 2)
         self.assertEqual(response.context['total_sets'], 4)
         self.assertContains(response, 'Squat')
-        self.assertContains(response, '90.0 kg')
+        self.assertContains(response, '90 kg')
 
     def test_uncompleted_sets_do_not_create_strength_records(self):
-        make_workout(self.user, exercises=(('Bench press', 3, 8, '60'),))
+        workout = make_workout(self.user, exercises=(('Bench press', 3, 8, '60'),))
+        ExerciseSet.objects.filter(exercise__workout=workout).update(is_completed=False)
         response = self.client.get(reverse('tracker:progress'))
         self.assertIsNone(response.context['personal_record'])
         self.assertEqual(response.context['session_count'], 0)
