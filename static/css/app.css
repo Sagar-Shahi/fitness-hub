@@ -422,3 +422,6 @@ input[type="datetime-local"], input[type="number"], input[type="date"], select, 
   .focus-dock > summary, .focus-panel { transition: border-color .18s ease, box-shadow .18s ease; }
   .focus-dock > summary:hover { border-color: var(--accent); }
 }
+
+.focus-local-file { display: block; width: 100%; max-width: 100%; margin: 5px 0 0; padding: 8px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); background: var(--bg); font: .78rem var(--sans); }
+.focus-local-file::file-selector-button { margin-right: 10px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-2); color: var(--ink); font: inherit; cursor: pointer; }
