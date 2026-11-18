@@ -209,6 +209,12 @@
   var focusVideoFrame = document.getElementById('focus-video-frame');
   var focusVideoStatus = document.getElementById('focus-video-status');
   if (focusVideoClose) focusVideoClose.addEventListener('click', closeFocusVideo);
+  var focusDockClose = document.getElementById('focus-dock-close');
+  if (focusDockClose) focusDockClose.addEventListener('click', function () {
+    closeFocusVideo();
+    var dock = document.getElementById('focus-dock');
+    if (dock) dock.removeAttribute('open');
+  });
   if (focusVideoFrame) focusVideoFrame.addEventListener('load', function () {
     var stage = document.getElementById('focus-video-stage');
     if (stage && !stage.hidden && focusVideoFrame.getAttribute('src') && focusVideoStatus) {
