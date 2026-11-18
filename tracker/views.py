@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -33,8 +34,11 @@ def _own_workout(request, pk):
 
 def _attach_set_forms(workout, bound_form=None):
     for exercise in workout.exercises.all():
+        exercise.add_set_form = ExerciseSetAddForm(prefix=f'add-set-{exercise.pk}')
         for entry in exercise.set_entries.all():
-            entry.edit_form = bound_form if bound_form is not None and bound_form.instance.pk == entry.pk else ExerciseSetForm(instance=entry)
+            prefix = f'set-{entry.pk}'
+            entry.edit_form = (bound_form if bound_form is not None and bound_form.instance.pk == entry.pk
+                               else ExerciseSetForm(instance=entry, prefix=prefix))
     return workout
 
 
@@ -99,7 +103,6 @@ def workout_detail(request, pk):
     return render(request, 'tracker/workout_detail.html', {
         'workout': workout,
         'form': form,
-        'set_add_form': ExerciseSetAddForm(),
     })
 
 
@@ -147,7 +150,7 @@ def exercise_add(request, pk):
         return redirect('tracker:workout-detail', pk=workout.pk)
     workout = _attach_set_forms(workout)
     return render(request, 'tracker/workout_detail.html', {
-        'workout': workout, 'form': form, 'set_add_form': ExerciseSetAddForm(),
+        'workout': workout, 'form': form,
     }, status=400)
 
 
@@ -164,21 +167,23 @@ def exercise_delete(request, pk, exercise_pk):
 def exercise_set_add(request, pk, exercise_pk):
     workout = _own_workout(request, pk)
     exercise = get_object_or_404(Exercise, pk=exercise_pk, workout=workout)
-    form = ExerciseSetAddForm(request.POST)
-    if exercise.set_entries.count() >= 50:
-        messages.error(request, 'An exercise can have at most 50 sets.')
-        return redirect('tracker:workout-detail', pk=workout.pk)
-    if form.is_valid():
-        entry = form.save(commit=False)
-        entry.exercise = exercise
-        entry.set_number = (exercise.set_entries.order_by('-set_number').values_list('set_number', flat=True).first() or 0) + 1
-        if entry.set_number > 50:
-            messages.error(request, 'No more set numbers are available for this exercise.')
+    form = ExerciseSetAddForm(request.POST, prefix=f'add-set-{exercise_pk}')
+    with transaction.atomic():
+        exercise = get_object_or_404(Exercise.objects.select_for_update(), pk=exercise_pk, workout=workout)
+        if exercise.set_entries.count() >= 50:
+            messages.error(request, 'An exercise can have at most 50 sets.')
+            return redirect('tracker:workout-detail', pk=workout.pk)
+        if form.is_valid():
+            entry = form.save(commit=False)
+            entry.exercise = exercise
+            entry.set_number = (exercise.set_entries.order_by('-set_number').values_list('set_number', flat=True).first() or 0) + 1
+            if entry.set_number > 50:
+                messages.error(request, 'No more set numbers are available for this exercise.')
+            else:
+                entry.save()
+                messages.success(request, f'Set {entry.set_number} added.')
         else:
-            entry.save()
-            messages.success(request, f'Set {entry.set_number} added.')
-    else:
-        messages.error(request, 'Please check the set details and try again.')
+            messages.error(request, 'Please check the set details and try again.')
     return redirect('tracker:workout-detail', pk=workout.pk)
 
 
@@ -188,7 +193,7 @@ def exercise_set_edit(request, pk, exercise_pk, set_pk):
     workout = _own_workout(request, pk)
     exercise = get_object_or_404(Exercise, pk=exercise_pk, workout=workout)
     entry = get_object_or_404(ExerciseSet, pk=set_pk, exercise=exercise)
-    form = ExerciseSetForm(request.POST, instance=entry)
+    form = ExerciseSetForm(request.POST, instance=entry, prefix=f'set-{entry.pk}')
     if form.is_valid():
         form.save()
         messages.success(request, f'Set {entry.set_number} updated.')
@@ -205,14 +210,15 @@ def exercise_set_edit(request, pk, exercise_pk, set_pk):
 @require_POST
 def exercise_set_delete(request, pk, exercise_pk, set_pk):
     workout = _own_workout(request, pk)
-    exercise = get_object_or_404(Exercise, pk=exercise_pk, workout=workout)
-    entry = get_object_or_404(ExerciseSet, pk=set_pk, exercise=exercise)
-    entry.delete()
-    # Keep visible set numbering contiguous after a removal.
-    for number, item in enumerate(exercise.set_entries.order_by('set_number', 'id'), start=1):
-        if item.set_number != number:
-            item.set_number = number
-            item.save(update_fields=['set_number'])
+    with transaction.atomic():
+        exercise = get_object_or_404(Exercise.objects.select_for_update(), pk=exercise_pk, workout=workout)
+        entry = get_object_or_404(ExerciseSet, pk=set_pk, exercise=exercise)
+        entry.delete()
+        # Keep visible set numbering contiguous after a removal.
+        for number, item in enumerate(exercise.set_entries.order_by('set_number', 'id'), start=1):
+            if item.set_number != number:
+                item.set_number = number
+                item.save(update_fields=['set_number'])
     messages.success(request, 'Set removed.')
     return redirect('tracker:workout-detail', pk=workout.pk)
 
