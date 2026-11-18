@@ -25,7 +25,7 @@
         <a href="{% url 'tracker:workout-list' %}" {% if 'workout' in view %}aria-current="page"{% endif %}>Workouts</a>
         <a href="{% url 'tracker:progress' %}" {% if view == 'tracker:progress' %}aria-current="page"{% endif %}>Progress</a>
         <a href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>Nutrition</a>
-        <details class="nav-more" {% if view == 'tracker:exercise-library' or view == 'tracker:learn' or view == 'tracker:weight' or view == 'shop:store' or view|slice:':5' == 'shop:' and view != 'shop:cart' and view != 'shop:product-outbound' %}open{% endif %}>
+        <details class="nav-more">
           <summary>Explore <span aria-hidden="true">⌄</span></summary>
           <div class="nav-more-menu">
             <a href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>Exercise library</a>
