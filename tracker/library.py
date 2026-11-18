@@ -36,6 +36,8 @@ def exercise_library(request):
     query = request.GET.get("q", "").strip()[:80]
     muscle = request.GET.get("muscle", "").strip().lower()[:40]
     equipment = request.GET.get("equipment", "").strip().lower()[:40]
+    level = request.GET.get("level", "").strip().lower()[:20]
+    category = request.GET.get("category", "").strip().lower()[:30]
     workout_id = request.GET.get("workout", "").strip()
     selected_workout = None
     if workout_id.isdigit():
@@ -43,17 +45,26 @@ def exercise_library(request):
 
     muscles = sorted({m for item in exercises for m in item.get("primaryMuscles", []) if isinstance(m, str)})
     equipment_types = sorted({item.get("equipment") for item in exercises if item.get("equipment")})
+    levels = sorted({str(item.get("level")) for item in exercises if item.get("level")})
+    categories = sorted({str(item.get("category")) for item in exercises if item.get("category")})
     filtered = []
     for item in exercises:
         name = str(item.get("name", ""))
         primary = item.get("primaryMuscles") or []
         item_equipment = str(item.get("equipment") or "")
-        haystack = " ".join([name, item_equipment, str(item.get("category", "")), " ".join(primary)]).lower()
+        secondary = item.get("secondaryMuscles") or []
+        item_level = str(item.get("level") or "").lower()
+        item_category = str(item.get("category") or "").lower()
+        haystack = " ".join([name, item_equipment, item_category, " ".join(primary), " ".join(secondary)]).lower()
         if query and query.lower() not in haystack:
             continue
         if muscle and muscle not in [str(m).lower() for m in primary]:
             continue
         if equipment and item_equipment.lower() != equipment:
+            continue
+        if level and item_level != level:
+            continue
+        if category and item_category != category:
             continue
         filtered.append(item)
 
@@ -67,8 +78,12 @@ def exercise_library(request):
         "query": query,
         "muscle": muscle,
         "equipment": equipment,
+        "level": level,
+        "category": category,
         "muscles": muscles,
         "equipment_types": equipment_types,
+        "levels": levels,
+        "categories": categories,
         "selected_workout": selected_workout,
         "workouts": Workout.objects.filter(owner=request.user).order_by("-date", "-id")[:100],
         "result_count": len(filtered),
