@@ -5,7 +5,7 @@ CSP = (
     "default-src 'self'; "
     "script-src 'self'; "
     "style-src 'self'; "
-    "img-src 'self' data:; "
+    "img-src 'self' data: https://i.ytimg.com; "
     "font-src 'self'; "
     "connect-src 'self'; "
     "media-src 'self' https: blob: data:; "
