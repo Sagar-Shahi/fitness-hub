@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Share progress · FitHub{% endblock %}
+{% block description %}Create a private summary of your recent FitHub training progress.{% endblock %}
+{% block content %}
+<section class="share-progress-page">
+  <div class="page-head">
+    <div><p class="eyebrow">YOUR WORK, WORTH CELEBRATING</p><h1>Share your progress</h1><p class="muted">A simple summary of your last 30 days. Your workout names, account details and private records stay off this card.</p></div>
+    <a class="btn btn-quiet" href="{% url 'tracker:dashboard' %}">Back to dashboard</a>
+  </div>
+  <article class="share-progress-card" aria-label="FitHub progress share card">
+    <div class="share-progress-brand"><span>FITHUB / TRAINING LOG</span><span>30 DAY RECAP</span></div>
+    <h1>Consistency<br><em>is built rep by rep.</em></h1>
+    <p class="share-progress-period">{{ period_start|date:"M j" }} – {{ period_end|date:"M j, Y" }}</p>
+    <div class="share-progress-stats">
+      <div class="share-progress-stat"><strong>{{ workouts }}</strong><span>WORKOUTS</span></div>
+      <div class="share-progress-stat"><strong>{{ completed_sets }}</strong><span>COMPLETED SETS</span></div>
+      <div class="share-progress-stat"><strong>{{ streak_days }}</strong><span>CURRENT STREAK · DAYS</span></div>
+    </div>
+    <div class="share-progress-footer"><strong>FitHub</strong><span>Train with purpose. Track your progress.</span></div>
+  </article>
+  <div class="share-progress-actions">
+    <button class="btn btn-primary" type="button" data-share-progress="{{ share_text }}">Share summary</button>
+    <button class="btn btn-quiet" type="button" data-print-share-card>Print / Save as PDF</button>
+    <a class="btn btn-quiet" href="{% url 'tracker:progress' %}">View strength progress</a>
+  </div>
+  <p class="muted">Share opens your device's share menu where supported. Print lets you save the card as a PDF. This page is private and requires your FitHub login.</p>
+</section>
+{% endblock %}
