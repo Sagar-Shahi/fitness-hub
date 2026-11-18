@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}My goals · FitHub{% endblock %}
+{% block title %}My Fitness · FitHub{% endblock %}
 {% block content %}
 <section class="goals-page">
   <header class="goals-intro">
-    <span class="goals-kicker">YOUR TRAINING, YOUR PACE</span>
-    <h1>Make your next move count.</h1>
-    <p>Choose a few targets. FitHub will turn them into progress you can actually see.</p>
+    <span class="goals-kicker">YOUR FITNESS, IN ONE PLACE</span>
+    <h1>Build your fitness routine.</h1>
+    <p>Set personal targets and find the programmes that help you work towards them.</p>
   </header>
 
   <form class="goals-form" method="post" novalidate>
@@ -64,5 +64,27 @@
       </div>
     </div>
   </form>
+
+  <section class="my-fitness-plans" aria-labelledby="my-fitness-plans-title">
+    <div class="page-head">
+      <div><span class="goals-kicker">YOUR PROGRAMMES</span><h2 id="my-fitness-plans-title">Your plans</h2>
+      <p class="muted">Workout and nutrition programmes you have added to your account.</p></div>
+      <a class="btn btn-quiet btn-small" href="{% url 'shop:plans' %}">Browse plans</a>
+    </div>
+    {% if my_plans %}
+    <div class="plan-grid">
+      {% for item in my_plans %}
+      <article class="card plan-card">
+        <span class="badge badge-{{ item.plan.kind }}">{{ item.plan.get_kind_display }}</span>
+        <h3 class="card-title">{{ item.title }}</h3>
+        <p class="muted">{{ item.plan.summary }}</p>
+        <div class="plan-foot"><span class="muted">Added {{ item.order.created_at|date:"M j, Y" }}</span><a class="btn btn-primary btn-small" href="{% url 'shop:plan-detail' item.plan.slug %}">Open plan</a></div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <section class="card empty-state"><h3 class="card-title">No plans added yet</h3><p class="muted">Explore workout and nutrition programmes when you're ready.</p><a class="btn btn-primary" href="{% url 'shop:plans' %}">Explore plans</a></section>
+    {% endif %}
+  </section>
 </section>
 {% endblock %}
