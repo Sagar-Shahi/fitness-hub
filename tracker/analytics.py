@@ -91,7 +91,7 @@ def dashboard(user, profile):
     calorie_target_reason = None
     if profile.age is not None and profile.age < 18:
         calorie_target = None
-        calorie_target_reason = 'Calorie targets are not shown for under-18 profiles.'
+        calorie_target_reason = nutrition_plan['reason'] if nutrition_plan and nutrition_plan.get('reason') else 'Personalized calorie targets are only calculated for adults.'
     elif nutrition_plan and nutrition_plan.get('reason'):
         calorie_target = None
         calorie_target_reason = nutrition_plan['reason']
