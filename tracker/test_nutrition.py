@@ -87,6 +87,13 @@ class PersonalizedNutritionTests(TestCase):
         self.assertGreater(profile.calorie_target, 2200)
         self.assertEqual(profile.nutrition_goal, 'muscle_gain')
 
+    def test_minor_does_not_see_a_fallback_calorie_input_on_goals_page(self):
+        self.profile.age = 17
+        self.profile.save()
+        response = self.client.get(reverse('tracker:goals'))
+        self.assertNotContains(response, 'Fallback daily calorie target (kcal)')
+        self.assertContains(response, 'Calorie and macro prescriptions are not shown for under-18 profiles')
+
     def test_minor_does_not_see_a_calorie_target_on_meals_page(self):
         self.profile.age = 17
         self.profile.save()
