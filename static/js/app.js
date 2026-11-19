@@ -30,6 +30,49 @@
     if (button) { event.preventDefault(); copyText(button.getAttribute('data-copy'), button); }
   });
 
+
+  // Background video: loaded only when it is welcome. Skipped for reduced motion and data saver,
+  // and for signed-in users on small screens, so a workout page never spends mobile data on it.
+  (function () {
+    var video = document.querySelector('.ambient-workout-video[data-src]');
+    var toggle = document.getElementById('video-toggle');
+    if (!video) return;
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var saver = (navigator.connection && navigator.connection.saveData) ||
+      (window.matchMedia && window.matchMedia('(prefers-reduced-data: reduce)').matches);
+    var narrow = window.matchMedia && window.matchMedia('(max-width: 899px)').matches;
+    if (reduced || saver || (video.getAttribute('data-scope') === 'wide' && narrow)) { video.remove(); return; }
+    video.src = video.getAttribute('data-src');
+    var started = video.play();
+    if (started && started.catch) started.catch(function () { /* autoplay blocked: leave the poster-less backdrop */ });
+    if (!toggle) return;
+    toggle.hidden = false;
+    toggle.addEventListener('click', function () {
+      var pausing = !video.paused;
+      if (pausing) { video.pause(); } else { video.play(); }
+      toggle.setAttribute('aria-pressed', pausing ? 'true' : 'false');
+      toggle.textContent = pausing ? 'Play background video' : 'Pause background video';
+    });
+  })();
+
+  // Show/hide toggle on password fields.
+  document.querySelectorAll('input[type="password"]').forEach(function (input) {
+    if (!input.id) return;
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn btn-quiet btn-small password-toggle';
+    button.textContent = 'Show password';
+    button.setAttribute('aria-controls', input.id);
+    button.setAttribute('aria-pressed', 'false');
+    button.addEventListener('click', function () {
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      button.textContent = show ? 'Hide password' : 'Show password';
+      button.setAttribute('aria-pressed', show ? 'true' : 'false');
+    });
+    input.insertAdjacentElement('afterend', button);
+  });
+
   document.addEventListener('submit', function (event) {
     var message = event.target.getAttribute && event.target.getAttribute('data-confirm');
     if (message && !window.confirm(message)) event.preventDefault();
