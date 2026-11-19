@@ -165,6 +165,7 @@ class PasswordChangeTests(TestCase):
                    DEFAULT_FROM_EMAIL='FitHub <noreply@example.com>')
 class PasswordResetTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = make_user('resetperson')
         self.url = reverse('accounts:password-reset')
 
@@ -184,6 +185,14 @@ class PasswordResetTests(TestCase):
         response = self.client.post(self.url, {'email': 'unknown@example.com'})
         self.assertRedirects(response, reverse('accounts:password-reset-done'))
         self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(PASSWORD_RESET_MAX_PER_HOUR=2)
+    def test_password_reset_requests_are_rate_limited_per_visitor(self):
+        first = self.client.post(self.url, {'email': 'unknown@example.com'})
+        second = self.client.post(self.url, {'email': 'unknown@example.com'})
+        third = self.client.post(self.url, {'email': 'unknown@example.com'})
+        self.assertEqual((first.status_code, second.status_code, third.status_code), (302, 302, 429))
+        self.assertEqual(third['Retry-After'], '3600')
 
     def test_valid_token_changes_password_and_invalidates_old_credentials(self):
         from django.contrib.auth.tokens import default_token_generator
