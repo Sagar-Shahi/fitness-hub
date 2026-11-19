@@ -113,7 +113,7 @@ class PersonalizedNutritionTests(TestCase):
         self.profile.save()
         response = self.client.get(reverse('tracker:dashboard'))
         self.assertIsNone(response.context['d']['calorie_target'])
-        self.assertContains(response, 'calorie targets are not shown for under-18 profiles')
+        self.assertContains(response, 'Calorie targets are not shown for under-18 profiles.')
 
     def test_meals_page_uses_personalized_calorie_and_macro_targets(self):
         self.profile.calorie_target = 2200
