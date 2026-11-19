@@ -359,7 +359,7 @@ def meals(request):
         return redirect(f"{reverse('tracker:meals')}?date={meal.date:%Y-%m-%d}")
     profile = profile_for(request.user)
     current_weight, nutrition_plan = _nutrition_plan_for(profile)
-    target = None if profile.age is not None and profile.age < 18 else (
+    target = None if nutrition_plan and nutrition_plan.get('reason') else (
         nutrition_plan['calories'] if nutrition_plan and nutrition_plan.get('calories') else profile.calorie_target
     )
     items = Meal.objects.filter(owner=request.user, date=day)
