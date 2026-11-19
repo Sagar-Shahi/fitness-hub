@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 
 from . import analytics
 from .models import BodyMetric, Exercise, ExerciseSet, Meal, Workout, profile_for
+from .nutrition import refresh_profile_calorie_target
 
 
 def _not_future(value):
@@ -153,15 +154,19 @@ class WeightSerializer(serializers.ModelSerializer):
     validate_date = staticmethod(_not_future)
 
     def create(self, validated):
+        user = self.context['request'].user
         obj, _ = BodyMetric.objects.update_or_create(
-            owner=self.context['request'].user, date=validated['date'], defaults={'weight_kg': validated['weight_kg']})
+            owner=user, date=validated['date'], defaults={'weight_kg': validated['weight_kg']})
+        refresh_profile_calorie_target(profile_for(user))
         return obj
 
     def update(self, instance, validated):
         if 'date' in validated and validated['date'] != instance.date and \
                 BodyMetric.objects.filter(owner=instance.owner, date=validated['date']).exists():
             raise serializers.ValidationError({'date': 'You already have a weight for that day.'})
-        return super().update(instance, validated)
+        updated = super().update(instance, validated)
+        refresh_profile_calorie_target(profile_for(updated.owner))
+        return updated
 
 
 class OwnedViewSet(viewsets.ModelViewSet):
@@ -197,6 +202,11 @@ class MealViewSet(OwnedViewSet):
 class WeightViewSet(OwnedViewSet):
     model = BodyMetric
     serializer_class = WeightSerializer
+
+    def perform_destroy(self, instance):
+        owner = instance.owner
+        instance.delete()
+        refresh_profile_calorie_target(profile_for(owner))
 
 
 class SummaryView(APIView):
