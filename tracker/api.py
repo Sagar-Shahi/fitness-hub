@@ -133,9 +133,12 @@ class MealSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         day = attrs.get('date') or (self.instance.date if self.instance else None)
-        if self.instance is None and day:
+        if day:
             user = self.context['request'].user
-            if Meal.objects.filter(owner=user, date=day).count() >= settings.MAX_MEALS_PER_DAY:
+            meals = Meal.objects.filter(owner=user, date=day)
+            if self.instance is not None:
+                meals = meals.exclude(pk=self.instance.pk)
+            if meals.count() >= settings.MAX_MEALS_PER_DAY:
                 raise serializers.ValidationError(f'At most {settings.MAX_MEALS_PER_DAY} meals per day.')
         return attrs
 
