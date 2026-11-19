@@ -230,6 +230,11 @@ class AffiliateStoreTests(Base):
         self.assertContains(response, 'Adjustable Dumbbells')
         self.assertNotContains(response, 'Yoga Mat')
 
+    def test_affiliate_links_are_disclosed_on_the_product_card(self):
+        self.make_product(affiliate_url='https://affiliate.example/track/123')
+        response = self.client.get(reverse('shop:store'))
+        self.assertContains(response, 'Affiliate link')
+
     def test_outbound_uses_affiliate_link_when_configured(self):
         product = self.make_product(affiliate_url='https://affiliate.example/track/123')
         response = self.client.get(reverse('shop:product-outbound', args=[product.slug]))
