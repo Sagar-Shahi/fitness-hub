@@ -604,3 +604,17 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
   border-bottom: 1px solid rgba(225,232,255,.16);
   background: rgba(10,14,27,.6);
 }
+
+
+.store-affiliate-disclosure {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #d9ccff;
+  background: rgba(153,132,255,.15);
+  border: 1px solid rgba(205,190,255,.24);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
