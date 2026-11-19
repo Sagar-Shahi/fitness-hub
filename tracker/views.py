@@ -301,11 +301,17 @@ def exercise_set_delete(request, pk, exercise_pk, set_pk):
         exercise = get_object_or_404(Exercise.objects.select_for_update(), pk=exercise_pk, workout=workout)
         entry = get_object_or_404(ExerciseSet, pk=set_pk, exercise=exercise)
         entry.delete()
-        # Keep visible set numbering contiguous after a removal.
-        for number, item in enumerate(exercise.set_entries.order_by('set_number', 'id'), start=1):
-            if item.set_number != number:
-                item.set_number = number
-                item.save(update_fields=['set_number'])
+        # Move remaining rows out of the final numbering range first. This avoids
+        # transient unique-key collisions when deleting an early set (for example,
+        # changing 2 -> 1 while another row still owns set 1 or 2).
+        remaining = list(exercise.set_entries.order_by('set_number', 'id'))
+        for index, item in enumerate(remaining, start=1):
+            item.set_number = 1000 + index
+        if remaining:
+            ExerciseSet.objects.bulk_update(remaining, ['set_number'])
+        for number, item in enumerate(remaining, start=1):
+            item.set_number = number
+            item.save(update_fields=['set_number'])
     messages.success(request, 'Set removed.')
     return redirect('tracker:workout-detail', pk=workout.pk)
 
