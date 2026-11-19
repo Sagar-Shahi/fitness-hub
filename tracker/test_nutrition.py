@@ -45,6 +45,17 @@ class PersonalizedNutritionTests(TestCase):
         self.profile.height_cm = None
         self.assertIsNone(calculate_nutrition_targets(self.profile))
 
+    def test_macro_targets_are_not_returned_when_they_exceed_calorie_estimate(self):
+        self.profile.age = 18
+        self.profile.height_cm = Decimal('120')
+        self.profile.starting_weight_kg = Decimal('300')
+        self.profile.sex_for_calculation = 'male'
+        self.profile.activity_level = 'sedentary'
+        self.profile.training_type = 'strength'
+        self.profile.nutrition_goal = 'fat_loss'
+        self.profile.body_fat_percentage = Decimal('2')
+        self.assertIn('reason', calculate_nutrition_targets(self.profile))
+
     def test_extreme_calorie_estimate_is_not_displayed(self):
         self.profile.age = 99
         self.profile.height_cm = Decimal('120')
@@ -70,6 +81,21 @@ class PersonalizedNutritionTests(TestCase):
         profile = Profile.objects.get(owner=self.user)
         self.assertGreater(profile.calorie_target, 2200)
         self.assertEqual(profile.nutrition_goal, 'muscle_gain')
+
+    def test_minor_does_not_see_a_calorie_target_on_meals_page(self):
+        self.profile.age = 17
+        self.profile.save()
+        response = self.client.get(reverse('tracker:meals'))
+        self.assertIsNone(response.context['target'])
+        self.assertContains(response, 'Calorie targets are not shown for under-18 profiles')
+        self.assertNotContains(response, '2200 kcal daily goal')
+
+    def test_dashboard_does_not_show_a_calorie_target_for_a_minor(self):
+        self.profile.age = 17
+        self.profile.save()
+        response = self.client.get(reverse('tracker:dashboard'))
+        self.assertIsNone(response.context['d']['calorie_target'])
+        self.assertContains(response, 'calorie targets are not shown for under-18 profiles')
 
     def test_meals_page_uses_personalized_calorie_and_macro_targets(self):
         self.profile.calorie_target = 2200
