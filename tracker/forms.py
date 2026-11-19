@@ -140,6 +140,10 @@ class MealForm(forms.ModelForm):
     def clean(self):
         data = super().clean()
         day = data.get('date')
-        if day and self.owner is not None and Meal.objects.filter(owner=self.owner, date=day).count() >= settings.MAX_MEALS_PER_DAY:
-            raise forms.ValidationError(f'You can log at most {settings.MAX_MEALS_PER_DAY} meals per day.')
+        if day and self.owner is not None:
+            meals = Meal.objects.filter(owner=self.owner, date=day)
+            if self.instance.pk:
+                meals = meals.exclude(pk=self.instance.pk)
+            if meals.count() >= settings.MAX_MEALS_PER_DAY:
+                raise forms.ValidationError(f'You can log at most {settings.MAX_MEALS_PER_DAY} meals per day.')
         return data
