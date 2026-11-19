@@ -27,6 +27,7 @@ def progress(request):
                 exercise__workout__owner=request.user,
                 exercise__name=selected,
                 is_completed=True,
+                is_warmup=False,
             )
             .values('exercise__workout_id', 'exercise__workout__date', 'exercise__workout__name')
             .annotate(
