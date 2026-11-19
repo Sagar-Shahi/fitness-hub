@@ -19,9 +19,14 @@ Security and privacy are design constraints here, not an afterthought.
 
 ## Features
 - **Workouts**: sessions with exercises and individually editable sets (reps, weight, completion, warm-up), completed-set volume, edit and delete, CSV export.
-- **Focus audio**: search public YouTube videos by song or artist and play embeddable results in the existing in-app player; paste YouTube links; play direct audio-file links or local files selected from your device (without uploading; reselect after reload); save a source link in this browser; and use browser-based spoken motivation. YouTube search uses the optional YOUTUBE_API_KEY server variable. Spotify search opens Spotify rather than streaming inside FitHub; full Spotify streaming requires Premium and is restricted for commercial apps by Spotify's policy. Protected streams are never extracted.
-- **Meals**: calories and protein/carbs/fat per meal, daily totals against your calorie target, day-by-day browsing.
-- **Weight**: one entry per day, chart with your target line.
+- **Focus audio**: search public YouTube videos by song or artist within a shared daily API-quota limit and play embeddable results in the existing in-app player; paste YouTube links; play direct audio-file links or local files selected from your device (without uploading; reselect after reload); save a source link in this browser; and use browser-based spoken motivation. YouTube search uses the optional YOUTUBE_API_KEY server variable. Spotify search opens Spotify rather than streaming inside FitHub; full Spotify streaming requires Premium and is restricted for commercial apps by Spotify's policy. Protected streams are never extracted.
+- **Meals**: add, edit and delete meals; calories and protein/carbs/fat per meal, daily totals and day-by-day browsing.
+- **Weight**: one entry per day, chart with your target line; deleting or changing entries refreshes personalized nutrition estimates.
+- **Progress**: strength history and personal records based on completed sets, with separate same-day workout sessions.
+- **Exercise library and Learn**: searchable movement catalogue, video tutorials, and source-linked training and nutrition education.
+- **Progress sharing**: private 30-day workout summary you can copy, share or print; no public workout link is created.
+- **Personalized nutrition**: adult-only Mifflin-St Jeor estimates with transparent macro calculations; optional body-composition details and no somatotype-based calorie assumptions.
+- **Gear Guide**: curated retailer links with affiliate disclosure; FitHub does not process purchases or payments.
 - **Dashboard**: weekly workout goal, calories left today, workout streak, 7/30/90-day charts. Charts are drawn as SVG on the server, so there is no chart library and no inline script.
 - **Plan shop**: training and diet plans, cart, orders, and a "My plans" page. The full plan text is only sent to people who bought it.
 - **REST API** with revocable API keys: workouts with nested exercises and optional `set_details` arrays, meals, weight and a summary.
@@ -42,7 +47,7 @@ python manage.py runserver
 Then open http://127.0.0.1:8000/ and sign up, or log in with the demo account printed by `seed_demo`.
 To create the sample plans on a live site run `python manage.py seed_plans`; you can also manage plans in the admin.
 
-Run the tests with `python manage.py test` (174 tests, no setup needed).
+Run the tests with `python manage.py test` (no external services or paid accounts needed).
 
 ## API
 Create a key on the **API keys** page (shown once, stored only as a SHA-256 hash) and send it as a Bearer token.
