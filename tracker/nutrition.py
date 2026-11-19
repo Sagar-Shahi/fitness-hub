@@ -82,3 +82,16 @@ def calculate_nutrition_targets(profile, weight_kg=None):
         'method': 'Mifflin-St Jeor BMR with an activity multiplier',
         'protein_method': 'Estimated lean mass' if lean_mass is not None else 'Current body weight',
     }
+
+
+def refresh_profile_calorie_target(profile):
+    """Keep the saved dashboard/API target aligned with the latest recorded body weight."""
+    from .models import BodyMetric
+
+    latest_weight = BodyMetric.objects.filter(owner=profile.owner).first()
+    current_weight = latest_weight.weight_kg if latest_weight else profile.starting_weight_kg
+    plan = calculate_nutrition_targets(profile, current_weight)
+    if plan and plan.get('calories'):
+        profile.calorie_target = plan['calories']
+        profile.save(update_fields=['calorie_target'])
+    return current_weight, plan
