@@ -130,7 +130,8 @@ class CheckoutTests(Base):
         self.client.post(reverse('shop:checkout'))
         self.assertEqual(Order.objects.count(), 1)
         self.assertEqual(self.client.post(reverse('shop:cart-add', args=[self.a.slug]), follow=True).status_code, 200)
-        self.assertEqual(CartItem.objects.filter(owner=self.user, plan=self.a).count(), 1)  # the stale line is left, but no second order
+        self.assertEqual(CartItem.objects.filter(owner=self.user, plan=self.a).count(), 1)  # stale rows cannot create a second order
+        self.assertNotContains(self.client.get(reverse('tracker:goals')), 'Cart (1)')
 
     def test_existing_buyers_keep_access_when_a_plan_is_unpublished(self):
         self._fill(self.a)
