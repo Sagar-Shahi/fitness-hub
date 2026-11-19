@@ -209,6 +209,23 @@ class MealApiTests(ApiCase):
             self.assertEqual(self.api.post(MEALS, good, format='json').status_code, 201)
             self.assertEqual(self.api.post(MEALS, good, format='json').status_code, 400)
 
+    @override_settings(MAX_MEALS_PER_DAY=1)
+    def test_update_cannot_move_a_meal_onto_a_full_day(self):
+        first = make_meal(self.user, ago=0, name='First')
+        make_meal(self.user, ago=1, name='Second')
+        response = self.api.patch(f'{MEALS}{first.pk}/', {'date': days_ago(1).isoformat()}, format='json')
+        self.assertEqual(response.status_code, 400)
+        first.refresh_from_db()
+        self.assertEqual(first.date, days_ago(0))
+
+    @override_settings(MAX_MEALS_PER_DAY=1)
+    def test_updating_existing_meal_does_not_consume_an_extra_slot(self):
+        meal = make_meal(self.user, ago=0, name='Existing')
+        response = self.api.patch(f'{MEALS}{meal.pk}/', {'calories': 700}, format='json')
+        self.assertEqual(response.status_code, 200)
+        meal.refresh_from_db()
+        self.assertEqual(meal.calories, 700)
+
     def test_other_users_meals(self):
         theirs = make_meal(make_user('victim'))
         self.assertEqual(self.api.get(f'{MEALS}{theirs.pk}/').status_code, 404)
