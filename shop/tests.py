@@ -132,6 +132,14 @@ class CheckoutTests(Base):
         self.assertEqual(self.client.post(reverse('shop:cart-add', args=[self.a.slug]), follow=True).status_code, 200)
         self.assertEqual(CartItem.objects.filter(owner=self.user, plan=self.a).count(), 1)  # the stale line is left, but no second order
 
+    def test_existing_buyers_keep_access_when_a_plan_is_unpublished(self):
+        self._fill(self.a)
+        self.client.post(reverse('shop:checkout'))
+        Plan.objects.filter(pk=self.a.pk).update(is_active=False)
+        response = self.client.get(reverse('shop:plan-detail', args=[self.a.slug]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'SECRET-FULL-CONTENT')
+
     def test_buying_unlocks_the_content(self):
         self._fill(self.a)
         self.client.post(reverse('shop:checkout'))
@@ -207,6 +215,13 @@ class AffiliateStoreTests(Base):
         self.assertTrue(products.filter(title='Pull Up Assist Band Set (4 Pieces)').exists())
         self.assertTrue(products.filter(title='20 kg Adjustable Dumbbell Set with Barbell Connector').exists())
         self.assertFalse(products.exclude(price_label='').exists())
+
+
+    def test_store_renders_a_verified_product_image_when_present(self):
+        product = self.make_product(image_url='https://images.example/dumbbells.jpg')
+        response = self.client.get(reverse('shop:store'))
+        self.assertContains(response, 'src="https://images.example/dumbbells.jpg"')
+        self.assertContains(response, 'alt="Adjustable Dumbbells"')
 
     def test_store_search_and_category_filter(self):
         self.make_product()
