@@ -32,8 +32,10 @@ def plans(request):
 
 @login_required
 def plan_detail(request, slug):
-    plan = get_object_or_404(Plan, slug=slug, is_active=True)
+    plan = get_object_or_404(Plan, slug=slug)
     owned = plan.pk in _owned_plan_ids(request.user)
+    if not plan.is_active and not owned:
+        return get_object_or_404(Plan.objects.none(), slug=slug)
     return render(request, 'shop/plan_detail.html', {
         'plan': plan, 'owned': owned,
         'in_cart': CartItem.objects.filter(owner=request.user, plan=plan).exists()})
