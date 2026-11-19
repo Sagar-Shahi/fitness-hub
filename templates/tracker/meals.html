@@ -11,9 +11,9 @@
 
 <section class="card meals-overview">
   <div class="progress-row">
-    <div class="goal-ring"><strong>{{ totals.calories }} of {{ target }} kcal</strong><span class="muted">{{ percent }}%</span></div>
-    <progress class="meter" max="100" value="{{ percent }}" aria-label="Calories against target">{{ percent }}%</progress>
-    <p class="meal-goal-note"><span>{% if percent >= 100 %}Daily calorie target reached{% else %}{{ target }} kcal daily goal{% endif %}</span><span>{{ totals.calories }} / {{ target }} kcal logged</span></p>
+    <div class="goal-ring"><strong>{% if target %}{{ totals.calories }} of {{ target }} kcal{% else %}{{ totals.calories }} kcal logged{% endif %}</strong><span class="muted">{% if target %}{{ percent }}%{% else %}today{% endif %}</span></div>
+    {% if target %}<progress class="meter" max="100" value="{{ percent }}" aria-label="Calories against target">{{ percent }}%</progress>{% endif %}
+    <p class="meal-goal-note">{% if target %}<span>{% if percent >= 100 %}Daily calorie target reached{% else %}{{ target }} kcal daily goal{% endif %}</span><span>{{ totals.calories }} / {{ target }} kcal logged</span>{% else %}<span>Meal logging is available.</span><span>Calorie targets are not shown for under-18 profiles.</span>{% endif %}</p>
   </div>
   <dl class="macro-row meals-macros">
     <div><dt>Protein</dt><dd>{{ totals.protein }} g</dd></div>
@@ -30,6 +30,8 @@
     </div>
     <p class="nutrition-plan-note">Remaining today: {{ macro_remaining.protein }} g protein · {{ macro_remaining.carbs }} g carbs · {{ macro_remaining.fat }} g fat. Use your <a href="{% url 'tracker:goals' %}">fitness profile</a> to update these estimates.</p>
   </section>
+  {% elif profile.age and profile.age < 18 %}
+  <section class="nutrition-target-card nutrition-target-incomplete"><strong>Age-appropriate guidance</strong><p>FitHub does not calculate calorie or macro prescriptions for under-18 profiles. You can still log meals and review your food history. Ask a qualified health professional for age-appropriate nutrition guidance.</p></section>
   {% else %}
   <section class="nutrition-target-card nutrition-target-incomplete"><strong>Want personalized targets?</strong><p>Complete your body and training details to get estimated calorie and macro goals.</p><a class="btn btn-quiet btn-small" href="{% url 'tracker:goals' %}">Set up nutrition profile</a></section>
   {% endif %}
@@ -52,7 +54,7 @@
       {% include 'partials/field.html' with field=form.fat_g %}
     </div>
     <section class="meal-live-preview" aria-live="polite" aria-atomic="true"><div><span class="muted">This meal</span><strong><span id="meal-preview-kcal">0</span> kcal</strong></div><div><span class="muted">Protein</span><strong><span id="meal-preview-protein">0</span> g</strong></div><div><span class="muted">Carbs</span><strong><span id="meal-preview-carbs">0</span> g</strong></div><div><span class="muted">Fat</span><strong><span id="meal-preview-fat">0</span> g</strong></div></section>
-    <p class="meal-after-add muted" id="meal-after-add">After adding: {{ totals.calories }} / {{ target }} kcal today.</p>
+    <p class="meal-after-add muted" id="meal-after-add">{% if target %}After adding: {{ totals.calories }} / {{ target }} kcal today.{% else %}After adding: {{ totals.calories }} kcal logged today.{% endif %}</p>
     <div class="form-actions"><button class="btn btn-primary" type="submit">＋ Add meal</button></div>
   </form>
   <section class="card flush meal-history-card">
