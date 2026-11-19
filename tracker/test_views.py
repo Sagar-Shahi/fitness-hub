@@ -325,6 +325,20 @@ class ExerciseSetTests(Base):
         self.client.post(delete_url)
         self.assertEqual(list(self.exercise.set_entries.values_list('set_number', flat=True)), [1, 2])
 
+    def test_deleting_first_set_renumbers_remaining_sets_without_unique_collision(self):
+        third = ExerciseSet.objects.create(
+            exercise=self.exercise, set_number=3, reps=6, weight_kg=Decimal('60.0')
+        )
+        delete_url = reverse('tracker:exercise-set-delete', args=[self.workout.pk, self.exercise.pk, self.first.pk])
+        response = self.client.post(delete_url)
+        self.assertRedirects(response, reverse('tracker:workout-detail', args=[self.workout.pk]))
+        self.assertEqual(
+            list(self.exercise.set_entries.values_list('set_number', flat=True)),
+            [1, 2],
+        )
+        third.refresh_from_db()
+        self.assertEqual(third.set_number, 2)
+
     def test_invalid_set_edit_preserves_session_progress_context(self):
         self.first.is_completed = True
         self.first.save(update_fields=['is_completed'])
