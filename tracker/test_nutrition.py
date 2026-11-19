@@ -90,6 +90,19 @@ class PersonalizedNutritionTests(TestCase):
         self.assertContains(response, 'Calorie targets are not shown for under-18 profiles')
         self.assertNotContains(response, '2200 kcal daily goal')
 
+    def test_unsafe_estimate_is_not_shown_as_a_fallback_target(self):
+        self.profile.age = 99
+        self.profile.height_cm = Decimal('120')
+        self.profile.starting_weight_kg = Decimal('30')
+        self.profile.activity_level = 'sedentary'
+        self.profile.nutrition_goal = 'fat_loss'
+        self.profile.save()
+        meals = self.client.get(reverse('tracker:meals'))
+        self.assertIsNone(meals.context['target'])
+        self.assertContains(meals, 'falls outside FitHub')
+        dashboard = self.client.get(reverse('tracker:dashboard'))
+        self.assertIsNone(dashboard.context['d']['calorie_target'])
+
     def test_dashboard_does_not_show_a_calorie_target_for_a_minor(self):
         self.profile.age = 17
         self.profile.save()
