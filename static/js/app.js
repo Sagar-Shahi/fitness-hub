@@ -595,7 +595,7 @@
     carbs: Math.max(0, Number(form.getAttribute('data-current-carbs')) || 0),
     fat: Math.max(0, Number(form.getAttribute('data-current-fat')) || 0)
   };
-  var target = Math.max(1, Number(form.getAttribute('data-calorie-target')) || 1);
+  var target = Math.max(0, Number(form.getAttribute('data-calorie-target')) || 0);
   function value(field) { return Math.max(0, Number(field && field.value) || 0); }
   function update() {
     Object.keys(fields).forEach(function (key) {
@@ -605,7 +605,9 @@
     });
     var after = current.calories + value(fields.calories);
     var note = document.getElementById('meal-after-add');
-    if (note) note.textContent = 'After adding: ' + after + ' / ' + target + ' kcal today (' + Math.round(after / target * 100) + '%).';
+    if (note) note.textContent = target > 0
+      ? 'After adding: ' + after + ' / ' + target + ' kcal today (' + Math.round(after / target * 100) + '%).'
+      : 'After adding: ' + after + ' kcal logged today.';
   }
   Object.keys(fields).forEach(function (key) {
     if (fields[key]) fields[key].addEventListener('input', update);
