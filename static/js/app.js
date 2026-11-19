@@ -206,7 +206,7 @@
     var videoStatus = document.getElementById('focus-video-status');
     var audio = document.getElementById('focus-audio');
     if (!dock || !stage || !frame) return false;
-    if (audio) audio.pause();
+    if (audio) clearAudioSource();
     dock.classList.add('has-video');
     dock.open = true;
     stage.hidden = false;
@@ -364,6 +364,7 @@
     var url = safeUrl(value);
     if (!url) { showStatus('Enter a complete http or https link.'); return; }
     clearAudioSource();
+    closeFocusVideo();
     localFile.value = '';
     input.value = url.href;
     openLink.href = url.href;
@@ -510,9 +511,11 @@
       return;
     }
     clearAudioSource();
+    closeFocusVideo();
     input.value = '';
     openLink.hidden = true;
     download.hidden = true;
+    try { window.localStorage.removeItem(storageKey); } catch (error) { /* storage may be disabled */ }
     try {
       activeObjectUrl = URL.createObjectURL(file);
       audio.src = activeObjectUrl;
