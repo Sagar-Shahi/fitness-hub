@@ -28,17 +28,18 @@ def progress(request):
                 exercise__name=selected,
                 is_completed=True,
             )
-            .values('exercise__workout__date')
+            .values('exercise__workout_id', 'exercise__workout__date', 'exercise__workout__name')
             .annotate(
                 max_weight=Max('weight_kg'),
                 sets=Count('id'),
                 reps=Sum('reps'),
             )
-            .order_by('exercise__workout__date')
+            .order_by('exercise__workout__date', 'exercise__workout_id')
         )
         sessions = [
             {
                 'date': item['exercise__workout__date'],
+                'workout_name': item['exercise__workout__name'],
                 'max_weight': item['max_weight'],
                 'sets': item['sets'],
                 'reps': item['reps'],
@@ -46,10 +47,11 @@ def progress(request):
             for item in grouped
         ]
         if sessions:
-            chart = analytics.line_chart(
-                [(item['date'], item['max_weight']) for item in sessions],
-                unit='kg',
-            )
+            # Show one strongest point per day, while keeping separate same-day workouts in history.
+            daily_best = {}
+            for item in sessions:
+                daily_best[item['date']] = max(daily_best.get(item['date'], item['max_weight']), item['max_weight'])
+            chart = analytics.line_chart(sorted(daily_best.items()), unit='kg')
             personal_record = max(item['max_weight'] for item in sessions)
             total_sets = sum(item['sets'] for item in sessions)
 
