@@ -69,7 +69,10 @@ def calculate_nutrition_targets(profile, weight_kg=None):
         lean_mass = None
         protein = _whole(weight * PROTEIN_FACTORS[profile.training_type])
     fat = _whole(weight * Decimal('0.8'))
-    carbs = max(0, _whole((Decimal(calories) - protein * 4 - fat * 9) / 4))
+    macro_calories = protein * 4 + fat * 9
+    if macro_calories > calories:
+        return {'reason': 'The estimated calorie target cannot support the calculated protein and fat amounts. Please ask a registered dietitian or healthcare professional for an appropriate plan.'}
+    carbs = max(0, _whole((Decimal(calories) - macro_calories) / 4))
     return {
         'calories': calories,
         'maintenance_calories': _whole(maintenance),
