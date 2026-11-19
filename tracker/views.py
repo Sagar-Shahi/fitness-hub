@@ -377,6 +377,17 @@ def meals(request):
 
 
 @login_required
+def meal_edit(request, pk):
+    meal = get_object_or_404(Meal, pk=pk, owner=request.user)
+    form = MealForm(request.POST or None, instance=meal, owner=request.user)
+    if request.method == 'POST' and form.is_valid():
+        updated = form.save()
+        messages.success(request, f'Updated {updated.name}.')
+        return redirect(f"{reverse('tracker:meals')}?date={updated.date:%Y-%m-%d}")
+    return render(request, 'tracker/meal_edit.html', {'form': form, 'meal': meal})
+
+
+@login_required
 @require_POST
 def meal_delete(request, pk):
     meal = get_object_or_404(Meal, pk=pk, owner=request.user)
