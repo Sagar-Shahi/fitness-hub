@@ -359,7 +359,9 @@ def meals(request):
         return redirect(f"{reverse('tracker:meals')}?date={meal.date:%Y-%m-%d}")
     profile = profile_for(request.user)
     current_weight, nutrition_plan = _nutrition_plan_for(profile)
-    target = nutrition_plan['calories'] if nutrition_plan and nutrition_plan.get('calories') else profile.calorie_target
+    target = None if profile.age is not None and profile.age < 18 else (
+        nutrition_plan['calories'] if nutrition_plan and nutrition_plan.get('calories') else profile.calorie_target
+    )
     items = Meal.objects.filter(owner=request.user, date=day)
     totals = analytics.day_totals(request.user, day)
     macro_remaining = None
@@ -370,7 +372,7 @@ def meals(request):
             'fat': max(0, nutrition_plan['fat_g'] - totals['fat']),
         }
     return render(request, 'tracker/meals.html', {
-        'form': form, 'day': day, 'items': items, 'totals': totals, 'target': target,
+        'form': form, 'day': day, 'items': items, 'totals': totals, 'target': target, 'profile': profile,
         'nutrition_plan': nutrition_plan, 'macro_remaining': macro_remaining,
         'percent': analytics.percent(totals['calories'], target),
         'prev': day - timedelta(days=1), 'next': day + timedelta(days=1) if day < timezone.localdate() else None})
