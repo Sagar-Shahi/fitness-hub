@@ -7,7 +7,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import ApiKey
 
-from .models import BodyMetric, ExerciseSet, Meal, Workout
+from .models import BodyMetric, ExerciseSet, Meal, Profile, Workout
 from .testutils import PASSWORD, days_ago, make_meal, make_user, make_weight, make_workout
 
 WORKOUTS, MEALS, WEIGHT, SUMMARY = '/api/v1/workouts/', '/api/v1/meals/', '/api/v1/weight/', '/api/v1/summary/'
@@ -228,6 +228,28 @@ class WeightApiTests(ApiCase):
                      {'date': '2999-01-01', 'weight_kg': '80'}, {'weight_kg': '80'}, {'date': days_ago(0).isoformat()}):
             with self.subTest(body=body):
                 self.assertEqual(self.api.post(WEIGHT, body, format='json').status_code, 400)
+
+    def test_weight_api_keeps_personalized_target_in_sync_on_create_update_and_delete(self):
+        profile = Profile.objects.create(
+            owner=self.user, age=30, height_cm=180, starting_weight_kg=80,
+            sex_for_calculation='male', activity_level='moderate',
+            training_type='strength', nutrition_goal='maintain',
+        )
+        from .nutrition import calculate_nutrition_targets
+        day = days_ago(0).isoformat()
+        created = self.api.post(WEIGHT, {'date': day, 'weight_kg': '90.0'}, format='json')
+        self.assertEqual(created.status_code, 201)
+        profile.refresh_from_db()
+        self.assertEqual(profile.calorie_target, calculate_nutrition_targets(profile, Decimal('90.0'))['calories'])
+
+        updated = self.api.patch(f"{WEIGHT}{created.json()['id']}/", {'weight_kg': '85.0'}, format='json')
+        self.assertEqual(updated.status_code, 200)
+        profile.refresh_from_db()
+        self.assertEqual(profile.calorie_target, calculate_nutrition_targets(profile, Decimal('85.0'))['calories'])
+
+        self.assertEqual(self.api.delete(f"{WEIGHT}{created.json()['id']}/").status_code, 204)
+        profile.refresh_from_db()
+        self.assertEqual(profile.calorie_target, calculate_nutrition_targets(profile, Decimal('80.0'))['calories'])
 
     def test_moving_an_entry_onto_another_day_is_refused(self):
         a, b = make_weight(self.user, ago=1), make_weight(self.user, ago=0)
