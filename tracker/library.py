@@ -76,11 +76,13 @@ def exercise_library(request):
             item["image_url"] = ""
         filtered.append(item)
 
-    page = max(1, int(request.GET.get("page", "1"))) if request.GET.get("page", "1").isdigit() else 1
+    raw_page = request.GET.get("page", "1")
+    page = int(raw_page) if raw_page.isdigit() and len(raw_page) <= 6 else 1
     page_size = 24
+    page_count = max(1, (len(filtered) + page_size - 1) // page_size)
+    page = min(max(1, page), page_count)
     start = (page - 1) * page_size
     page_items = filtered[start:start + page_size]
-    page_count = max(1, (len(filtered) + page_size - 1) // page_size)
     return render(request, "tracker/exercise_library.html", {
         "exercises": page_items,
         "query": query,
