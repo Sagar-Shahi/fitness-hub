@@ -1,6 +1,6 @@
 from django.conf import settings
 
-# External audio is permitted only through media-src. Scripts, styles, images and API calls remain same-origin.
+# Remote media and HTTPS thumbnails are allowed; scripts, styles and API calls remain same-origin.
 CSP = (
     "default-src 'self'; "
     "script-src 'self'; "
