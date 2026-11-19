@@ -67,6 +67,7 @@
       closeExploreMenu();
       document.querySelectorAll('details.account-menu[open]').forEach(function (menu) { menu.removeAttribute('open'); });
       var dock = document.getElementById('focus-dock');
+      closeFocusVideo();
       if (dock) dock.removeAttribute('open');
     }
   });
@@ -238,6 +239,10 @@
     var dock = document.getElementById('focus-dock');
     if (dock) dock.removeAttribute('open');
   });
+  var focusDock = document.getElementById('focus-dock');
+  if (focusDock) focusDock.addEventListener('toggle', function () {
+    if (!focusDock.open) closeFocusVideo();
+  });
   if (focusVideoFrame) focusVideoFrame.addEventListener('load', function () {
     var stage = document.getElementById('focus-video-stage');
     if (stage && !stage.hidden && focusVideoFrame.getAttribute('src') && focusVideoStatus) {
@@ -346,12 +351,12 @@
   function safeUrl(value) {
     try {
       var url = new URL(value.trim());
-      return (url.protocol === 'https:' || url.protocol === 'http:') ? url : null;
+      return url.protocol === 'https:' ? url : null;
     } catch (error) { return null; }
   }
   function providerName(url) {
     var host = url.hostname.toLowerCase().replace(/^www\./, '');
-    if (host === 'youtube.com' || host === 'youtu.be' || host === 'music.youtube.com') return 'YouTube';
+    if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtu.be' || host === 'music.youtube.com') return 'YouTube';
     if (host === 'spotify.com' || host.endsWith('.spotify.com')) return 'Spotify';
     return '';
   }
@@ -362,7 +367,11 @@
 
   function loadUrl(value, save) {
     var url = safeUrl(value);
-    if (!url) { showStatus('Enter a complete http or https link.'); return; }
+    if (!url) {
+      if (!save) { try { window.localStorage.removeItem(storageKey); } catch (error) { /* storage may be disabled */ } }
+      showStatus('Enter a complete HTTPS link.');
+      return;
+    }
     clearAudioSource();
     closeFocusVideo();
     localFile.value = '';
