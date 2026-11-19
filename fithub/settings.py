@@ -147,7 +147,8 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # --- Internationalisation ----------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = os.environ.get('DJANGO_TIME_ZONE', 'UTC')
+# FitHub's initial catalogue and retailers target Nepal; deployments elsewhere can override this.
+TIME_ZONE = os.environ.get('DJANGO_TIME_ZONE', 'Asia/Kathmandu')
 USE_I18N = True
 USE_TZ = True
 
