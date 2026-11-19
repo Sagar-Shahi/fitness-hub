@@ -593,6 +593,14 @@ class ExerciseLibraryTests(Base):
         self.assertEqual(response.context["category"], "stretching")
 
     @patch("tracker.library._catalog", return_value=(EXERCISES, None))
+    def test_invalid_page_numbers_clamp_to_a_valid_page(self, catalog):
+        response = self.client.get(reverse("tracker:exercise-library"), {"page": "999999"})
+        self.assertEqual(response.context["page"], response.context["page_count"])
+        huge = self.client.get(reverse("tracker:exercise-library"), {"page": "9" * 5000})
+        self.assertEqual(huge.status_code, 200)
+        self.assertEqual(huge.context["page"], 1)
+
+    @patch("tracker.library._catalog", return_value=(EXERCISES, None))
     def test_only_my_workouts_can_be_selected_for_quick_add(self, catalog):
         mine = make_workout(self.user, name="My workout", exercises=())
         other = make_user("other")
