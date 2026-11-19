@@ -32,7 +32,7 @@
       <span class="store-category">{{ product.get_category_display }}</span>
       <h2>{{ product.title }}</h2>
       <p class="muted">{{ product.description }}</p>
-      <div class="store-product-meta"><span>{{ product.seller_name }}</span>{% if product.price_label %}<strong>{{ product.price_label }}</strong>{% endif %}</div>
+      <div class="store-product-meta"><span>{{ product.seller_name }}</span>{% if product.price_label %}<strong>{{ product.price_label }}</strong>{% endif %}{% if product.affiliate_url %}<span class="store-affiliate-disclosure">Affiliate link</span>{% endif %}</div>
       <a class="btn btn-primary btn-block" href="{% url 'shop:product-outbound' product.slug %}" target="_blank" rel="noopener noreferrer sponsored">Visit retailer <span aria-hidden="true">↗</span></a>
     </div>
   </article>
