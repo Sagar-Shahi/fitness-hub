@@ -736,3 +736,20 @@ a:not(.btn):focus-visible { border-radius: 5px; }
   .dashboard-action, .table tbody tr { transition: none; }
   .dashboard-action:hover { transform: none; }
 }
+
+
+/* Reliable photographic fallback: visible when video is blocked, paused by reduced-motion,
+   or unavailable. Pexels photo is served from its public image CDN. */
+body {
+  background-color: #080b14;
+  background-image:
+    linear-gradient(180deg, rgba(7, 9, 17, .48), rgba(7, 9, 17, .82)),
+    url("https://images.pexels.com/photos/6455896/pexels-photo-6455896.jpeg?cs=srgb&dl=pexels-julia-larson-6455896.jpg&fm=jpg");
+  background-size: cover;
+  background-position: center 42%;
+  background-attachment: fixed;
+}
+.ambient-workout-video { pointer-events: none; }
+@media (max-width: 760px) {
+  body { background-position: 58% center; background-attachment: scroll; }
+}
