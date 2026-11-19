@@ -26,14 +26,14 @@ def _whole(value):
 
 def calculate_nutrition_targets(profile, weight_kg=None):
     """Return daily estimates or a clear reason when the profile is not suitable."""
+    if profile.age is not None and profile.age < 18:
+        return {'reason': 'Personalized calorie targets are only calculated for adults. Please seek age-appropriate guidance from a qualified professional.'}
     required = (
         profile.age, profile.height_cm, profile.sex_for_calculation,
         profile.activity_level, profile.training_type,
     )
     if any(value in (None, '') for value in required):
         return None
-    if profile.age < 18:
-        return {'reason': 'Personalized calorie targets are only calculated for adults. Please seek age-appropriate guidance from a qualified professional.'}
     weight = weight_kg or profile.starting_weight_kg
     if not weight:
         return None
