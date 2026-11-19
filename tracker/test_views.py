@@ -26,7 +26,7 @@ class LoginRequiredTests(TestCase):
             reverse('tracker:workout-detail', args=[workout.pk]), reverse('tracker:workout-edit', args=[workout.pk]),
             reverse('tracker:workout-delete', args=[workout.pk]), reverse('tracker:exercise-add', args=[workout.pk]),
             reverse('tracker:exercise-delete', args=[workout.pk, exercise.pk]), reverse('tracker:weight-delete', args=[weight.pk]),
-            reverse('tracker:meal-delete', args=[meal.pk]),
+            reverse('tracker:meal-edit', args=[meal.pk]), reverse('tracker:meal-delete', args=[meal.pk]),
             reverse('shop:plans'), reverse('shop:cart'), reverse('shop:orders'), reverse('shop:my-plans'), reverse('shop:checkout'),
         ]
         for url in urls:
@@ -437,6 +437,32 @@ class MealTests(Base):
         for junk in ('junk', '2026-13-45', "'; DROP TABLE", '9999-01-01'):
             with self.subTest(date=junk):
                 self.assertEqual(self.client.get(reverse('tracker:meals'), {'date': junk}).status_code, 200)
+
+    def test_edit_meal_updates_values_and_returns_to_the_updated_day(self):
+        meal = make_meal(self.user, ago=2, name='Old meal')
+        new_day = days_ago(1)
+        response = self.client.post(reverse('tracker:meal-edit', args=[meal.pk]), {
+            'name': 'Updated meal', 'kind': 'dinner', 'date': new_day.isoformat(),
+            'calories': 720, 'protein_g': 35, 'carbs_g': 80, 'fat_g': 20,
+        })
+        self.assertRedirects(response, f"{reverse('tracker:meals')}?date={new_day.isoformat()}")
+        meal.refresh_from_db()
+        self.assertEqual((meal.name, meal.kind, meal.calories), ('Updated meal', 'dinner', 720))
+
+    @override_settings(MAX_MEALS_PER_DAY=1)
+    def test_editing_existing_meal_does_not_count_it_again(self):
+        meal = make_meal(self.user, name='Existing meal')
+        response = self.client.post(reverse('tracker:meal-edit', args=[meal.pk]), {
+            'name': 'Still one meal', 'kind': 'lunch', 'date': days_ago(0).isoformat(),
+            'calories': 500, 'protein_g': 20, 'carbs_g': 60, 'fat_g': 10,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Meal.objects.filter(owner=self.user).count(), 1)
+
+    def test_cannot_edit_another_users_meal(self):
+        other = make_user('meal-owner')
+        meal = make_meal(other)
+        self.assertEqual(self.client.get(reverse('tracker:meal-edit', args=[meal.pk])).status_code, 404)
 
     def test_delete_returns_to_the_same_day(self):
         meal = make_meal(self.user, ago=2)
