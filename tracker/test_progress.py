@@ -39,6 +39,15 @@ class ProgressPageTests(TestCase):
         self.assertIsNone(response.context['personal_record'])
         self.assertEqual(response.context['session_count'], 0)
 
+    def test_same_day_workouts_remain_separate_in_session_history(self):
+        morning = make_workout(self.user, ago=0, name='Morning session', exercises=(('Squat', 2, 5, '80'),))
+        evening = make_workout(self.user, ago=0, name='Evening session', exercises=(('Squat', 3, 5, '90'),))
+        ExerciseSet.objects.filter(exercise__workout__in=[morning, evening]).update(is_completed=True)
+        response = self.client.get(reverse('tracker:progress'), {'exercise': 'Squat'})
+        self.assertEqual(response.context['session_count'], 2)
+        self.assertEqual([item['workout_name'] for item in response.context['sessions']], ['Evening session', 'Morning session'])
+        self.assertEqual(response.context['total_sets'], 5)
+
     def test_another_users_exercise_is_never_selectable(self):
         other = make_user('another-user')
         make_workout(other, exercises=(('Secret lift', 3, 8, '100'),))
