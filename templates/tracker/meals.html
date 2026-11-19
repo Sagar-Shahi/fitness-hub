@@ -64,7 +64,7 @@
         <tbody>
           {% for m in items %}
           <tr><td><span class="cell-title">{{ m.name }}</span><span class="cell-sub muted">{{ m.get_kind_display }}</span></td><td class="num">{{ m.calories }}</td><td class="num nowrap">{{ m.protein_g }} / {{ m.carbs_g }} / {{ m.fat_g }}</td>
-            <td class="actions-cell"><form method="post" action="{% url 'tracker:meal-delete' m.pk %}" data-confirm="Delete {{ m.name }}?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Delete</button></form></td></tr>
+            <td class="actions-cell"><div class="head-actions"><a class="btn btn-quiet btn-small" href="{% url 'tracker:meal-edit' m.pk %}">Edit</a><form method="post" action="{% url 'tracker:meal-delete' m.pk %}" data-confirm="Delete {{ m.name }}?">{% csrf_token %}<button class="btn btn-danger-quiet btn-small" type="submit">Delete</button></form></div></td></tr>
           {% endfor %}
         </tbody>
       </table>
