@@ -13,7 +13,7 @@
   <div class="progress-row">
     <div class="goal-ring"><strong>{% if target %}{{ totals.calories }} of {{ target }} kcal{% else %}{{ totals.calories }} kcal logged{% endif %}</strong><span class="muted">{% if target %}{{ percent }}%{% else %}today{% endif %}</span></div>
     {% if target %}<progress class="meter" max="100" value="{{ percent }}" aria-label="Calories against target">{{ percent }}%</progress>{% endif %}
-    <p class="meal-goal-note">{% if target %}<span>{% if percent >= 100 %}Daily calorie target reached{% else %}{{ target }} kcal daily goal{% endif %}</span><span>{{ totals.calories }} / {{ target }} kcal logged</span>{% else %}<span>Meal logging is available.</span><span>Calorie targets are not shown for under-18 profiles.</span>{% endif %}</p>
+    <p class="meal-goal-note">{% if target %}<span>{% if percent >= 100 %}Daily calorie target reached{% else %}{{ target }} kcal daily goal{% endif %}</span><span>{{ totals.calories }} / {{ target }} kcal logged</span>{% else %}<span>Meal logging is available.</span><span>Complete your profile to see a target when appropriate.</span>{% endif %}</p>
   </div>
   <dl class="macro-row meals-macros">
     <div><dt>Protein</dt><dd>{{ totals.protein }} g</dd></div>
