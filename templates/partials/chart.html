@@ -2,7 +2,7 @@
   {% if chart.kind == 'line' and chart.empty %}
   <p class="muted chart-empty">No weight entries in this period yet.</p>
   {% else %}
-  <svg class="chart-svg" viewBox="0 0 {{ chart.width }} {{ chart.height }}" role="img" aria-label="{{ chart.description }}">
+  <svg class="chart-svg" data-animate-chart viewBox="0 0 {{ chart.width }} {{ chart.height }}" role="img" aria-label="{{ chart.description }}">
     {% for tick in chart.ticks %}
     <line class="chart-grid" x1="{{ chart.left }}" x2="{{ chart.right_edge }}" y1="{{ tick.y }}" y2="{{ tick.y }}"/>
     <text class="chart-label" x="{{ chart.left }}" dx="-6" y="{{ tick.y }}" dy="4" text-anchor="end">{{ tick.value }}</text>

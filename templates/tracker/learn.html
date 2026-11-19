@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Learn · FitHub{% endblock %}
+{% block description %}Explore practical, source-linked lessons about strength training, nutrition, recovery and fitness science.{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div><p class="eyebrow">KNOWLEDGE FOR YOUR NEXT SESSION</p><h1>Learn</h1><p class="muted">Understand the why behind your training. Practical lessons, clear explanations and sources you can check.</p></div>
+  <span class="badge">{{ result_count }} lessons</span>
+</section>
+<section class="card learn-intro">
+  <div><p class="eyebrow">THE FIT HUB FIELD GUIDE</p><h2>Train with understanding.</h2><p class="muted">Start with the basics, explore the science, then put what you learn into practice. Reading lessons here does not use live YouTube search quota.</p></div>
+  <a class="btn btn-quiet" href="{% url 'tracker:exercise-library' %}">Explore exercises</a>
+</section>
+<form method="get" class="card learn-filters" role="search">
+  <div class="field"><label for="learn-search">Search lessons</label><input id="learn-search" type="search" name="q" value="{{ query }}" placeholder="Try protein, recovery, strength..."></div>
+  <div class="field"><label for="learn-category">Topic</label><select id="learn-category" name="category"><option value="">All topics</option>{% for item in categories %}<option value="{{ item }}" {% if category == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Search lessons</button><a class="btn btn-quiet" href="{% url 'tracker:learn' %}">Clear</a></div>
+</form>
+{% if articles %}
+<div class="learn-grid">
+{% for article in articles %}
+  <article class="card learn-card">
+    <div class="learn-card-meta"><span class="badge">{{ article.category }}</span><span class="small muted">{{ article.read_time }} read</span></div>
+    <h2>{{ article.title }}</h2><p class="muted">{{ article.summary }}</p>
+    {% if article.exercise_query %}<a class="btn btn-quiet btn-small learn-practice-link" href="{% url 'tracker:exercise-library' %}?q={{ article.exercise_query|urlencode }}">Find related exercises ↗</a>{% endif %}
+    <details class="learn-details"><summary>Read lesson <span aria-hidden="true">＋</span></summary>
+      <div class="learn-article-body">
+      {% for section in article.sections %}
+        <section><h3>{{ section.heading }}</h3>
+          {% if section.body %}<p>{{ section.body }}</p>{% endif %}
+          {% if section.bullets %}<ul>{% for bullet in section.bullets %}<li>{{ bullet }}</li>{% endfor %}</ul>{% endif %}
+        </section>
+      {% endfor %}
+      <div class="learn-sources"><strong>Sources and further reading</strong><ul>{% for source in article.sources %}<li><a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.label }} ↗</a></li>{% endfor %}</ul></div>
+      </div>
+    </details>
+  </article>
+{% endfor %}
+</div>
+{% else %}
+<section class="card empty-state"><h2 class="card-title">No lessons found</h2><p class="muted">Try another search or choose all topics.</p><a class="btn btn-quiet" href="{% url 'tracker:learn' %}">Show all lessons</a></section>
+{% endif %}
+<p class="muted small">FitHub lessons are general education, not diagnosis or individual medical advice. Guidance may not apply to children, pregnancy, injury or medical conditions; consult an appropriately qualified professional when needed. Sources are linked so you can read the original guidance.</p>
+{% endblock %}

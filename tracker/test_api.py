@@ -7,7 +7,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import ApiKey
 
-from .models import BodyMetric, Meal, Workout
+from .models import BodyMetric, ExerciseSet, Meal, Profile, Workout
 from .testutils import PASSWORD, days_ago, make_meal, make_user, make_weight, make_workout
 
 WORKOUTS, MEALS, WEIGHT, SUMMARY = '/api/v1/workouts/', '/api/v1/meals/', '/api/v1/weight/', '/api/v1/summary/'
@@ -86,6 +86,48 @@ class WorkoutApiTests(ApiCase):
         self.assertEqual(len(data['exercises']), 2)
         self.assertEqual(Decimal(data['volume_kg']), Decimal('1920.0'))  # 4*8*60
         self.assertEqual(Workout.objects.get().owner, self.user)
+
+    def test_create_and_update_individual_set_details(self):
+        exercises = [{
+            'name': 'Bench press',
+            'sets': 2,
+            'reps': 10,
+            'weight_kg': '40.0',
+            'set_details': [
+                {'set_number': 1, 'reps': 12, 'weight_kg': '40.0', 'is_completed': True, 'is_warmup': False},
+                {'set_number': 2, 'reps': 8, 'weight_kg': '50.0', 'is_completed': True, 'is_warmup': False},
+            ],
+        }]
+        response = self.api.post(WORKOUTS, self.body(exercises=exercises), format='json')
+        self.assertEqual(response.status_code, 201, response.content)
+        data = response.json()
+        self.assertEqual(len(data['exercises'][0]['set_details']), 2)
+        self.assertEqual(Decimal(data['volume_kg']), Decimal('880.0'))
+        workout = Workout.objects.get()
+        self.assertEqual(ExerciseSet.objects.filter(exercise__workout=workout).count(), 2)
+
+        replacement = [{
+            'name': 'Incline press', 'sets': 1, 'reps': 6, 'weight_kg': '30.0',
+            'set_details': [
+                {'set_number': 1, 'reps': 6, 'weight_kg': '35.0', 'is_completed': False, 'is_warmup': True},
+            ],
+        }]
+        updated = self.api.patch(f'{WORKOUTS}{workout.pk}/', {'exercises': replacement}, format='json')
+        self.assertEqual(updated.status_code, 200, updated.content)
+        self.assertEqual(updated.json()['exercises'][0]['set_details'][0]['is_warmup'], True)
+        self.assertEqual(ExerciseSet.objects.filter(exercise__workout=workout).count(), 1)
+
+    def test_duplicate_nested_set_numbers_are_rejected(self):
+        exercises = [{
+            'name': 'Bench press', 'sets': 2, 'reps': 10, 'weight_kg': '40.0',
+            'set_details': [
+                {'set_number': 1, 'reps': 10, 'weight_kg': '40.0'},
+                {'set_number': 1, 'reps': 8, 'weight_kg': '50.0'},
+            ],
+        }]
+        response = self.api.post(WORKOUTS, self.body(exercises=exercises), format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Workout.objects.count(), 0)
 
     def test_server_owned_fields_cannot_be_set(self):
         other = make_user('victim')
@@ -167,6 +209,23 @@ class MealApiTests(ApiCase):
             self.assertEqual(self.api.post(MEALS, good, format='json').status_code, 201)
             self.assertEqual(self.api.post(MEALS, good, format='json').status_code, 400)
 
+    @override_settings(MAX_MEALS_PER_DAY=1)
+    def test_update_cannot_move_a_meal_onto_a_full_day(self):
+        first = make_meal(self.user, ago=0, name='First')
+        make_meal(self.user, ago=1, name='Second')
+        response = self.api.patch(f'{MEALS}{first.pk}/', {'date': days_ago(1).isoformat()}, format='json')
+        self.assertEqual(response.status_code, 400)
+        first.refresh_from_db()
+        self.assertEqual(first.date, days_ago(0))
+
+    @override_settings(MAX_MEALS_PER_DAY=1)
+    def test_updating_existing_meal_does_not_consume_an_extra_slot(self):
+        meal = make_meal(self.user, ago=0, name='Existing')
+        response = self.api.patch(f'{MEALS}{meal.pk}/', {'calories': 700}, format='json')
+        self.assertEqual(response.status_code, 200)
+        meal.refresh_from_db()
+        self.assertEqual(meal.calories, 700)
+
     def test_other_users_meals(self):
         theirs = make_meal(make_user('victim'))
         self.assertEqual(self.api.get(f'{MEALS}{theirs.pk}/').status_code, 404)
@@ -187,6 +246,28 @@ class WeightApiTests(ApiCase):
             with self.subTest(body=body):
                 self.assertEqual(self.api.post(WEIGHT, body, format='json').status_code, 400)
 
+    def test_weight_api_keeps_personalized_target_in_sync_on_create_update_and_delete(self):
+        profile = Profile.objects.create(
+            owner=self.user, age=30, height_cm=180, starting_weight_kg=80,
+            sex_for_calculation='male', activity_level='moderate',
+            training_type='strength', nutrition_goal='maintain',
+        )
+        from .nutrition import calculate_nutrition_targets
+        day = days_ago(0).isoformat()
+        created = self.api.post(WEIGHT, {'date': day, 'weight_kg': '90.0'}, format='json')
+        self.assertEqual(created.status_code, 201)
+        profile.refresh_from_db()
+        self.assertEqual(profile.calorie_target, calculate_nutrition_targets(profile, Decimal('90.0'))['calories'])
+
+        updated = self.api.patch(f"{WEIGHT}{created.json()['id']}/", {'weight_kg': '85.0'}, format='json')
+        self.assertEqual(updated.status_code, 200)
+        profile.refresh_from_db()
+        self.assertEqual(profile.calorie_target, calculate_nutrition_targets(profile, Decimal('85.0'))['calories'])
+
+        self.assertEqual(self.api.delete(f"{WEIGHT}{created.json()['id']}/").status_code, 204)
+        profile.refresh_from_db()
+        self.assertEqual(profile.calorie_target, calculate_nutrition_targets(profile, Decimal('80.0'))['calories'])
+
     def test_moving_an_entry_onto_another_day_is_refused(self):
         a, b = make_weight(self.user, ago=1), make_weight(self.user, ago=0)
         response = self.api.patch(f'{WEIGHT}{a.pk}/', {'date': b.date.isoformat()}, format='json')
@@ -206,6 +287,11 @@ class SummaryApiTests(ApiCase):
         data = self.api.get(SUMMARY).json()
         self.assertEqual((data['workouts_this_week'], data['minutes_this_week'], data['calories_today'], data['protein_g_today']), (1, 40, 700, 40))
         self.assertEqual((data['latest_weight_kg'], data['streak_days'], data['calorie_target']), ('79.9', 1, 2200))
+
+    def test_summary_does_not_return_a_calorie_target_for_a_minor(self):
+        Profile.objects.create(owner=self.user, age=17)
+        data = self.api.get(SUMMARY).json()
+        self.assertIsNone(data['calorie_target'])
 
     def test_summary_for_a_new_account(self):
         data = self.api.get(SUMMARY).json()

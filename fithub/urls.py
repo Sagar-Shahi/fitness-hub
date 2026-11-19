@@ -11,6 +11,7 @@ handler500 = 'core.views.error_500'
 
 urlpatterns = [
     path('', core_views.home, name='home'),
+    path('about/', core_views.about, name='about'),
     path('healthz/', core_views.health, name='health'),
     path('accounts/', include('accounts.urls')),
     path('api/v1/', include('tracker.api_urls')),

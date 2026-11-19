@@ -2,7 +2,7 @@ import logging
 
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_safe
 
 logger = logging.getLogger(__name__)
@@ -10,7 +10,14 @@ logger = logging.getLogger(__name__)
 
 @require_safe
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('tracker:dashboard')
     return render(request, 'home.html')
+
+
+@require_safe
+def about(request):
+    return render(request, 'about.html')
 
 
 @require_safe

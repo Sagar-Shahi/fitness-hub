@@ -1,16 +1,95 @@
 {% extends 'base.html' %}
-{% block title %}My goals · FitHub{% endblock %}
+{% block title %}My Fitness · FitHub{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>My goals</h1><p class="muted">Used for the progress bars on your dashboard. You can change them whenever you like.</p></div></div>
-<form class="card form-card" method="post" novalidate>
-  {% csrf_token %}
-  {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
-  <div class="form-grid">
-    {% include 'partials/field.html' with field=form.calorie_target %}
-    {% include 'partials/field.html' with field=form.weekly_workout_target %}
-    {% include 'partials/field.html' with field=form.target_weight_kg %}
-  </div>
-  <p class="help">These are your own targets, not medical advice. For a calorie or weight plan that suits your health, ask a doctor or dietitian.</p>
-  <div class="form-actions"><button class="btn btn-primary" type="submit">Save goals</button><a class="btn btn-quiet" href="{% url 'tracker:dashboard' %}">Cancel</a></div>
-</form>
+<section class="goals-page">
+  <header class="goals-intro">
+    <span class="goals-kicker">YOUR FITNESS, IN ONE PLACE</span>
+    <h1>Build your personal fitness profile.</h1>
+    <p>Tell FitHub about your body and training. We'll estimate nutrition targets that fit your goal.</p>
+  </header>
+
+  <form class="goals-form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+    <article class="goal-card nutrition-profile-card">
+      <div class="goal-card-top"><span class="goal-icon" aria-hidden="true">✳</span><span class="goal-step">01 / YOUR BODY</span></div>
+      <h2>Personal details</h2>
+      <p class="goal-description">These details help estimate your resting energy needs. Your latest weight-tracking entry takes priority over the starting weight below.</p>
+      <div class="form-grid">
+        {% include 'partials/field.html' with field=form.age hide_required=True %}
+        {% include 'partials/field.html' with field=form.sex_for_calculation hide_required=True %}
+        {% include 'partials/field.html' with field=form.height_cm hide_required=True %}
+        {% include 'partials/field.html' with field=form.starting_weight_kg hide_required=True %}
+      </div>
+      <div class="body-profile-subsection">
+        <span class="goals-kicker">BODY TYPE & COMPOSITION · OPTIONAL</span>
+        <p class="goal-description">Choose a body-type description if it feels useful. Measurements are more informative for tracking changes; skip anything you don't know.</p>
+        <div class="form-grid">
+          {% include 'partials/field.html' with field=form.body_type hide_required=True %}
+          {% include 'partials/field.html' with field=form.body_fat_percentage hide_required=True %}
+          {% include 'partials/field.html' with field=form.waist_cm hide_required=True %}
+          {% include 'partials/field.html' with field=form.muscle_mass_kg hide_required=True %}
+        </div>
+      </div>
+    </article>
+    <article class="goal-card nutrition-profile-card">
+      <div class="goal-card-top"><span class="goal-icon" aria-hidden="true">↗</span><span class="goal-step">02 / YOUR TRAINING</span></div>
+      <h2>Activity and exercise</h2>
+      <p class="goal-description">Choose the level that best describes a typical week, including your usual workouts.</p>
+      <div class="form-grid">
+        {% include 'partials/field.html' with field=form.activity_level hide_required=True %}
+        {% include 'partials/field.html' with field=form.training_type hide_required=True %}
+        {% include 'partials/field.html' with field=form.weekly_workout_target hide_required=True %}
+      </div>
+    </article>
+    <article class="goal-card nutrition-profile-card">
+      <div class="goal-card-top"><span class="goal-icon" aria-hidden="true">◎</span><span class="goal-step">03 / YOUR GOALS</span></div>
+      <h2>Progress targets</h2>
+      <p class="goal-description">Your goal weight is optional. Nutrition estimates will use your selected training goal.</p>
+      <div class="form-grid">
+        {% include 'partials/field.html' with field=form.nutrition_goal hide_required=True %}
+        {% include 'partials/field.html' with field=form.target_weight_kg hide_required=True %}
+        {% if not form.instance.age or form.instance.age >= 18 %}
+        {% include 'partials/field.html' with field=form.calorie_target hide_required=True %}
+        {% endif %}
+      </div>
+      {% if not form.instance.age or form.instance.age >= 18 %}
+      <p class="goal-footnote">The fallback calorie target is used only until an adult profile has enough information for a personalized estimate.</p>
+      {% else %}
+      <p class="goal-footnote">Calorie and macro prescriptions are not shown for under-18 profiles. Your workouts, weight history and meal log remain available.</p>
+      {% endif %}
+    </article>
+    {% if nutrition_plan and nutrition_plan.calories %}
+    <section class="nutrition-recommendation" aria-live="polite">
+      <span class="goals-kicker">YOUR ESTIMATED DAILY PLAN</span>
+      <h2>{{ nutrition_plan.calories }} kcal</h2>
+      <p>{{ nutrition_plan.goal_label }} · based on your profile and {% if current_weight %}{{ current_weight }} kg current weight{% else %}your entered body details{% endif %}.</p>
+      <div class="nutrition-target-grid">
+        <div><strong>{{ nutrition_plan.protein_g }} g</strong><span>Protein</span></div>
+        <div><strong>{{ nutrition_plan.carbs_g }} g</strong><span>Carbs</span></div>
+        <div><strong>{{ nutrition_plan.fat_g }} g</strong><span>Fat</span></div>
+      </div>
+      <small>These are estimates, not medical prescriptions. Adjust based on your progress, energy and professional advice. {% if nutrition_plan.body_composition_used %}Protein uses your estimated lean mass; calorie estimates still use the standard energy equation.{% endif %}</small>
+    </section>
+    {% elif nutrition_plan and nutrition_plan.reason %}
+    <section class="goals-note"><span class="goals-note-mark" aria-hidden="true">i</span><p>{{ nutrition_plan.reason }}</p></section>
+    {% else %}
+    <section class="goals-note"><span class="goals-note-mark" aria-hidden="true">i</span><p>Complete your age, height, current weight, activity level, training style and goal in this profile to unlock personalized nutrition estimates. Somatotype labels such as ectomorph or endomorph are not used because they do not reliably determine calorie needs.</p></section>
+    {% endif %}
+    <section class="goals-note"><span class="goals-note-mark" aria-hidden="true">i</span><p>Nutrition estimates are intended for adults. If you are under 18, pregnant, have a medical condition or a history of disordered eating, get individualized guidance from a qualified health professional rather than following calorie targets from an app.</p></section>
+    <div class="goals-submit-row">
+      <div><strong>Ready when you are.</strong><span>You can update your profile whenever your routine changes.</span></div>
+      <div class="form-actions"><button class="btn btn-primary goals-save" type="submit">Save my profile <span aria-hidden="true">→</span></button><a class="btn btn-quiet" href="{% url 'tracker:dashboard' %}">Maybe later</a></div>
+    </div>
+  </form>
+
+  <section class="my-fitness-plans" aria-labelledby="my-fitness-plans-title">
+    <div class="page-head"><div><span class="goals-kicker">YOUR PROGRAMMES</span><h2 id="my-fitness-plans-title">Your plans</h2><p class="muted">Workout and nutrition programmes you have added to your account.</p></div><a class="btn btn-quiet btn-small" href="{% url 'shop:plans' %}">Browse plans</a></div>
+    {% if my_plans %}
+    <div class="plan-grid">{% for item in my_plans %}<article class="card plan-card"><span class="badge badge-{{ item.plan.kind }}">{{ item.plan.get_kind_display }}</span><h3 class="card-title">{{ item.title }}</h3><p class="muted">{{ item.plan.summary }}</p><div class="plan-foot"><span class="muted">Added {{ item.order.created_at|date:"M j, Y" }}</span><a class="btn btn-primary btn-small" href="{% url 'shop:plan-detail' item.plan.slug %}">Open plan</a></div></article>{% endfor %}</div>
+    {% else %}
+    <section class="card empty-state"><h3 class="card-title">No plans added yet</h3><p class="muted">Explore workout and nutrition programmes when you're ready.</p><a class="btn btn-primary" href="{% url 'shop:plans' %}">Explore plans</a></section>
+    {% endif %}
+  </section>
+</section>
 {% endblock %}

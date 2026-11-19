@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetView
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -63,6 +63,22 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
+
+
+class ThrottledPasswordResetView(PasswordResetView):
+    """Limit reset-email requests per visitor without revealing whether an email exists."""
+
+    def post(self, request, *args, **kwargs):
+        key = throttle.make_key('password-reset', throttle.client_ip(request))
+        if throttle.exceeded(key, settings.PASSWORD_RESET_MAX_PER_HOUR, 3600):
+            response = HttpResponse(
+                'Too many password reset requests. Please try again later.',
+                status=429,
+                content_type='text/plain',
+            )
+            response['Retry-After'] = '3600'
+            return response
+        return super().post(request, *args, **kwargs)
 
 
 class PasswordChange(PasswordChangeView):

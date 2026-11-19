@@ -5,10 +5,9 @@
 <div class="page-head compact">
   <div><span class="badge badge-{{ plan.kind }}">{{ plan.get_kind_display }}</span><h1>{{ plan.title }}</h1><p class="muted">{{ plan.summary }}</p></div>
   <div class="head-actions">
-    <span class="price">${{ plan.price }}</span>
     {% if owned %}<span class="badge badge-paid">Owned</span>
-    {% elif in_cart %}<a class="btn btn-quiet" href="{% url 'shop:cart' %}">In cart</a>
-    {% else %}<form method="post" action="{% url 'shop:cart-add' plan.slug %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Add to cart</button></form>{% endif %}
+    {% else %}<span class="price">${{ plan.price }}</span>{% if in_cart %}<a class="btn btn-quiet" href="{% url 'shop:cart' %}">In cart</a>
+    {% else %}<form method="post" action="{% url 'shop:cart-add' plan.slug %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Add to cart</button></form>{% endif %}{% endif %}
   </div>
 </div>
 <section class="card">

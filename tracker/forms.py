@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.utils import timezone
 
-from .models import BodyMetric, Exercise, Meal, Profile, Workout
+from .models import BodyMetric, Exercise, ExerciseSet, Meal, Profile, Workout
 
 DATE = forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d')
 
@@ -16,9 +16,40 @@ def _not_future(value):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['calorie_target', 'weekly_workout_target', 'target_weight_kg']
-        labels = {'calorie_target': 'Daily calories (kcal)', 'weekly_workout_target': 'Workouts per week',
-                  'target_weight_kg': 'Target weight (kg, optional)'}
+        fields = [
+            'age', 'sex_for_calculation', 'height_cm', 'starting_weight_kg',
+            'body_type', 'body_fat_percentage', 'waist_cm', 'muscle_mass_kg',
+            'activity_level', 'training_type', 'nutrition_goal', 'calorie_target',
+            'weekly_workout_target', 'target_weight_kg',
+        ]
+        labels = {
+            'age': 'Age (years)',
+            'sex_for_calculation': 'Sex used for the energy estimate',
+            'height_cm': 'Height (cm)',
+            'starting_weight_kg': 'Current weight (kg)',
+            'body_type': 'Traditional body type (optional)',
+            'body_fat_percentage': 'Body-fat percentage (optional)',
+            'waist_cm': 'Waist measurement (cm, optional)',
+            'muscle_mass_kg': 'Muscle mass (kg, optional)',
+            'activity_level': 'Usual activity level',
+            'training_type': 'Main training style',
+            'nutrition_goal': 'Main fitness goal',
+            'calorie_target': 'Fallback daily calorie target (kcal)',
+            'weekly_workout_target': 'Workouts per week',
+            'target_weight_kg': 'Target weight (kg, optional)',
+        }
+        help_texts = {
+            'starting_weight_kg': 'FitHub uses your latest Weight entry when one is available.',
+            'body_type': 'A self-description only. It does not determine calorie needs.',
+            'body_fat_percentage': 'Enter this only if you have a reasonably reliable measurement; it is never required.',
+            'waist_cm': 'Measure around your waist consistently to compare changes over time.',
+            'muscle_mass_kg': 'Optional; use a measurement from a body-composition scale or assessment.',
+            'sex_for_calculation': 'Used only in the standard BMR equation; choose the average estimate if unsure.',
+            'calorie_target': 'Used until your profile has enough details for a personalized estimate.',
+        }
+
+    def clean_nutrition_goal(self):
+        return self.cleaned_data.get('nutrition_goal') or 'maintain'
 
 
 class WorkoutForm(forms.ModelForm):
@@ -60,6 +91,24 @@ class ExerciseForm(forms.ModelForm):
         return data
 
 
+class ExerciseSetAddForm(forms.ModelForm):
+    class Meta:
+        model = ExerciseSet
+        fields = ['reps', 'weight_kg', 'is_warmup']
+        labels = {'weight_kg': 'Weight (kg)', 'is_warmup': 'Warm-up set'}
+
+
+class ExerciseSetForm(forms.ModelForm):
+    class Meta:
+        model = ExerciseSet
+        fields = ['reps', 'weight_kg', 'is_warmup', 'is_completed']
+        labels = {
+            'weight_kg': 'Weight (kg)',
+            'is_warmup': 'Warm-up',
+            'is_completed': 'Completed',
+        }
+
+
 class WeightForm(forms.ModelForm):
     class Meta:
         model = BodyMetric
@@ -91,6 +140,10 @@ class MealForm(forms.ModelForm):
     def clean(self):
         data = super().clean()
         day = data.get('date')
-        if day and self.owner is not None and Meal.objects.filter(owner=self.owner, date=day).count() >= settings.MAX_MEALS_PER_DAY:
-            raise forms.ValidationError(f'You can log at most {settings.MAX_MEALS_PER_DAY} meals per day.')
+        if day and self.owner is not None:
+            meals = Meal.objects.filter(owner=self.owner, date=day)
+            if self.instance.pk:
+                meals = meals.exclude(pk=self.instance.pk)
+            if meals.count() >= settings.MAX_MEALS_PER_DAY:
+                raise forms.ValidationError(f'You can log at most {settings.MAX_MEALS_PER_DAY} meals per day.')
         return data

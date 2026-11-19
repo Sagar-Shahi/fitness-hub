@@ -11,7 +11,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from . import analytics
-from .models import BodyMetric, Exercise, Meal, Workout, profile_for
+from .models import BodyMetric, Exercise, ExerciseSet, Meal, Workout, profile_for
+from .nutrition import refresh_profile_calorie_target
 
 
 def _not_future(value):
@@ -20,11 +21,62 @@ def _not_future(value):
     return value
 
 
+class ExerciseSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExerciseSet
+        fields = ['id', 'set_number', 'reps', 'weight_kg', 'is_completed', 'is_warmup']
+        read_only_fields = ['id']
+
+
 class ExerciseSerializer(serializers.ModelSerializer):
+    set_details = ExerciseSetSerializer(source='set_entries', many=True, required=False)
+
     class Meta:
         model = Exercise
-        fields = ['id', 'name', 'sets', 'reps', 'weight_kg']
+        fields = ['id', 'name', 'sets', 'reps', 'weight_kg', 'set_details']
         read_only_fields = ['id']
+
+    def validate_set_details(self, value):
+        if len(value) > 50:
+            raise serializers.ValidationError('At most 50 sets per exercise.')
+        numbers = [entry['set_number'] for entry in value]
+        if len(numbers) != len(set(numbers)):
+            raise serializers.ValidationError('Set numbers must be unique within an exercise.')
+        return value
+
+    def create(self, validated):
+        # Older API clients send only summary fields. Materialize those as completed
+        # sets to preserve their historical volume semantics. An explicit [] means
+        # the client intentionally supplied no sets and must remain zero volume.
+        set_details = validated.pop('set_entries', None)
+        exercise = Exercise.objects.create(**validated)
+        if set_details is None:
+            set_details = [
+                {
+                    'set_number': number,
+                    'reps': exercise.reps,
+                    'weight_kg': exercise.weight_kg,
+                    'is_completed': True,
+                    'is_warmup': False,
+                }
+                for number in range(1, exercise.sets + 1)
+            ]
+        ExerciseSet.objects.bulk_create([
+            ExerciseSet(exercise=exercise, **entry) for entry in set_details
+        ])
+        return exercise
+
+    def update(self, instance, validated):
+        set_details = validated.pop('set_entries', None)
+        for key, value in validated.items():
+            setattr(instance, key, value)
+        instance.save()
+        if set_details is not None:
+            instance.set_entries.all().delete()
+            ExerciseSet.objects.bulk_create([
+                ExerciseSet(exercise=instance, **entry) for entry in set_details
+            ])
+        return instance
 
 
 class WorkoutSerializer(serializers.ModelSerializer):
@@ -54,7 +106,8 @@ class WorkoutSerializer(serializers.ModelSerializer):
     def create(self, validated):
         exercises = validated.pop('exercises', [])
         workout = Workout.objects.create(owner=self.context['request'].user, **validated)
-        Exercise.objects.bulk_create([Exercise(workout=workout, **e) for e in exercises])
+        for exercise_data in exercises:
+            ExerciseSerializer().create({'workout': workout, **exercise_data})
         return workout
 
     @transaction.atomic
@@ -65,7 +118,8 @@ class WorkoutSerializer(serializers.ModelSerializer):
         instance.save()
         if exercises is not None:  # sending a list replaces the exercises; leaving it out keeps them
             instance.exercises.all().delete()
-            Exercise.objects.bulk_create([Exercise(workout=instance, **e) for e in exercises])
+            for exercise_data in exercises:
+                ExerciseSerializer().create({'workout': instance, **exercise_data})
         return instance
 
 
@@ -79,9 +133,12 @@ class MealSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         day = attrs.get('date') or (self.instance.date if self.instance else None)
-        if self.instance is None and day:
+        if day:
             user = self.context['request'].user
-            if Meal.objects.filter(owner=user, date=day).count() >= settings.MAX_MEALS_PER_DAY:
+            meals = Meal.objects.filter(owner=user, date=day)
+            if self.instance is not None:
+                meals = meals.exclude(pk=self.instance.pk)
+            if meals.count() >= settings.MAX_MEALS_PER_DAY:
                 raise serializers.ValidationError(f'At most {settings.MAX_MEALS_PER_DAY} meals per day.')
         return attrs
 
@@ -100,15 +157,19 @@ class WeightSerializer(serializers.ModelSerializer):
     validate_date = staticmethod(_not_future)
 
     def create(self, validated):
+        user = self.context['request'].user
         obj, _ = BodyMetric.objects.update_or_create(
-            owner=self.context['request'].user, date=validated['date'], defaults={'weight_kg': validated['weight_kg']})
+            owner=user, date=validated['date'], defaults={'weight_kg': validated['weight_kg']})
+        refresh_profile_calorie_target(profile_for(user))
         return obj
 
     def update(self, instance, validated):
         if 'date' in validated and validated['date'] != instance.date and \
                 BodyMetric.objects.filter(owner=instance.owner, date=validated['date']).exists():
             raise serializers.ValidationError({'date': 'You already have a weight for that day.'})
-        return super().update(instance, validated)
+        updated = super().update(instance, validated)
+        refresh_profile_calorie_target(profile_for(updated.owner))
+        return updated
 
 
 class OwnedViewSet(viewsets.ModelViewSet):
@@ -123,7 +184,7 @@ class WorkoutViewSet(OwnedViewSet):
     serializer_class = WorkoutSerializer
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('exercises')
+        return super().get_queryset().prefetch_related('exercises__set_entries')
 
 
 class MealViewSet(OwnedViewSet):
@@ -144,6 +205,11 @@ class MealViewSet(OwnedViewSet):
 class WeightViewSet(OwnedViewSet):
     model = BodyMetric
     serializer_class = WeightSerializer
+
+    def perform_destroy(self, instance):
+        owner = instance.owner
+        instance.delete()
+        refresh_profile_calorie_target(profile_for(owner))
 
 
 class SummaryView(APIView):
