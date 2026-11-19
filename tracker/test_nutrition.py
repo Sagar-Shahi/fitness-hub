@@ -41,6 +41,11 @@ class PersonalizedNutritionTests(TestCase):
         self.profile.age = 17
         self.assertIn('reason', calculate_nutrition_targets(self.profile))
 
+    def test_minor_is_not_given_a_target_even_with_incomplete_profile(self):
+        self.profile.age = 17
+        self.profile.height_cm = None
+        self.assertIn('reason', calculate_nutrition_targets(self.profile))
+
     def test_incomplete_profile_does_not_make_up_targets(self):
         self.profile.height_cm = None
         self.assertIsNone(calculate_nutrition_targets(self.profile))
