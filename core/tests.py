@@ -255,3 +255,18 @@ class RepositoryHygieneTests(TestCase):
         text = (Path(settings.BASE_DIR) / '.env.example').read_text()
         active = [line for line in text.splitlines() if line.strip() and not line.lstrip().startswith('#')]
         self.assertEqual(active, ['DJANGO_DEBUG=True'])
+
+
+class PublicChromeTests(TestCase):
+    def test_anonymous_header_links_and_deferred_video(self):
+        html = self.client.get('/').content.decode()
+        self.assertIn('nav-public', html)
+        self.assertIn('Gear guide', html)
+        # The video file is never in a src attribute, so scripts decide whether it loads.
+        self.assertNotIn('<source', html)
+        self.assertIn('data-src="https://videos.pexels.com/', html)
+        self.assertIn('id="video-toggle"', html)
+
+    def test_decorative_arrows_hidden_from_screen_readers(self):
+        html = self.client.get('/about/').content.decode()
+        self.assertNotIn('free account ↗', html)
