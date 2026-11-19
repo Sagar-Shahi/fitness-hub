@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}About FitHub · Train with purpose{% endblock %}
+{% block description %}Learn about FitHub, a practical fitness platform for tracking workouts, nutrition and progress in one place.{% endblock %}
+{% block content %}
+<div class="about-page">
+  <section class="about-hero">
+    <p class="about-kicker">ABOUT FITHUB / BUILT FOR THE WORK</p>
+    <h1>Progress isn't a guess.<br><em>It's built, rep by rep.</em></h1>
+    <p class="about-lead">FitHub brings your training, nutrition and progress together, so you can spend less time trying to remember what you did and more time moving forward.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Start training free <span aria-hidden="true">↗</span></a>
+      <a class="btn btn-quiet" href="{% url 'home' %}">Back to home</a>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div><p class="about-kicker">THE IDEA</p><h2>A clearer way to stay consistent.</h2></div>
+    <div class="about-section-copy">
+      <p>Every training session tells a story: the exercises you chose, the weight you lifted, the reps you completed and the effort you put in. FitHub gives those details a home.</p>
+      <p>It is designed for everyday gym-goers who want a straightforward place to record their work, understand their habits and see progress over time. No complicated setup is needed to get started.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="about-kicker">WHAT YOU CAN DO</p>
+    <div class="about-values">
+      <article class="about-value"><span class="about-value-index">01 / TRAIN</span><h3>Record every set.</h3><p>Save exercises, reps, weight, warm-up sets and completion so your workout history stays useful.</p></article>
+      <article class="about-value"><span class="about-value-index">02 / FUEL</span><h3>Keep an eye on nutrition.</h3><p>Log meals and follow calories and macros alongside your training routine.</p></article>
+      <article class="about-value"><span class="about-value-index">03 / GROW</span><h3>Make progress visible.</h3><p>Use your workout history, weight entries, charts and goals to understand how things change.</p></article>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div><p class="about-kicker">OUR APPROACH</p><h2>Useful first. Yours always.</h2></div>
+    <div class="about-section-copy">
+      <p>Fitness is personal, and your records should be too. FitHub is built around practical tracking, clear information and giving you control of your own data.</p>
+      <p>FitHub is a training and wellness tracking tool, not a medical service. Use it to support your routine, and speak with a qualified professional for medical or nutrition advice.</p>
+    </div>
+  </section>
+
+  <section class="about-section" id="gear-guide">
+    <div><p class="about-kicker">GEAR GUIDE / USE IT WISELY</p><h2>Choose equipment with care.</h2></div>
+    <div class="about-section-copy">
+      <p>FitHub's Gear Guide is an informational starting point to help you explore fitness equipment. It is not an endorsement, certification, or guarantee that a product is suitable for every person, workout, or gym.</p>
+      <div class="about-values">
+        <article class="about-value">
+          <span class="about-value-index">RESTRICTIONS</span>
+          <h3>Know what the guide can’t do.</h3>
+          <p>Product details, prices, stock and merchant policies can change. Check the seller’s current listing, sizing, compatibility, return terms and warranty before buying. FitHub does not manufacture, sell, inspect or certify the listed equipment.</p>
+        </article>
+        <article class="about-value">
+          <span class="about-value-index">SAFETY WARNING</span>
+          <h3>Your safety comes first.</h3>
+          <p>Read the manufacturer’s instructions, check equipment for damage before use, use it only as intended and choose a load you can control. Stop if you feel pain or equipment seems unsafe. Ask a qualified trainer or professional for guidance when unsure.</p>
+        </article>
+      </div>
+      <p>FitHub’s Gear Guide is for general information only. It is not medical, injury-prevention or professional equipment-safety advice.</p>
+      <p><a class="btn btn-primary" href="{% url 'shop:store' %}">Open the Gear Guide <span aria-hidden="true">↗</span></a></p>
+    </div>
+  </section>
+
+  <section class="about-cta">
+    <div><h2>Ready to put your work on record?</h2><p>Start with one workout. Build from there.</p></div>
+    <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create your free account ↗</a>
+  </section>
+
+  <section class="about-section" id="contact">
+    <div><p class="about-kicker">GET IN TOUCH</p><h2>We're here to listen.</h2></div>
+    <div class="about-section-copy">
+      <p>Questions, ideas, or feedback? Contact the FitHub team. We'd love to hear from you.</p>
+      <p><strong>Email us:</strong> <a href="mailto:fitnesshubojt@gmail.com">fitnesshubojt@gmail.com</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

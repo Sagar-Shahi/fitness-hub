@@ -114,6 +114,18 @@ DATABASES = {
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Shared database-backed cache for reusable research results across app instances.
+# The table is created by tracker migration 0003_research_cache.
+CACHES = {
+    'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': 'fithub-default'},
+    'research': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'fithub_research_cache',
+        'TIMEOUT': 60 * 60 * 24,
+    },
+}
+YOUTUBE_DAILY_SEARCH_LIMIT = env_int('YOUTUBE_DAILY_SEARCH_LIMIT', 75)
+
 # --- Passwords -------------------------------------------------------------------------------
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.Argon2PasswordHasher',
@@ -135,7 +147,8 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # --- Internationalisation ----------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = os.environ.get('DJANGO_TIME_ZONE', 'UTC')
+# FitHub's initial catalogue and retailers target Nepal; deployments elsewhere can override this.
+TIME_ZONE = os.environ.get('DJANGO_TIME_ZONE', 'Asia/Kathmandu')
 USE_I18N = True
 USE_TZ = True
 
@@ -172,6 +185,7 @@ if TRUSTED_PROXY_COUNT > 0:
 LOGIN_MAX_FAILURES = env_int('LOGIN_MAX_FAILURES', 5)
 LOGIN_LOCKOUT_SECONDS = env_int('LOGIN_LOCKOUT_SECONDS', 300)
 REGISTER_MAX_PER_HOUR = env_int('REGISTER_MAX_PER_HOUR', 10)
+PASSWORD_RESET_MAX_PER_HOUR = env_int('PASSWORD_RESET_MAX_PER_HOUR', 5)
 API_RATE_USER = os.environ.get('API_RATE_USER', '120/min')
 API_RATE_ANON = os.environ.get('API_RATE_ANON', '20/min')
 API_KEY_FAILURES_PER_5_MIN = env_int('API_KEY_FAILURES_PER_5_MIN', 20)
@@ -218,3 +232,20 @@ if PRODUCTION:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool('DJANGO_HSTS_INCLUDE_SUBDOMAINS', False)
     SECURE_HSTS_PRELOAD = env_bool('DJANGO_HSTS_PRELOAD', False)
     CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
+
+# --- Account recovery email -----------------------------------------------------------------
+# Configure these on the hosting service to send password-reset emails. Never commit real values.
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '').strip()
+EMAIL_PORT = env_int('EMAIL_PORT', 587)
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '').strip()
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', True)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'FitHub <noreply@localhost>')
+EMAIL_TIMEOUT = 10
+EMAIL_BACKEND = (
+    'django.core.mail.backends.smtp.EmailBackend' if EMAIL_HOST
+    else (
+        'django.core.mail.backends.console.EmailBackend' if DEBUG or RUNNING_TESTS
+        else 'django.core.mail.backends.dummy.EmailBackend'
+    )
+)

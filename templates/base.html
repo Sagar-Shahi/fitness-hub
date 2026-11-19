@@ -8,9 +8,13 @@
   <title>{% block title %}FitHub{% endblock %}</title>
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/glass.css' %}">
   <script src="{% static 'js/app.js' %}" defer></script>
 </head>
 <body>
+  <video class="ambient-workout-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true" tabindex="-1">
+    <source src="https://videos.pexels.com/video-files/4921640/4921640-hd_1066_1920_25fps.mp4" type="video/mp4">
+  </video>
   <a class="skip-link" href="#main">Skip to content</a>
   {% with view=request.resolver_match.view_name %}
   <header class="topbar">
@@ -21,22 +25,49 @@
       </a>
       {% if user.is_authenticated %}
       <nav class="nav" aria-label="Main">
-        <a href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
-        <a href="{% url 'tracker:workout-list' %}" {% if 'workout' in view %}aria-current="page"{% endif %}>Workouts</a>
-        <a href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>Meals</a>
-        <a href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>Weight</a>
-        <a href="{% url 'shop:plans' %}" {% if view|slice:':5' == 'shop:' and view != 'shop:cart' %}aria-current="page"{% endif %}>Plans</a>
+        <a class="nav-link" href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Home</span>
+        </a>
+        <a class="nav-link" href="{% url 'tracker:workout-list' %}" {% if 'workout' in view %}aria-current="page"{% endif %}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11"/></svg><span>Workouts</span>
+        </a>
+        <a class="nav-link" href="{% url 'tracker:progress' %}" {% if view == 'tracker:progress' %}aria-current="page"{% endif %}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 6-7"/><path d="M16 6h4v4"/></svg><span>Progress</span>
+        </a>
+        <a class="nav-link" href="{% url 'tracker:meals' %}" {% if view == 'tracker:meals' %}aria-current="page"{% endif %}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v7M4.5 3v4a2.5 2.5 0 0 0 5 0V3M7 9.5V21M16 3v18M16 3c3 2 4 5 4 8h-4"/></svg><span>Nutrition</span>
+        </a>
+        <details class="nav-more">
+          <summary class="nav-more-summary" {% if view == 'tracker:exercise-library' or view == 'about' or view == 'tracker:learn' or view == 'tracker:weight' or view == 'shop:store' or view == 'shop:plans' or view == 'shop:my-plans' or view == 'shop:plan-detail' %}aria-current="page"{% endif %}><svg class="nav-icon nav-explore-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/></svg><span>Explore</span><svg class="nav-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></summary>
+          <div class="nav-more-menu">
+            <a class="explore-link" href="{% url 'tracker:exercise-library' %}" {% if view == 'tracker:exercise-library' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v13A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 10h6"/></svg><span><strong>Exercise library</strong><small>Find your next movement</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'about' %}" {% if view == 'about' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.4 1.6c-1.1 1.1-1.9 1.3-1.9 3M12 17h.01"/></svg><span><strong>About FitHub</strong><small>Our approach and mission</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'tracker:learn' %}" {% if view == 'tracker:learn' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H12v17H5.5A2.5 2.5 0 0 0 3 22zM21 5.5A2.5 2.5 0 0 0 18.5 3H12v17h6.5a2.5 2.5 0 0 1 2.5 2z"/></svg><span><strong>Learn</strong><small>Training tips and guides</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'tracker:weight' %}" {% if view == 'tracker:weight' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l1 14H3zM9 7a3 3 0 0 1 6 0M12 11v4m0 0 2-2"/></svg><span><strong>Weight tracking</strong><small>Follow your trend over time</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'shop:store' %}" {% if view == 'shop:store' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 2-5h12l2 5M3 8h18l-1 13H4zM9 12v3m6-3v3"/></svg><span><strong>Gear guide</strong><small>Explore training essentials</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a class="explore-link" href="{% url 'shop:plans' %}" {% if view == 'shop:plans' or view == 'shop:my-plans' or view == 'shop:plan-detail' %}aria-current="page"{% endif %}>
+              <svg class="explore-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-7-4-7 4zM9 8h6M9 11h6"/></svg><span><strong>Training plans</strong><small>Build a routine that fits you</small></span><svg class="explore-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+          </div>
+        </details>
       </nav>
       <div class="topbar-actions">
-        <a class="btn btn-quiet btn-small" href="{% url 'shop:cart' %}">Cart{% if cart_count %} ({{ cart_count }}){% endif %}</a>
+        <a class="nav-cart btn btn-quiet btn-small" href="{% url 'shop:cart' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 1.9-1.4L21 9H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span>Cart{% if cart_count %} ({{ cart_count }}){% endif %}</span></a>
         <details class="account-menu">
-          <summary><span class="avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</span><span class="visually-hidden">Account menu for </span>{{ user.username }}</summary>
+          <summary><span class="avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</span><span class="account-name">{{ user.username }}</span><svg class="account-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg><span class="visually-hidden">Account menu for {{ user.username }}</span></summary>
           <div class="menu">
-            <a href="{% url 'tracker:goals' %}">My goals</a>
-            <a href="{% url 'shop:my-plans' %}">My plans</a>
+            <a href="{% url 'tracker:goals' %}">My Fitness</a>
             <a href="{% url 'shop:orders' %}">Orders</a>
-            <a href="{% url 'tracker:export' %}">Export workouts (CSV)</a>
-            <a href="{% url 'accounts:api-keys' %}">API keys</a>
             <a href="{% url 'accounts:password-change' %}">Change password</a>
             <a href="{% url 'accounts:delete' %}">Delete account</a>
             <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
@@ -58,9 +89,37 @@
     {% block content %}{% endblock %}
   </main>
 
+  {% if user.is_authenticated %}
+  <details class="focus-dock" id="focus-dock" data-music-search-url="{% url 'tracker:focus-music-search' %}">
+    <summary><span class="focus-indicator" aria-hidden="true"></span><span>Focus audio</span><span class="focus-hint">music · voice</span></summary>
+    <section class="focus-panel" aria-label="Focus audio player">
+      <div class="focus-panel-head"><div><p class="eyebrow">TRAINING MODE</p><h2>Find your rhythm.</h2></div><div class="focus-panel-tools"><span class="focus-symbol" aria-hidden="true">♫</span><button class="focus-panel-close" id="focus-dock-close" type="button" aria-label="Close Focus Audio" title="Close">×</button></div></div>
+      <label class="focus-label" for="focus-audio-url">Find music or paste a link</label>
+      <div class="focus-url-row"><input id="focus-audio-url" type="search" inputmode="search" placeholder="Song, artist, playlist or audio link" autocomplete="off"><button class="btn btn-primary btn-small" id="focus-load" type="button">YouTube</button></div>
+      <div class="focus-actions focus-search-actions"><button class="btn btn-quiet btn-small" id="focus-spotify-search" type="button">Search Spotify</button><span class="focus-help">YouTube plays public videos here; Spotify opens on Spotify.</span></div>
+      <p class="focus-help" id="focus-status" role="status">Search a song or artist to find YouTube videos that play inside FitHub. No YouTube account connection is needed for public videos.</p>
+      <div class="focus-music-results" id="focus-music-results" aria-label="YouTube search results" aria-live="polite"></div>
+      <audio id="focus-audio" controls preload="none"></audio>
+      <section class="focus-video-stage" id="focus-video-stage" aria-label="Video player" hidden>
+        <div class="focus-video-heading"><strong id="focus-video-title">Now playing</strong><button class="btn btn-quiet btn-small" id="focus-video-close" type="button">Close video</button></div>
+        <div class="focus-video-square">
+          <iframe id="focus-video-frame" title="FitHub video player" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <p class="focus-help" id="focus-video-status" role="status" aria-live="polite">Video plays here inside Focus Audio.</p>
+      </section>
+      <label class="focus-label" for="focus-local-file">Or play an audio file already on this device</label>
+      <input class="focus-local-file" id="focus-local-file" type="file" accept="audio/*">
+      <p class="focus-help">Local files stay on your device; FitHub does not upload them.</p>
+      <div class="focus-actions"><a class="btn btn-quiet btn-small" id="focus-open" href="#" target="_blank" rel="noopener noreferrer" hidden>Open link ↗</a><a class="btn btn-quiet btn-small" id="focus-download" href="#" download hidden>Download file</a><button class="btn btn-quiet btn-small" id="focus-clear" type="button">Clear</button></div>
+      <div class="focus-voice"><div><strong>Coach voice</strong><p class="focus-help">Optional spoken cues from your browser.</p></div><div class="focus-actions"><button class="btn btn-quiet btn-small" id="focus-speak" type="button">Motivate me</button><button class="btn btn-quiet btn-small" id="focus-stop-speak" type="button">Stop voice</button></div></div>
+      <p class="focus-help focus-legal">Only download audio you own or are allowed to download. Streaming platforms may restrict playback or downloads; FitHub does not bypass those limits. Your saved link stays in this browser.</p>
+    </section>
+  </details>
+  {% endif %}
+
   <footer class="site-footer">
     <div class="container footer-inner">
-      <span>FitHub. Your data stays yours: export it any time. Not medical advice.</span>
+      <span>FitHub. Your data stays yours: export it any time. Not medical advice. <a href="{% url 'about' %}">About FitHub</a></span>
       <span class="muted">Built by Sagar Bahadur Shahi</span>
     </div>
   </footer>

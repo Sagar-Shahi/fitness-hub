@@ -160,6 +160,61 @@ class PasswordChangeTests(TestCase):
         self.assertTrue(self.user.check_password(PASSWORD))
 
 
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+                   DEFAULT_FROM_EMAIL='FitHub <noreply@example.com>')
+class PasswordResetTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.user = make_user('resetperson')
+        self.url = reverse('accounts:password-reset')
+
+    def test_request_page_is_available(self):
+        self.assertEqual(self.client.get(self.url).status_code, 200)
+
+    def test_existing_account_receives_a_reset_link(self):
+        from django.core import mail
+        response = self.client.post(self.url, {'email': self.user.email})
+        self.assertRedirects(response, reverse('accounts:password-reset-done'))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('/accounts/password-reset/', mail.outbox[0].body)
+        self.assertIn('resetperson@example.com', mail.outbox[0].to)
+
+    def test_unknown_email_gets_the_same_confirmation_without_an_email(self):
+        from django.core import mail
+        response = self.client.post(self.url, {'email': 'unknown@example.com'})
+        self.assertRedirects(response, reverse('accounts:password-reset-done'))
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(PASSWORD_RESET_MAX_PER_HOUR=2)
+    def test_password_reset_requests_are_rate_limited_per_visitor(self):
+        first = self.client.post(self.url, {'email': 'unknown@example.com'})
+        second = self.client.post(self.url, {'email': 'unknown@example.com'})
+        third = self.client.post(self.url, {'email': 'unknown@example.com'})
+        self.assertEqual((first.status_code, second.status_code, third.status_code), (302, 302, 429))
+        self.assertEqual(third['Retry-After'], '3600')
+
+    def test_valid_token_changes_password_and_invalidates_old_credentials(self):
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        token = default_token_generator.make_token(self.user)
+        confirm_url = reverse('accounts:password-reset-confirm', kwargs={'uidb64': uid, 'token': token})
+        response = self.client.get(confirm_url)
+        self.assertEqual(response.status_code, 302)
+        confirm_url = response.url  # Django exchanges the emailed token for a session-bound token.
+        self.assertEqual(self.client.get(confirm_url).status_code, 200)
+        new_password = 'A-New-Strong-Passphrase-2026'
+        response = self.client.post(confirm_url, {
+            'new_password1': new_password,
+            'new_password2': new_password,
+        })
+        self.assertRedirects(response, reverse('accounts:password-reset-complete'))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password(new_password))
+        self.assertFalse(self.user.check_password(PASSWORD))
+
 class ApiKeyModelTests(TestCase):
     def test_issue_returns_the_raw_key_once_and_stores_only_a_hash(self):
         user = make_user()

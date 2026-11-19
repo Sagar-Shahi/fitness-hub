@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from .models import BodyMetric, Exercise, Meal, Workout
+from .models import BodyMetric, Exercise, ExerciseSet, Meal, Workout
 
 PASSWORD = 'S3cure-pass-91-xyz'
 
@@ -21,7 +21,17 @@ def days_ago(n):
 def make_workout(owner, ago=0, name='Push day', minutes=45, exercises=((('Bench press', 4, 8, '60')),)):
     workout = Workout.objects.create(owner=owner, date=days_ago(ago), name=name, duration_min=minutes)
     for n, sets, reps, kg in exercises:
-        Exercise.objects.create(workout=workout, name=n, sets=sets, reps=reps, weight_kg=Decimal(kg))
+        exercise = Exercise.objects.create(workout=workout, name=n, sets=sets, reps=reps, weight_kg=Decimal(kg))
+        ExerciseSet.objects.bulk_create([
+            ExerciseSet(
+                exercise=exercise,
+                set_number=number,
+                reps=reps,
+                weight_kg=Decimal(kg),
+                is_completed=True,
+            )
+            for number in range(1, sets + 1)
+        ])
     return workout
 
 

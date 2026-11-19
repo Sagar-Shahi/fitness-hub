@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from tracker.testutils import make_user
 
-from .models import CartItem, Order, OrderItem, Plan
+from .models import AffiliateProduct, CartItem, Order, OrderItem, Plan
 
 
 def make_plan(title='Plan', price='9.00', **extra):
@@ -130,7 +130,16 @@ class CheckoutTests(Base):
         self.client.post(reverse('shop:checkout'))
         self.assertEqual(Order.objects.count(), 1)
         self.assertEqual(self.client.post(reverse('shop:cart-add', args=[self.a.slug]), follow=True).status_code, 200)
-        self.assertEqual(CartItem.objects.filter(owner=self.user, plan=self.a).count(), 1)  # the stale line is left, but no second order
+        self.assertEqual(CartItem.objects.filter(owner=self.user, plan=self.a).count(), 1)  # stale rows cannot create a second order
+        self.assertNotContains(self.client.get(reverse('tracker:goals')), 'Cart (1)')
+
+    def test_existing_buyers_keep_access_when_a_plan_is_unpublished(self):
+        self._fill(self.a)
+        self.client.post(reverse('shop:checkout'))
+        Plan.objects.filter(pk=self.a.pk).update(is_active=False)
+        response = self.client.get(reverse('shop:plan-detail', args=[self.a.slug]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'SECRET-FULL-CONTENT')
 
     def test_buying_unlocks_the_content(self):
         self._fill(self.a)
@@ -177,3 +186,71 @@ class CartTotalTests(Base):
         response = self.client.get(reverse('shop:cart'))
         self.assertEqual(response.context['total'], Decimal('14.50'))
         self.assertEqual([i.plan for i in response.context['items']], [self.b])
+
+
+class AffiliateStoreTests(Base):
+    def make_product(self, **extra):
+        values = {
+            'title': 'Adjustable Dumbbells',
+            'category': 'equipment',
+            'description': 'Space-saving strength training equipment.',
+            'seller_name': 'Example Fitness Seller',
+            'seller_url': 'https://seller.example/products/dumbbells',
+            'is_active': True,
+        }
+        values.update(extra)
+        return AffiliateProduct.objects.create(**values)
+
+    def test_store_shows_only_published_products(self):
+        self.make_product()
+        self.make_product(title='Hidden Product', is_active=False)
+        response = self.client.get(reverse('shop:store'))
+        self.assertContains(response, 'Adjustable Dumbbells')
+        self.assertNotContains(response, 'Hidden Product')
+        self.assertContains(response, 'FitHub is your guide, not the seller')
+        self.assertContains(response, 'FitHub does not take payment')
+
+    def test_initial_gear_guide_products_are_published_without_stale_prices(self):
+        products = AffiliateProduct.objects.filter(is_active=True)
+        self.assertEqual(products.count(), 5)
+        self.assertTrue(products.filter(title='Pull Up Assist Band Set (4 Pieces)').exists())
+        self.assertTrue(products.filter(title='20 kg Adjustable Dumbbell Set with Barbell Connector').exists())
+        self.assertFalse(products.exclude(price_label='').exists())
+
+
+    def test_store_renders_a_verified_product_image_when_present(self):
+        product = self.make_product(image_url='https://images.example/dumbbells.jpg')
+        response = self.client.get(reverse('shop:store'))
+        self.assertContains(response, 'src="https://images.example/dumbbells.jpg"')
+        self.assertContains(response, 'alt="Adjustable Dumbbells"')
+
+    def test_store_search_and_category_filter(self):
+        self.make_product()
+        self.make_product(title='Yoga Mat', category='accessories')
+        response = self.client.get(reverse('shop:store'), {'q': 'dumbbells', 'category': 'equipment'})
+        self.assertContains(response, 'Adjustable Dumbbells')
+        self.assertNotContains(response, 'Yoga Mat')
+
+    def test_affiliate_links_are_disclosed_on_the_product_card(self):
+        self.make_product(affiliate_url='https://affiliate.example/track/123')
+        response = self.client.get(reverse('shop:store'))
+        self.assertContains(response, 'Affiliate link')
+
+    def test_outbound_uses_affiliate_link_when_configured(self):
+        product = self.make_product(affiliate_url='https://affiliate.example/track/123')
+        response = self.client.get(reverse('shop:product-outbound', args=[product.slug]))
+        self.assertRedirects(response, 'https://affiliate.example/track/123', fetch_redirect_response=False)
+
+    def test_outbound_falls_back_to_seller_link(self):
+        product = self.make_product()
+        response = self.client.get(reverse('shop:product-outbound', args=[product.slug]))
+        self.assertRedirects(response, product.seller_url, fetch_redirect_response=False)
+
+    def test_outbound_does_not_redirect_to_non_https_url(self):
+        product = self.make_product(affiliate_url='http://unsafe.example/item')
+        response = self.client.get(reverse('shop:product-outbound', args=[product.slug]))
+        self.assertEqual(response.status_code, 503)
+
+    def test_inactive_product_outbound_is_404(self):
+        product = self.make_product(is_active=False)
+        self.assertEqual(self.client.get(reverse('shop:product-outbound', args=[product.slug])).status_code, 404)

@@ -18,6 +18,68 @@ class Profile(models.Model):
 
     owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='fit_profile')
     calorie_target = models.PositiveIntegerField(default=2200, validators=[MinValueValidator(800), MaxValueValidator(6000)])
+
+    age = models.PositiveSmallIntegerField(
+        null=True, blank=True, validators=[MinValueValidator(13), MaxValueValidator(100)]
+    )
+    height_cm = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(120), MaxValueValidator(230)],
+    )
+    starting_weight_kg = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(30), MaxValueValidator(300)],
+    )
+    sex_for_calculation = models.CharField(
+        max_length=20, blank=True,
+        choices=[
+            ('female', 'Female'), ('male', 'Male'),
+            ('other', 'Other / prefer not to say'),
+        ],
+    )
+    activity_level = models.CharField(
+        max_length=20, blank=True,
+        choices=[
+            ('sedentary', 'Mostly sitting / little exercise'),
+            ('light', 'Light activity (1–3 days/week)'),
+            ('moderate', 'Moderate activity (3–5 days/week)'),
+            ('very_active', 'Very active (6–7 days/week)'),
+        ],
+    )
+    body_type = models.CharField(
+        max_length=12, blank=True,
+        choices=[
+            ('ectomorph', 'Ectomorph / naturally lean'),
+            ('mesomorph', 'Mesomorph / naturally muscular'),
+            ('endomorph', 'Endomorph / naturally rounder build'),
+            ('unsure', 'Not sure'),
+        ],
+    )
+    body_fat_percentage = models.DecimalField(
+        max_digits=4, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(Decimal('2')), MaxValueValidator(Decimal('75'))],
+    )
+    waist_cm = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(Decimal('30')), MaxValueValidator(Decimal('200'))],
+    )
+    muscle_mass_kg = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True,
+        validators=[MinValueValidator(Decimal('10')), MaxValueValidator(Decimal('150'))],
+    )
+    nutrition_goal = models.CharField(
+        max_length=12, blank=True, default='maintain',
+        choices=[('fat_loss', 'Fat loss'), ('maintain', 'Weight maintenance'), ('muscle_gain', 'Muscle gain')],
+    )
+    training_type = models.CharField(
+        max_length=12, blank=True,
+        choices=[
+            ('strength', 'Strength / muscle building'),
+            ('cardio', 'Cardio / endurance'),
+            ('mixed', 'Mixed strength and cardio'),
+            ('general', 'General fitness'),
+        ],
+    )
     weekly_workout_target = models.PositiveSmallIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(14)])
     target_weight_kg = models.DecimalField(
         max_digits=4, decimal_places=1, null=True, blank=True,
@@ -45,8 +107,16 @@ class Workout(models.Model):
 
     @property
     def volume_kg(self):
-        """Total weight lifted: sets x reps x kilograms, summed over the exercises."""
-        return sum((e.sets * e.reps * e.weight_kg for e in self.exercises.all()), Decimal('0'))
+        """Total volume from completed individual sets only."""
+        return sum(
+            (
+                entry.reps * entry.weight_kg
+                for exercise in self.exercises.all()
+                for entry in exercise.set_entries.all()
+                if entry.is_completed
+            ),
+            Decimal('0'),
+        )
 
 
 class Exercise(models.Model):
@@ -62,6 +132,33 @@ class Exercise(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ExerciseSet(models.Model):
+    """One performed (or planned) set belonging to a workout exercise."""
+
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, related_name='set_entries')
+    set_number = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(50)]
+    )
+    reps = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(500)]
+    )
+    weight_kg = models.DecimalField(
+        max_digits=5, decimal_places=1, default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(1000)],
+    )
+    is_completed = models.BooleanField(default=False)
+    is_warmup = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['set_number', 'id']
+        constraints = [
+            models.UniqueConstraint(fields=['exercise', 'set_number'], name='unique_exercise_set_number'),
+        ]
+
+    def __str__(self):
+        return f'{self.exercise.name} · set {self.set_number}'
 
 
 class BodyMetric(models.Model):
@@ -99,3 +196,14 @@ class Meal(models.Model):
 def profile_for(user):
     profile, _ = Profile.objects.get_or_create(owner=user)
     return profile
+
+
+class ResearchCacheEntry(models.Model):
+    """Django database-cache row for shared, short-lived research results."""
+
+    cache_key = models.CharField(max_length=255, primary_key=True)
+    value = models.TextField()
+    expires = models.DateTimeField(db_index=True)
+
+    class Meta:
+        db_table = 'fithub_research_cache'

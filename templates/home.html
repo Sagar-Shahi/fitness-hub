@@ -1,33 +1,60 @@
 {% extends 'base.html' %}
-{% block title %}FitHub{% endblock %}
+{% load static %}
+{% block title %}FitHub · Train. Track. Progress.{% endblock %}
+{% block description %}Your training command center. Log every set, follow your progress and build strength with FitHub.{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-text">
-    <p class="eyebrow">Private fitness tracking</p>
-    <h1>Train, eat and weigh in. See what is actually working.</h1>
-    <p class="lead">FitHub keeps your workouts, meals and body weight in one place, turns them into clear weekly progress, and offers training and diet plans when you want a head start. Your data is yours: export it any time.</p>
+<section class="home-hero home-hero-athletic">
+  <div class="home-copy">
+    <p class="eyebrow"><span class="eyebrow-mark"></span> THE TRAINING PLATFORM</p>
+    <h1>BUILT BY<br>THE WORK.<br><em>PROVEN BY REPS.</em></h1>
+    <p class="home-lead">Your training, nutrition and progress in one place. Track every set, stay consistent and make every session count.</p>
     <div class="hero-actions">
       {% if user.is_authenticated %}
-      <a class="btn btn-primary" href="{% url 'tracker:dashboard' %}">Open your dashboard</a>
+      <a class="btn btn-primary" href="{% url 'tracker:dashboard' %}">Open dashboard <span aria-hidden="true">↗</span></a>
+      <a class="btn btn-quiet" href="{% url 'tracker:workout-create' %}">Log a workout</a>
       {% else %}
-      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create a free account</a>
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Start training free <span aria-hidden="true">↗</span></a>
       <a class="btn btn-quiet" href="{% url 'accounts:login' %}">Log in</a>
       {% endif %}
     </div>
+    <div class="home-proof"><span class="proof-dot"></span> TRACK EVERY SET <span class="proof-sep">/</span> OWN YOUR PROGRESS</div>
   </div>
-  <figure class="hero-demo" aria-label="Example week">
-    <p class="demo-label">This week</p>
-    <p class="demo-url">3 of 4 workouts &middot; 2 h 40 min</p>
-    <p class="demo-label">Today</p>
-    <p class="demo-url demo-short">1,840 of 2,200 kcal &middot; <strong>142 g</strong> protein</p>
-    <p class="demo-label">Last 30 days</p>
-    <p class="demo-url">Weight <span class="t1">82.4 &rarr; 80.9 kg</span> &middot; streak <span class="t2">5 days</span></p>
-  </figure>
+
+  <div class="home-visual athletic-preview" aria-label="Illustrative strength training session preview">
+    <div class="visual-topline"><span>SESSION PREVIEW / 01</span><span class="visual-live"><i></i> STRENGTH DAY</span></div>
+    <div class="preview-main">
+      <div class="preview-main-head"><div><span class="visual-kicker">TODAY'S TRAINING</span><strong>Upper body strength</strong></div><span class="preview-tag">SAMPLE</span></div>
+      <div class="preview-metrics"><div><strong>04</strong><span>EXERCISES</span></div><div><strong>12</strong><span>WORKING SETS</span></div><div><strong>60</strong><span>MIN TARGET</span></div></div>
+      <button class="preview-exercise preview-set-button" type="button" data-demo-set aria-pressed="false"><span class="exercise-number">01</span><span class="preview-exercise-copy"><strong>Barbell bench press</strong><small>4 sets · 8 reps</small></span><span class="exercise-weight">60 kg</span><span class="demo-set-state" aria-hidden="true">＋</span></button>
+      <button class="preview-exercise preview-set-button" type="button" data-demo-set aria-pressed="false"><span class="exercise-number">02</span><span class="preview-exercise-copy"><strong>Incline dumbbell press</strong><small>3 sets · 10 reps</small></span><span class="exercise-weight">20 kg</span><span class="demo-set-state" aria-hidden="true">＋</span></button>
+      <button class="preview-exercise preview-set-button" type="button" data-demo-set aria-pressed="false"><span class="exercise-number">03</span><span class="preview-exercise-copy"><strong>Seated cable row</strong><small>3 sets · 12 reps</small></span><span class="exercise-weight">45 kg</span><span class="demo-set-state" aria-hidden="true">＋</span></button>
+      <button class="preview-exercise preview-set-button" type="button" data-demo-set aria-pressed="false"><span class="exercise-number">04</span><span class="preview-exercise-copy"><strong>Lateral raises</strong><small>2 sets · 15 reps</small></span><span class="exercise-weight">8 kg</span><span class="demo-set-state" aria-hidden="true">＋</span></button>
+      <div class="preview-footer"><span>TRY IT — TAP A SET</span><span><span data-demo-completed>0</span> / 4 COMPLETE</span></div>
+    </div>
+    <div class="preview-bottom"><span>BUILT FOR REAL TRAINING</span><span>FITNESS, MEASURED.</span></div>
+  </div>
 </section>
 
-<section class="features">
-  <div class="card"><h2 class="card-title">Log in seconds</h2><p class="muted">Workouts with sets, reps and weights. Meals with calories and macros. One weight entry per day.</p></div>
-  <div class="card"><h2 class="card-title">See the trend</h2><p class="muted">Weekly goal progress, calories against your target, workout streak and a weight chart with your goal line.</p></div>
-  <div class="card"><h2 class="card-title">Built to be safe</h2><p class="muted">Argon2 passwords, per-account data isolation, strict browser security headers and rate-limited logins.</p></div>
+
+<section class="home-performance home-real-tools" aria-labelledby="home-performance-title">
+  <div class="home-performance-heading">
+    <div><p class="eyebrow"><span class="eyebrow-mark"></span> YOUR TRAINING, NOT GUESSED NUMBERS</p><h2 id="home-performance-title">Real records.<br><em>Useful progress.</em></h2></div>
+    <p>When you sign in, FitHub shows graphs built from your saved workouts, completed sets, meals and weigh-ins. No generated stats.</p>
+  </div>
+  <div class="home-real-tools-grid">
+    <a class="home-real-tool" href="{% url 'accounts:login' %}"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 18h18M5 15l4-5 4 3 6-8"/></svg></span><span><strong>Workout analytics</strong><small>Sessions, training volume and trends from your logs.</small></span><span class="home-insight-arrow" aria-hidden="true">↗</span></a>
+    <a class="home-real-tool" href="{% url 'accounts:login' %}"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span><span><strong>Nutrition tracking</strong><small>Meals, calories and macros you actually enter.</small></span><span class="home-insight-arrow" aria-hidden="true">↗</span></a>
+    <a class="home-real-tool" href="{% url 'accounts:login' %}"><span class="home-insight-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></span><span><strong>Body-weight history</strong><small>Follow your recorded weigh-ins over time.</small></span><span class="home-insight-arrow" aria-hidden="true">↗</span></a>
+  </div>
+  <p class="home-real-tools-note">Already have an account? <a href="{% url 'accounts:login' %}">Sign in to see your real dashboard</a>.</p>
+</section>
+
+<section class="home-section home-section-athletic">
+  <div class="section-heading"><div><p class="eyebrow">ONE PLATFORM. EVERY REP.</p><h2>Everything that moves<br><em>your training forward.</em></h2></div><p>Spend less time guessing and more time training. Keep your sessions, food and progress connected.</p></div>
+  <div class="home-features">
+    <a class="feature-tile" href="{% url 'accounts:login' %}"><span class="tile-index">01 / TRAIN</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h18M7 7l-4 5 4 5M17 7l4 5-4 5"/></svg></div><h3>Track every working set.</h3><p>Log reps, weight, warm-ups and completed sets. Know exactly what you did last session.</p><span class="home-feature-link">Open workout tracking ↗</span></a>
+    <a class="feature-tile" href="{% url 'accounts:login' %}"><span class="tile-index">02 / FUEL</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg></div><h3>Keep nutrition in check.</h3><p>Track meals, calories and macros alongside the work you put in at the gym.</p><span class="home-feature-link">Open meal tracking ↗</span></a>
+    <a class="feature-tile" href="{% url 'accounts:login' %}"><span class="tile-index">03 / PROGRESS</span><div class="tile-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 3 8-9"/><path d="M15 5h6v6"/></svg></div><h3>See strength add up.</h3><p>Follow training consistency, body-weight trends and your personal goals over time.</p><span class="home-feature-link">Open progress tracking ↗</span></a>
+  </div>
 </section>
 {% endblock %}
