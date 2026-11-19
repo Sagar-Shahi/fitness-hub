@@ -48,6 +48,37 @@ def _attach_set_forms(workout, bound_form=None):
     return workout
 
 
+def _workout_detail_context(workout, form=None, bound_set_form=None):
+    """Build one consistent context for the session page, including validation re-renders."""
+    workout = _attach_set_forms(workout, bound_set_form)
+    exercises = list(workout.exercises.all())
+    set_entries = [entry for exercise in exercises for entry in exercise.set_entries.all()]
+    total_sets = len(set_entries)
+    completed_sets = sum(1 for entry in set_entries if entry.is_completed)
+    return {
+        'workout': workout,
+        'form': form or ExerciseForm(workout=workout),
+        'total_sets': total_sets,
+        'completed_sets': completed_sets,
+        'progress_percent': round(completed_sets * 100 / total_sets) if total_sets else 0,
+    }
+
+
+def _nutrition_plan_for(profile):
+    latest_weight = BodyMetric.objects.filter(owner=profile.owner).first()
+    current_weight = latest_weight.weight_kg if latest_weight else profile.starting_weight_kg
+    from .nutrition import calculate_nutrition_targets
+    return current_weight, calculate_nutrition_targets(profile, current_weight)
+
+
+def _refresh_calorie_target(profile):
+    current_weight, nutrition_plan = _nutrition_plan_for(profile)
+    if nutrition_plan and nutrition_plan.get('calories'):
+        profile.calorie_target = nutrition_plan['calories']
+        profile.save(update_fields=['calorie_target'])
+    return current_weight, nutrition_plan
+
+
 def _csv_safe(value):
     text = str(value)
     return "'" + text if text[:1] in ('=', '+', '-', '@', '\t', '\r') else text
@@ -104,18 +135,10 @@ def share_progress(request):
 def goals(request):
     profile = profile_for(request.user)
     form = ProfileForm(request.POST or None, instance=profile)
-    latest_weight = BodyMetric.objects.filter(owner=request.user).first()
-    current_weight = latest_weight.weight_kg if latest_weight else profile.starting_weight_kg
-    from .nutrition import calculate_nutrition_targets
-    nutrition_plan = calculate_nutrition_targets(profile, current_weight)
+    current_weight, nutrition_plan = _nutrition_plan_for(profile)
     if request.method == 'POST' and form.is_valid():
         profile = form.save()
-        latest_weight = BodyMetric.objects.filter(owner=request.user).first()
-        current_weight = latest_weight.weight_kg if latest_weight else profile.starting_weight_kg
-        nutrition_plan = calculate_nutrition_targets(profile, current_weight)
-        if nutrition_plan and nutrition_plan.get('calories'):
-            profile.calorie_target = nutrition_plan['calories']
-            profile.save(update_fields=['calorie_target'])
+        current_weight, nutrition_plan = _refresh_calorie_target(profile)
         messages.success(request, 'Your fitness profile and nutrition targets have been saved.')
         return redirect('tracker:dashboard')
     items = (OrderItem.objects.filter(order__owner=request.user).select_related('plan', 'order')
@@ -170,20 +193,8 @@ def focus_music_search(request):
 
 @login_required
 def workout_detail(request, pk):
-    workout = _attach_set_forms(_own_workout(request, pk))
-    form = ExerciseForm(workout=workout)
-    exercises = list(workout.exercises.all())
-    total_sets = sum(exercise.set_entries.count() for exercise in exercises)
-    completed_sets = sum(
-        exercise.set_entries.filter(is_completed=True).count() for exercise in exercises
-    )
-    return render(request, 'tracker/workout_detail.html', {
-        'workout': workout,
-        'form': form,
-        'total_sets': total_sets,
-        'completed_sets': completed_sets,
-        'progress_percent': round(completed_sets * 100 / total_sets) if total_sets else 0,
-    })
+    workout = _own_workout(request, pk)
+    return render(request, 'tracker/workout_detail.html', _workout_detail_context(workout))
 
 
 @login_required
@@ -228,10 +239,10 @@ def exercise_add(request, pk):
         ])
         messages.success(request, f'Added {exercise.name}. Complete each set as you train.')
         return redirect('tracker:workout-detail', pk=workout.pk)
-    workout = _attach_set_forms(workout)
-    return render(request, 'tracker/workout_detail.html', {
-        'workout': workout, 'form': form,
-    }, status=400)
+    return render(
+        request, 'tracker/workout_detail.html',
+        _workout_detail_context(workout, form=form), status=400,
+    )
 
 
 @login_required
@@ -239,6 +250,7 @@ def exercise_add(request, pk):
 def exercise_delete(request, pk, exercise_pk):
     workout = _own_workout(request, pk)
     get_object_or_404(Exercise, pk=exercise_pk, workout=workout).delete()
+    messages.success(request, 'Exercise and its sets removed.')
     return redirect('tracker:workout-detail', pk=workout.pk)
 
 
@@ -277,11 +289,11 @@ def exercise_set_edit(request, pk, exercise_pk, set_pk):
         form.save()
         messages.success(request, f'Set {entry.set_number} updated.')
         return redirect('tracker:workout-detail', pk=workout.pk)
-    workout = _attach_set_forms(workout, form)
-    return render(request, 'tracker/workout_detail.html', {
-        'workout': workout,
-        'form': ExerciseForm(workout=workout),
-    }, status=400)
+    return render(
+        request, 'tracker/workout_detail.html',
+        _workout_detail_context(workout, form=ExerciseForm(workout=workout), bound_set_form=form),
+        status=400,
+    )
 
 
 @login_required
@@ -308,12 +320,7 @@ def weight(request):
         BodyMetric.objects.update_or_create(
             owner=request.user, date=form.cleaned_data['date'], defaults={'weight_kg': form.cleaned_data['weight_kg']})
         profile = profile_for(request.user)
-        latest_weight = BodyMetric.objects.filter(owner=request.user).first()
-        from .nutrition import calculate_nutrition_targets
-        nutrition_plan = calculate_nutrition_targets(profile, latest_weight.weight_kg if latest_weight else None)
-        if nutrition_plan and nutrition_plan.get('calories'):
-            profile.calorie_target = nutrition_plan['calories']
-            profile.save(update_fields=['calorie_target'])
+        _refresh_calorie_target(profile)
         messages.success(request, 'Weight saved. Your nutrition estimates have been refreshed when your profile is complete.')
         return redirect('tracker:weight')
     days = _days(request, 90)
@@ -330,6 +337,8 @@ def weight(request):
 @require_POST
 def weight_delete(request, pk):
     get_object_or_404(BodyMetric, pk=pk, owner=request.user).delete()
+    _refresh_calorie_target(profile_for(request.user))
+    messages.success(request, 'Weight entry deleted. Your nutrition estimate has been refreshed when your profile is complete.')
     return redirect('tracker:weight')
 
 
@@ -352,10 +361,7 @@ def meals(request):
         messages.success(request, f'Logged {meal.name}.')
         return redirect(f"{reverse('tracker:meals')}?date={meal.date:%Y-%m-%d}")
     profile = profile_for(request.user)
-    latest_weight = BodyMetric.objects.filter(owner=request.user).first()
-    current_weight = latest_weight.weight_kg if latest_weight else profile.starting_weight_kg
-    from .nutrition import calculate_nutrition_targets
-    nutrition_plan = calculate_nutrition_targets(profile, current_weight)
+    current_weight, nutrition_plan = _nutrition_plan_for(profile)
     target = nutrition_plan['calories'] if nutrition_plan and nutrition_plan.get('calories') else profile.calorie_target
     items = Meal.objects.filter(owner=request.user, date=day)
     totals = analytics.day_totals(request.user, day)
@@ -379,6 +385,7 @@ def meal_delete(request, pk):
     meal = get_object_or_404(Meal, pk=pk, owner=request.user)
     day = meal.date
     meal.delete()
+    messages.success(request, 'Meal deleted.')
     return redirect(f"{reverse('tracker:meals')}?date={day:%Y-%m-%d}")
 
 
