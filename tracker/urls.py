@@ -32,5 +32,6 @@ urlpatterns = [
     path('app/weight/', views.weight, name='weight'),
     path('app/weight/<int:pk>/delete/', views.weight_delete, name='weight-delete'),
     path('app/meals/', views.meals, name='meals'),
+    path('app/meals/<int:pk>/edit/', views.meal_edit, name='meal-edit'),
     path('app/meals/<int:pk>/delete/', views.meal_delete, name='meal-delete'),
 ]
