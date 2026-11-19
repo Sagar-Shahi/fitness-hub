@@ -80,3 +80,37 @@ class ExerciseLibraryTutorialTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(self.url, {"name": " "})
         self.assertEqual(response.status_code, 400)
+
+
+class WorkoutExerciseTutorialTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        caches["research"].clear()
+        self.user = make_user("workout-tutorial-owner")
+        self.client.force_login(self.user)
+
+    @patch.dict("os.environ", {"YOUTUBE_API_KEY": "private-test-key"})
+    @patch("tracker.tutorials.urlopen")
+    def test_workout_tutorial_uses_shared_quota_limited_search(self, mocked_urlopen):
+        response_mock = mocked_urlopen.return_value.__enter__.return_value
+        response_mock.read.return_value = json.dumps({
+            "items": [{
+                "id": {"videoId": "abcdefghijk"},
+                "snippet": {"title": "Bench Press Form", "channelTitle": "Training"},
+            }],
+        }).encode()
+        from .testutils import make_workout
+        workout = make_workout(self.user, exercises=(("Bench Press", 3, 8, "60"),))
+        exercise = workout.exercises.first()
+        response = self.client.get(reverse("tracker:exercise-tutorials", args=[exercise.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["videos"][0]["id"], "abcdefghijk")
+        self.assertIn("videoEmbeddable=true", mocked_urlopen.call_args.args[0].full_url)
+
+    def test_workout_tutorial_cannot_read_another_users_exercise(self):
+        from .testutils import make_workout
+        other = make_user("workout-tutorial-other")
+        workout = make_workout(other, exercises=(("Private lift", 2, 8, "20"),))
+        exercise = workout.exercises.first()
+        response = self.client.get(reverse("tracker:exercise-tutorials", args=[exercise.pk]))
+        self.assertEqual(response.status_code, 404)
