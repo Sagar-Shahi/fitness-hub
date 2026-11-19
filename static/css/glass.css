@@ -601,7 +601,8 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
 }
 .nav > .nav-link {
   position: relative;
-  z-index: 1;
+  z-index: 200;
+  pointer-events: auto;
 }
 .nav > details.nav-more {
   position: relative;
