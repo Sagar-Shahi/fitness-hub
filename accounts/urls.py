@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+from django.contrib.auth.views import LogoutView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.urls import path
 
 from . import views
@@ -10,7 +10,7 @@ urlpatterns = [
     path('login/', views.ThrottledLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),  # POST only
     path('password/', views.PasswordChange.as_view(), name='password-change'),
-    path('password-reset/', PasswordResetView.as_view(
+    path('password-reset/', views.ThrottledPasswordResetView.as_view(
         template_name='accounts/password_reset_form.html',
         email_template_name='accounts/password_reset_email.html',
         subject_template_name='accounts/password_reset_subject.txt',
