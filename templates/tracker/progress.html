@@ -20,13 +20,13 @@
 <dl class="stats dashboard-stats">
   <div class="stat"><dt>PERSONAL RECORD</dt><dd>{% if personal_record != None %}{{ personal_record }} <span class="stat-denom">kg</span>{% else %}&ndash;{% endif %}</dd><dd class="stat-note">Heaviest completed set for {{ selected }}.</dd></div>
   <div class="stat"><dt>SESSIONS LOGGED</dt><dd>{{ session_count }}</dd><dd class="stat-note">Separate workouts with completed sets.</dd></div>
-  <div class="stat"><dt>COMPLETED SETS</dt><dd>{{ total_sets }}</dd><dd class="stat-note">Sets included in this exercise history.</dd></div>
+  <div class="stat"><dt>WORKING SETS</dt><dd>{{ total_sets }}</dd><dd class="stat-note">Completed non-warm-up sets.</dd></div>
 </dl>
 
 <section class="card dashboard-chart-card">
   <div class="card-head"><div><p class="eyebrow">STRENGTH TREND</p><h2 class="card-title">{{ selected }} · heaviest set</h2></div></div>
   {% if sessions %}{% include 'partials/chart.html' with chart=chart %}{% else %}<p class="muted empty-state">No completed sets yet. Finish a set in a workout to start your strength history.</p>{% endif %}
-  <p class="muted">Only completed sets count. Warm-up sets are included if marked completed; compare like-for-like technique and equipment.</p>
+  <p class="muted">Only completed working sets count toward strength records. Warm-up sets stay in your workout log but are excluded here.</p>
 </section>
 
 <section class="card flush">
