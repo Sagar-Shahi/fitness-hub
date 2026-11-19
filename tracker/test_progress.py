@@ -39,6 +39,22 @@ class ProgressPageTests(TestCase):
         self.assertIsNone(response.context['personal_record'])
         self.assertEqual(response.context['session_count'], 0)
 
+    def test_warmup_sets_do_not_set_strength_personal_records(self):
+        workout = make_workout(self.user, exercises=(('Bench press', 2, 5, '90'),))
+        exercise = workout.exercises.get()
+        sets = list(exercise.set_entries.order_by('set_number'))
+        sets[0].is_completed = True
+        sets[0].is_warmup = True
+        sets[0].weight_kg = Decimal('120.0')
+        sets[0].save()
+        sets[1].is_completed = True
+        sets[1].is_warmup = False
+        sets[1].weight_kg = Decimal('90.0')
+        sets[1].save()
+        response = self.client.get(reverse('tracker:progress'), {'exercise': 'Bench press'})
+        self.assertEqual(response.context['personal_record'], Decimal('90.0'))
+        self.assertEqual(response.context['total_sets'], 1)
+
     def test_same_day_workouts_remain_separate_in_session_history(self):
         morning = make_workout(self.user, ago=0, name='Morning session', exercises=(('Squat', 2, 5, '80'),))
         evening = make_workout(self.user, ago=0, name='Evening session', exercises=(('Squat', 3, 5, '90'),))
