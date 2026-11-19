@@ -83,14 +83,27 @@ def dashboard(user, profile):
     change = None
     if latest and first_in_window and first_in_window.pk != latest.pk:
         change = latest.weight_kg - first_in_window.weight_kg
-    # Avoid showing a default or manually entered calorie prescription for under-18 profiles.
-    calorie_target = None if profile.age is not None and profile.age < 18 else profile.calorie_target
+    # Never present a default/manual calorie number as a prescription when an estimate is unsafe.
+    from .nutrition import calculate_nutrition_targets
+    nutrition_plan = calculate_nutrition_targets(
+        profile, latest.weight_kg if latest else profile.starting_weight_kg
+    )
+    calorie_target_reason = None
+    if profile.age is not None and profile.age < 18:
+        calorie_target = None
+        calorie_target_reason = 'Calorie targets are not shown for under-18 profiles.'
+    elif nutrition_plan and nutrition_plan.get('reason'):
+        calorie_target = None
+        calorie_target_reason = nutrition_plan['reason']
+    else:
+        calorie_target = profile.calorie_target
     return {
         'week_done': week_workouts.count(),
         'week_target': profile.weekly_workout_target,
         'week_minutes': week_workouts.aggregate(m=Sum('duration_min'))['m'] or 0,
         'today': totals,
         'calorie_target': calorie_target,
+        'calorie_target_reason': calorie_target_reason,
         'calorie_left': calorie_target - totals['calories'] if calorie_target is not None else None,
         'streak': streak(user),
         'latest_weight': latest,
