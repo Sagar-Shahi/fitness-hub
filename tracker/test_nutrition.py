@@ -92,7 +92,7 @@ class PersonalizedNutritionTests(TestCase):
         self.profile.save()
         response = self.client.get(reverse('tracker:meals'))
         self.assertIsNone(response.context['target'])
-        self.assertContains(response, 'Calorie targets are not shown for under-18 profiles')
+        self.assertContains(response, 'Personalized calorie targets are only calculated for adults.')
         self.assertNotContains(response, '2200 kcal daily goal')
 
     def test_unsafe_estimate_is_not_shown_as_a_fallback_target(self):
