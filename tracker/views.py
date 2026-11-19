@@ -72,11 +72,8 @@ def _nutrition_plan_for(profile):
 
 
 def _refresh_calorie_target(profile):
-    current_weight, nutrition_plan = _nutrition_plan_for(profile)
-    if nutrition_plan and nutrition_plan.get('calories'):
-        profile.calorie_target = nutrition_plan['calories']
-        profile.save(update_fields=['calorie_target'])
-    return current_weight, nutrition_plan
+    from .nutrition import refresh_profile_calorie_target
+    return refresh_profile_calorie_target(profile)
 
 
 def _csv_safe(value):
