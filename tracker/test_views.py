@@ -325,6 +325,20 @@ class ExerciseSetTests(Base):
         self.client.post(delete_url)
         self.assertEqual(list(self.exercise.set_entries.values_list('set_number', flat=True)), [1, 2])
 
+    def test_invalid_set_edit_preserves_session_progress_context(self):
+        self.first.is_completed = True
+        self.first.save(update_fields=['is_completed'])
+        url = reverse('tracker:exercise-set-edit', args=[self.workout.pk, self.exercise.pk, self.second.pk])
+        response = self.client.post(url, {
+            f'set-{self.second.pk}-reps': 'not-a-number',
+            f'set-{self.second.pk}-weight_kg': '50.0',
+            f'set-{self.second.pk}-is_warmup': False,
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.context['total_sets'], 2)
+        self.assertEqual(response.context['completed_sets'], 1)
+        self.assertEqual(response.context['progress_percent'], 50)
+
     def test_set_endpoints_are_post_only_and_owner_scoped(self):
         edit_url = reverse('tracker:exercise-set-edit', args=[self.workout.pk, self.exercise.pk, self.first.pk])
         self.assertEqual(self.client.get(edit_url).status_code, 405)
@@ -357,6 +371,23 @@ class WeightTests(Base):
             with self.subTest(data=data):
                 self.assertEqual(self.client.post(url, dict({'date': days_ago(0).isoformat()}, **data)).status_code, 200)
         self.assertEqual(BodyMetric.objects.count(), 0)
+
+    def test_deleting_latest_weight_recalculates_nutrition_from_previous_entry(self):
+        profile = Profile.objects.create(
+            owner=self.user, age=30, height_cm=180, starting_weight_kg=80,
+            sex_for_calculation='male', activity_level='moderate',
+            training_type='strength', nutrition_goal='maintain',
+        )
+        previous = make_weight(self.user, ago=1, kg='70.0')
+        latest = make_weight(self.user, ago=0, kg='90.0')
+        from .nutrition import calculate_nutrition_targets
+        profile.calorie_target = calculate_nutrition_targets(profile, latest.weight_kg)['calories']
+        profile.save(update_fields=['calorie_target'])
+        response = self.client.post(reverse('tracker:weight-delete', args=[latest.pk]))
+        self.assertRedirects(response, reverse('tracker:weight'))
+        profile.refresh_from_db()
+        expected = calculate_nutrition_targets(profile, previous.weight_kg)['calories']
+        self.assertEqual(profile.calorie_target, expected)
 
     def test_same_date_for_two_users_is_fine(self):
         other = make_user('other')
