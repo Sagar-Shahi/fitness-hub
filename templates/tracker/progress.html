@@ -19,7 +19,7 @@
 
 <dl class="stats dashboard-stats">
   <div class="stat"><dt>PERSONAL RECORD</dt><dd>{% if personal_record != None %}{{ personal_record }} <span class="stat-denom">kg</span>{% else %}&ndash;{% endif %}</dd><dd class="stat-note">Heaviest completed set for {{ selected }}.</dd></div>
-  <div class="stat"><dt>SESSIONS LOGGED</dt><dd>{{ session_count }}</dd><dd class="stat-note">Sessions with completed sets.</dd></div>
+  <div class="stat"><dt>SESSIONS LOGGED</dt><dd>{{ session_count }}</dd><dd class="stat-note">Separate workouts with completed sets.</dd></div>
   <div class="stat"><dt>COMPLETED SETS</dt><dd>{{ total_sets }}</dd><dd class="stat-note">Sets included in this exercise history.</dd></div>
 </dl>
 
@@ -32,8 +32,8 @@
 <section class="card flush">
   <div class="card-head card-pad"><div><p class="eyebrow">SESSION HISTORY</p><h2 class="card-title">Your logged sets</h2></div></div>
   {% if sessions %}
-  <div class="table-wrap"><table class="table"><thead><tr><th scope="col">Date</th><th scope="col" class="num">Heaviest set</th><th scope="col" class="num">Sets</th><th scope="col" class="num">Total reps</th></tr></thead>
-  <tbody>{% for item in sessions %}<tr><td>{{ item.date|date:"D, M j, Y" }}</td><td class="num">{{ item.max_weight }} kg</td><td class="num">{{ item.sets }}</td><td class="num">{{ item.reps }}</td></tr>{% endfor %}</tbody></table></div>
+  <div class="table-wrap"><table class="table"><thead><tr><th scope="col">Date</th><th scope="col">Workout</th><th scope="col" class="num">Heaviest set</th><th scope="col" class="num">Sets</th><th scope="col" class="num">Total reps</th></tr></thead>
+  <tbody>{% for item in sessions %}<tr><td>{{ item.date|date:"D, M j, Y" }}</td><td>{{ item.workout_name }}</td><td class="num">{{ item.max_weight }} kg</td><td class="num">{{ item.sets }}</td><td class="num">{{ item.reps }}</td></tr>{% endfor %}</tbody></table></div>
   {% else %}<p class="muted empty-state">Your completed sessions will appear here.</p>{% endif %}
 </section>
 {% else %}
