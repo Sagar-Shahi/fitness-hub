@@ -271,6 +271,11 @@ class SummaryApiTests(ApiCase):
         self.assertEqual((data['workouts_this_week'], data['minutes_this_week'], data['calories_today'], data['protein_g_today']), (1, 40, 700, 40))
         self.assertEqual((data['latest_weight_kg'], data['streak_days'], data['calorie_target']), ('79.9', 1, 2200))
 
+    def test_summary_does_not_return_a_calorie_target_for_a_minor(self):
+        Profile.objects.create(owner=self.user, age=17)
+        data = self.api.get(SUMMARY).json()
+        self.assertIsNone(data['calorie_target'])
+
     def test_summary_for_a_new_account(self):
         data = self.api.get(SUMMARY).json()
         self.assertEqual((data['workouts_this_week'], data['latest_weight_kg'], data['target_weight_kg']), (0, None, None))
