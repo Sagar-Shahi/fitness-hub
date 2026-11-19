@@ -68,6 +68,9 @@ class ThrottleTests(TestCase):
 
 
 class SecurityHeaderTests(TestCase):
+    def test_default_timezone_matches_the_nepal_first_product(self):
+        self.assertEqual(settings.TIME_ZONE, 'Asia/Kathmandu')
+
     def test_public_pages_send_a_strict_content_security_policy(self):
         response = self.client.get('/')
         csp = response['Content-Security-Policy']
