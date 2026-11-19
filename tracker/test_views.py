@@ -5,7 +5,7 @@ from unittest.mock import patch
 from datetime import timedelta
 from decimal import Decimal
 
-from django.core.cache import cache
+from django.core.cache import cache, caches
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -41,6 +41,7 @@ class LoginRequiredTests(TestCase):
 class Base(TestCase):
     def setUp(self):
         cache.clear()
+        caches['research'].clear()
         self.user = make_user('sam')
         self.client.force_login(self.user)
 
@@ -60,7 +61,7 @@ class FocusMusicSearchTests(Base):
         self.assertIn('paste a YouTube video link', response.json()['error'])
 
     @patch.dict('os.environ', {'YOUTUBE_API_KEY': 'test-key'})
-    @patch('tracker.views.urlopen')
+    @patch('tracker.tutorials.urlopen')
     def test_returns_only_valid_embeddable_video_results(self, urlopen_mock):
         class FakeResponse:
             def __enter__(self):
@@ -80,6 +81,43 @@ class FocusMusicSearchTests(Base):
         self.assertEqual(response.json()['videos'][0]['id'], 'abcdefghijk')
         self.assertEqual(response.json()['videos'][0]['title'], 'Gym mix')
         self.assertIn('videoEmbeddable=true', urlopen_mock.call_args.args[0].full_url)
+
+    @override_settings(YOUTUBE_DAILY_SEARCH_LIMIT=1)
+    @patch.dict('os.environ', {'YOUTUBE_API_KEY': 'test-key'})
+    @patch('tracker.tutorials.urlopen')
+    def test_daily_budget_also_limits_music_search(self, urlopen_mock):
+        class FakeResponse:
+            def __enter__(self): return self
+            def __exit__(self, exc_type, exc_value, traceback): return False
+            def read(self):
+                return b'{"items":[{"id":{"videoId":"abcdefghijk"},"snippet":{"title":"Gym mix"}}]}'
+        urlopen_mock.return_value = FakeResponse()
+        url = reverse('tracker:focus-music-search')
+        first = self.client.get(url, {'q': 'gym music'})
+        second = self.client.get(url, {'q': 'strength playlist'})
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 429)
+        urlopen_mock.assert_called_once()
+
+    @patch.dict('os.environ', {'YOUTUBE_API_KEY': 'test-key'})
+    @patch('tracker.tutorials.urlopen')
+    def test_cached_music_results_are_shared_and_do_not_need_a_key(self, urlopen_mock):
+        class FakeResponse:
+            def __enter__(self): return self
+            def __exit__(self, exc_type, exc_value, traceback): return False
+            def read(self):
+                return b'{"items":[{"id":{"videoId":"abcdefghijk"},"snippet":{"title":"Gym mix"}}]}'
+        urlopen_mock.return_value = FakeResponse()
+        url = reverse('tracker:focus-music-search')
+        first = self.client.get(url, {'q': 'gym music'})
+        other = make_user('music-search-other')
+        self.client.force_login(other)
+        with patch.dict('os.environ', {'YOUTUBE_API_KEY': ''}):
+            second = self.client.get(url, {'q': ' gym   music '})
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(second.json(), first.json())
+        urlopen_mock.assert_called_once()
 
 
 class DashboardTests(Base):
