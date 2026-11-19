@@ -525,63 +525,8 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
 }
 
 
-/* Keep the open Explore dropdown above neighboring navigation pills. */
-.nav {
-  position: relative;
-  isolation: auto;
-  overflow: visible;
-}
-.nav > .nav-more {
-  position: relative;
-  z-index: 1;
-}
-.nav > .nav-more[open] {
-  z-index: 60;
-}
-.nav > .nav-more[open] > .nav-more-menu {
-  position: absolute;
-  z-index: 61;
-  top: calc(100% + 12px);
-  left: 0;
-}
-.nav > .nav-link,
-.nav > .nav-more:not([open]) {
-  position: relative;
-  z-index: 1;
-}
-@media (max-width: 1000px) {
-  .nav {
-    overflow-x: visible;
-    overflow-y: visible;
-  }
-}
-@media (max-width: 760px) {
-  .nav > .nav-more[open] > .nav-more-menu {
-    position: fixed;
-    z-index: 100;
-    top: 118px;
-    left: 12px;
-    right: 12px;
-  }
-}
-
-
-/* Navigation hit-testing: real navigation links always win over an open Explore panel. */
-.nav { position: relative; isolation: auto; }
-.nav > .nav-link {
-  position: relative;
-  z-index: 45;
-  pointer-events: auto;
-}
-.nav > details.nav-more { position: relative; z-index: 40; }
-.nav > details.nav-more > .nav-more-menu {
-  z-index: 40;
-  pointer-events: auto;
-}
-.nav > details.nav-more > summary { position: relative; z-index: 41; }
-
-
-/* Explore dropdown layering: keep the whole navigation above page content. */
+/* One predictable stacking system: the header sits above page content, while
+   real navigation links always win hit-testing over the open Explore panel. */
 .topbar {
   position: sticky;
   top: 0;
@@ -611,11 +556,16 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
 .nav > details.nav-more[open] {
   z-index: 100;
 }
+.nav > details.nav-more > summary {
+  position: relative;
+  z-index: 1;
+}
 .nav > details.nav-more[open] > .nav-more-menu {
   position: absolute;
   z-index: 101;
   top: calc(100% + 12px);
   left: 0;
+  right: auto;
   pointer-events: auto;
 }
 @media (max-width: 1000px) {
@@ -626,10 +576,31 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
 }
 @media (max-width: 760px) {
   .nav > details.nav-more[open] > .nav-more-menu {
-    position: fixed;
-    z-index: 1100;
-    top: 118px;
-    left: 12px;
-    right: 12px;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: auto;
+    right: 0;
+    width: min(340px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 170px - env(safe-area-inset-bottom));
   }
+}
+@media (max-width: 420px) {
+  .nav > details.nav-more[open] > .nav-more-menu {
+    right: 0;
+    width: min(320px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 150px - env(safe-area-inset-bottom));
+  }
+}
+
+/* Product photography is optional; preserve a polished fallback when no image exists. */
+.store-product-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 16px 16px 0 0;
+  border-bottom: 1px solid rgba(225,232,255,.16);
+  background: rgba(10,14,27,.6);
 }
