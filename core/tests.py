@@ -74,6 +74,7 @@ class SecurityHeaderTests(TestCase):
         self.assertIn("script-src 'self'", csp)
         self.assertIn("style-src 'self';", csp)
         self.assertIn("media-src 'self' https: blob: data:", csp)
+        self.assertIn("img-src 'self' data: https:", csp)
         self.assertNotIn('unsafe-inline', csp)
         self.assertNotIn('unsafe-eval', csp)
         self.assertIn("frame-ancestors 'none'", csp)
