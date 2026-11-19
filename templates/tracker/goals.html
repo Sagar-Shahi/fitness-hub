@@ -49,9 +49,15 @@
       <div class="form-grid">
         {% include 'partials/field.html' with field=form.nutrition_goal hide_required=True %}
         {% include 'partials/field.html' with field=form.target_weight_kg hide_required=True %}
+        {% if not form.instance.age or form.instance.age >= 18 %}
         {% include 'partials/field.html' with field=form.calorie_target hide_required=True %}
+        {% endif %}
       </div>
-      <p class="goal-footnote">The fallback calorie target is used until your profile has enough information to calculate a personalized estimate.</p>
+      {% if not form.instance.age or form.instance.age >= 18 %}
+      <p class="goal-footnote">The fallback calorie target is used only until an adult profile has enough information for a personalized estimate.</p>
+      {% else %}
+      <p class="goal-footnote">Calorie and macro prescriptions are not shown for under-18 profiles. Your workouts, weight history and meal log remain available.</p>
+      {% endif %}
     </article>
     {% if nutrition_plan and nutrition_plan.calories %}
     <section class="nutrition-recommendation" aria-live="polite">
