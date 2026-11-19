@@ -736,3 +736,9 @@ a:not(.btn):focus-visible { border-radius: 5px; }
   .dashboard-action, .table tbody tr { transition: none; }
   .dashboard-action:hover { transform: none; }
 }
+
+/* Public header links, password toggle and background-video control. */
+.nav-public { margin-right: auto; }
+@media (max-width: 620px) { .nav-public { display: none; } }
+.password-toggle { margin-top: 6px; }
+#video-toggle[hidden] { display: none; }

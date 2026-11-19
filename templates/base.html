@@ -12,9 +12,7 @@
   <script src="{% static 'js/app.js' %}" defer></script>
 </head>
 <body>
-  <video class="ambient-workout-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true" tabindex="-1">
-    <source src="https://videos.pexels.com/video-files/4921640/4921640-hd_1066_1920_25fps.mp4" type="video/mp4">
-  </video>
+  <video class="ambient-workout-video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="https://videos.pexels.com/video-files/4921640/4921640-hd_1066_1920_25fps.mp4" data-scope="{% if user.is_authenticated %}wide{% else %}all{% endif %}"></video>
   <a class="skip-link" href="#main">Skip to content</a>
   {% with view=request.resolver_match.view_name %}
   <header class="topbar">
@@ -75,6 +73,10 @@
         </details>
       </div>
       {% else %}
+      <nav class="nav nav-public" aria-label="Main">
+        <a class="nav-link" href="{% url 'about' %}" {% if request.resolver_match.view_name == 'about' %}aria-current="page"{% endif %}><span>About</span></a>
+        <a class="nav-link" href="{% url 'shop:store' %}" {% if request.resolver_match.view_name == 'shop:store' %}aria-current="page"{% endif %}><span>Gear guide</span></a>
+      </nav>
       <div class="topbar-actions">
         <a class="btn btn-quiet btn-small" href="{% url 'accounts:login' %}">Log in</a>
         <a class="btn btn-primary btn-small" href="{% url 'accounts:register' %}">Sign up</a>
@@ -121,6 +123,7 @@
     <div class="container footer-inner">
       <span>FitHub. Your data stays yours: export it any time. Not medical advice. <a href="{% url 'about' %}">About FitHub</a></span>
       <span class="muted">Built by Sagar Bahadur Shahi</span>
+      <button class="btn btn-quiet btn-small" id="video-toggle" type="button" aria-pressed="false" hidden>Pause background video</button>
     </div>
   </footer>
 </body>
