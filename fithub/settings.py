@@ -111,6 +111,7 @@ DATABASES = {
     'default': dj_database_url.config(
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
         conn_max_age=60,
+        conn_health_checks=True,  # drop and reopen a connection the host closed while idle
     )
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
