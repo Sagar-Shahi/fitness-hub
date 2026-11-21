@@ -9,18 +9,30 @@
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
   <link rel="stylesheet" href="{% static 'css/glass.css' %}">
-  <script src="{% static 'js/app.js' %}" defer></script>
+  {% block extra_head %}{% endblock %}
+  <script src="{% static 'js/app.js' %}?v=food-lookup-2" defer></script>
 </head>
 <body>
-  <video class="ambient-workout-video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="https://videos.pexels.com/video-files/4921640/4921640-hd_1066_1920_25fps.mp4" data-scope="{% if user.is_authenticated %}wide{% else %}all{% endif %}"></video>
+  <video class="ambient-workout-video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"
+    data-src="https://videos.pexels.com/video-files/4921640/4921640-hd_1066_1920_25fps.mp4"
+    data-additional-srcs="https://videos.pexels.com/video-files/4686178/4686178-hd_1080_1920_30fps.mp4|https://videos.pexels.com/video-files/35585591/15079561_1080_1920_30fps.mp4"
+    data-scope="{% if user.is_authenticated %}wide{% else %}all{% endif %}"></video>
   <a class="skip-link" href="#main">Skip to content</a>
   {% with view=request.resolver_match.view_name %}
-  <header class="topbar">
+  {% if view != 'about' %}
+  <header class="topbar{% if view == 'accounts:login' or view == 'accounts:register' %} topbar-auth{% endif %}">
     <div class="topbar-inner">
-      <a class="brand" href="{% if user.is_authenticated %}{% url 'tracker:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+      {% if user.is_authenticated %}
+      <a class="brand" href="{% url 'tracker:dashboard' %}">
         <svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><rect width="32" height="32" rx="7" class="brand-bg"/><path d="M7 16h18M9.5 10.5v11M5 13v6M22.5 10.5v11M27 13v6" class="brand-line"/></svg>
         <span>FitHub</span>
       </a>
+      {% else %}
+      <div class="brand" aria-label="FitHub">
+        <svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><rect width="32" height="32" rx="7" class="brand-bg"/><path d="M7 16h18M9.5 10.5v11M5 13v6M22.5 10.5v11M27 13v6" class="brand-line"/></svg>
+        <span>FitHub</span>
+      </div>
+      {% endif %}
       {% if user.is_authenticated %}
       <nav class="nav" aria-label="Main">
         <a class="nav-link" href="{% url 'tracker:dashboard' %}" {% if view == 'tracker:dashboard' %}aria-current="page"{% endif %}>
@@ -73,6 +85,12 @@
         </details>
       </div>
       {% else %}
+      {% if view == 'accounts:login' or view == 'accounts:register' %}
+      <div class="auth-header-note">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <span>{% if view == 'accounts:login' %}SECURE SIGN-IN{% else %}PRIVATE ACCOUNT SETUP{% endif %}</span>
+      </div>
+      {% else %}
       <nav class="nav nav-public" aria-label="Main">
         <a class="nav-link" href="{% url 'about' %}" {% if request.resolver_match.view_name == 'about' %}aria-current="page"{% endif %}><span>About</span></a>
         <a class="nav-link" href="{% url 'shop:store' %}" {% if request.resolver_match.view_name == 'shop:store' %}aria-current="page"{% endif %}><span>Gear guide</span></a>
@@ -82,8 +100,10 @@
         <a class="btn btn-primary btn-small" href="{% url 'accounts:register' %}">Sign up</a>
       </div>
       {% endif %}
+      {% endif %}
     </div>
   </header>
+  {% endif %}
   {% endwith %}
 
   <main id="main" class="container">
@@ -121,10 +141,11 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <span>FitHub. Your data stays yours: export it any time. Not medical advice. <a href="{% url 'about' %}">About FitHub</a></span>
+      <span>FitHub provides general fitness and nutrition tracking—not medical advice. Consult a qualified professional for personal guidance. Your data stays yours: export it any time. <a href="{% url 'about' %}">About FitHub</a></span>
       <span class="muted">Built by Sagar Bahadur Shahi</span>
       <button class="btn btn-quiet btn-small" id="video-toggle" type="button" aria-pressed="false" hidden>Pause background video</button>
     </div>
   </footer>
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>

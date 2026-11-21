@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
@@ -19,6 +21,23 @@ class RegistrationTests(TestCase):
     def setUp(self):
         cache.clear()
 
+    def test_account_forms_have_clear_grouping_and_password_autocomplete(self):
+        registration = self.client.get(reverse('accounts:register'))
+        self.assertContains(registration, 'Account details')
+        self.assertContains(registration, 'autocomplete="username"')
+        self.assertContains(registration, 'autocomplete="email"')
+        self.assertContains(registration, 'autocomplete="new-password"')
+        self.assertNotContains(registration, 'autofocus')
+        registration_html = registration.content.decode()
+        self.assertLess(registration_html.index('class="auth-card register-card"'),
+                        registration_html.index('class="register-story"'))
+        login = self.client.get(reverse('accounts:login'))
+        self.assertContains(login, 'autocomplete="current-password"')
+        self.assertNotContains(login, 'autofocus')
+        login_html = login.content.decode()
+        self.assertLess(login_html.index('class="auth-card login-card"'),
+                        login_html.index('class="login-story"'))
+
     def test_registering_creates_a_hashed_account_and_logs_in(self):
         response = self.client.post(reverse('accounts:register'), REGISTER)
         self.assertRedirects(response, reverse('tracker:goals'))
@@ -27,6 +46,25 @@ class RegistrationTests(TestCase):
         self.assertNotIn('Another-Strong-Pass-77', user.password)
         self.assertTrue(user.check_password('Another-Strong-Pass-77'))
         self.assertIn('_auth_user_id', self.client.session)
+
+    def test_optional_profile_details_are_saved(self):
+        data = dict(REGISTER, age='28', height_cm='175.5', weight_kg='72.4')
+        response = self.client.post(reverse('accounts:register'), data)
+        self.assertRedirects(response, reverse('tracker:goals'))
+        user = User.objects.get(username='NewPerson')
+        profile = user.fit_profile
+        self.assertEqual(profile.age, 28)
+        self.assertEqual(profile.height_cm, Decimal('175.5'))
+        self.assertEqual(profile.starting_weight_kg, Decimal('72.4'))
+        self.assertEqual(user.body_metrics.get().weight_kg, Decimal('72.4'))
+
+    def test_optional_profile_details_may_be_left_blank(self):
+        response = self.client.post(reverse('accounts:register'), dict(REGISTER, age='', height_cm='', weight_kg=''))
+        self.assertRedirects(response, reverse('tracker:goals'))
+        profile = User.objects.get(username='NewPerson').fit_profile
+        self.assertIsNone(profile.age)
+        self.assertIsNone(profile.height_cm)
+        self.assertIsNone(profile.starting_weight_kg)
 
     def test_the_hidden_bot_trap_blocks_sign_ups(self):
         response = self.client.post(reverse('accounts:register'), dict(REGISTER, website='http://spam.example'))

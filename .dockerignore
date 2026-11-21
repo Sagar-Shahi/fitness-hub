@@ -2,6 +2,8 @@
 .env
 *.sqlite3
 staticfiles
+node_modules
+static/bundles
 __pycache__
 *.pyc
 docs

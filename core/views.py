@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def home(request):
     if request.user.is_authenticated:
         return redirect('tracker:dashboard')
-    return render(request, 'home.html')
+    return redirect('about')
 
 
 @require_safe

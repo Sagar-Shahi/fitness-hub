@@ -84,7 +84,7 @@ class SecurityHeaderTests(TestCase):
         self.assertIn("object-src 'none'", csp)
 
     def test_focus_player_is_only_rendered_for_signed_in_users(self):
-        self.assertNotContains(self.client.get('/'), 'Focus audio')
+        self.assertNotContains(self.client.get('/', follow=True), 'Focus audio')
         user = get_user_model().objects.create_user(username='focus-user', password='Safe-password-123')
         self.client.force_login(user)
         self.assertContains(self.client.get(reverse('tracker:dashboard')), 'Focus audio')
@@ -259,12 +259,25 @@ class RepositoryHygieneTests(TestCase):
 
 class PublicChromeTests(TestCase):
     def test_anonymous_header_links_and_deferred_video(self):
-        html = self.client.get('/').content.decode()
-        self.assertIn('nav-public', html)
-        self.assertIn('Gear guide', html)
+        response = self.client.get('/')
+        self.assertRedirects(response, '/about/', fetch_redirect_response=False)
+        html = self.client.get('/about/').content.decode()
+        self.assertNotIn('class="topbar"', html)
+        self.assertIn('Start training free', html)
+        self.assertIn('Log in', html)
+
+    def test_anonymous_account_header_does_not_link_the_brand(self):
+        html = self.client.get('/accounts/login/').content.decode()
+        self.assertIn('class="brand"', html)
+        self.assertNotIn('<a class="brand"', html)
+        self.assertIn('auth-header-note', html)
+        self.assertNotIn('nav-public', html)
         # The video file is never in a src attribute, so scripts decide whether it loads.
         self.assertNotIn('<source', html)
         self.assertIn('data-src="https://videos.pexels.com/', html)
+        self.assertIn('data-additional-srcs="https://videos.pexels.com/', html)
+        self.assertIn('4686178-hd_1080_1920_30fps.mp4', html)
+        self.assertIn('15079561_1080_1920_30fps.mp4', html)
         self.assertIn('id="video-toggle"', html)
 
     def test_decorative_arrows_hidden_from_screen_readers(self):

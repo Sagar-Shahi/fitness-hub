@@ -1,18 +1,53 @@
 {% extends 'base.html' %}
 {% block title %}Sign up · FitHub{% endblock %}
 {% block content %}
-<section class="auth-card card">
-  <h1>Create your account</h1>
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
-    {% include 'partials/field.html' with field=form.username %}
-    {% include 'partials/field.html' with field=form.email %}
-    {% include 'partials/field.html' with field=form.password1 %}
-    {% include 'partials/field.html' with field=form.password2 %}
-    <div class="trap" aria-hidden="true">{% include 'partials/field.html' with field=form.website hide_required=True %}</div>
-    <button class="btn btn-primary btn-block" type="submit">Create account</button>
-  </form>
-  <p class="muted auth-alt">Already registered? <a href="{% url 'accounts:login' %}">Log in</a></p>
+<section class="auth-shell register-shell" aria-labelledby="register-title">
+  <div class="auth-card register-card">
+    <div class="register-card-heading">
+      <p class="auth-kicker">NEW ACCOUNT</p>
+      <h1 id="register-title">Create your account</h1>
+      <p>Set up your FitHub profile in less than a minute.</p>
+    </div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+      <fieldset class="register-account-fields">
+        <legend>Account details</legend>
+        {% include 'partials/field.html' with field=form.username %}
+        {% include 'partials/field.html' with field=form.email %}
+        {% include 'partials/field.html' with field=form.password1 %}
+        {% include 'partials/field.html' with field=form.password2 %}
+      </fieldset>
+      <fieldset class="register-details">
+        <legend>About you <span>Optional</span></legend>
+        <div class="register-details-grid">
+          {% include 'partials/field.html' with field=form.age hide_required=True %}
+          {% include 'partials/field.html' with field=form.height_cm hide_required=True %}
+          {% include 'partials/field.html' with field=form.weight_kg hide_required=True %}
+        </div>
+      </fieldset>
+      <div class="trap" aria-hidden="true">{% include 'partials/field.html' with field=form.website hide_required=True %}</div>
+      <button class="btn btn-primary btn-block" type="submit">Create account <span aria-hidden="true">↗</span></button>
+    </form>
+    <p class="muted auth-alt">Already registered? <a href="{% url 'accounts:login' %}">Log in</a></p>
+  </div>
+
+  <div class="register-story">
+    <p class="auth-kicker"><span></span> START YOUR TRAINING JOURNEY</p>
+    <h2>One place for<br><em>every personal best.</em></h2>
+    <p class="register-story-copy">Create an account to track workouts, nutrition and progress with a clear view of the work you put in.</p>
+    {% include 'partials/auth-fitness-art.html' %}
+    <div class="register-benefits" aria-label="Account benefits">
+      <div><span class="register-benefit-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 18V6M4 18h16M7 15l3-4 3 2 5-7"/></svg>
+      </span><span><strong>Track your progress</strong><small>Turn completed sessions into measurable results.</small></span></div>
+      <div><span class="register-benefit-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11"/></svg>
+      </span><span><strong>Own every session</strong><small>Log sets, reps and weights in one training log.</small></span></div>
+      <div><span class="register-benefit-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>
+      </span><span><strong>Build lasting habits</strong><small>Keep training and nutrition in the same routine.</small></span></div>
+    </div>
+  </div>
 </section>
 {% endblock %}
