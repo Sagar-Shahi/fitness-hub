@@ -361,6 +361,7 @@ class GoogleSignInTests(TestCase):
 
     def test_button_shown_only_when_configured(self):
         self.assertContains(self.client.get(reverse('accounts:login')), 'Continue with Google')
+        self.assertContains(self.client.get(reverse('accounts:register')), 'Sign up with Google')
         with override_settings(GOOGLE_AUTH_ENABLED=False):
             self.assertNotContains(self.client.get(reverse('accounts:login')), 'Continue with Google')
             self.assertEqual(self.client.get(reverse('accounts:google-login')).status_code, 404)
