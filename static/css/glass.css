@@ -923,7 +923,7 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
   min-height:520px;
 }
 .about-hero-copy { position:relative; z-index:2; }
-.about-hero h1 { max-width:760px; font-size:clamp(3.1rem,6.5vw,6.1rem); line-height:.91; letter-spacing:-.075em; }
+.about-hero h1 { max-width:760px; font-size:clamp(3.1rem,6.5vw,6.1rem); line-height:.95; letter-spacing:-.035em; word-spacing:.12em; }
 .about-hero .about-lead { max-width:580px; }
 .about-session-preview {
   width:100%;
