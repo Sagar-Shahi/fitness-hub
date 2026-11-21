@@ -1463,3 +1463,9 @@ a:not(.btn):focus-visible { border-radius: 5px; }
   justify-content: center;
   gap: 0.6rem;
 }
+
+/* Fix: the generic "body > :not(.ambient-workout-video) { z-index: 2 }" rule is more specific than
+   .topbar, so the header dropped to z-index 2 and page buttons painted over the account menu. */
+body > .topbar { position: relative; z-index: 1000; }
+.account-menu[open] { z-index: 1100; }
+.account-menu[open] > .menu { position: absolute; z-index: 1100; }
