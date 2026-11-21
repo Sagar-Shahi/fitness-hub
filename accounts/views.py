@@ -1,9 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import logout, login
+import secrets
+
+from django.contrib.auth import get_user_model, logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetView
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
@@ -11,7 +14,9 @@ from django.views.decorators.http import require_POST
 from core import throttle
 
 from .forms import ApiKeyForm, CaseInsensitiveAuthenticationForm, RegisterForm
-from .models import ApiKey
+from . import google_auth
+from .models import ApiKey, GoogleIdentity
+from tracker.models import BodyMetric, Profile
 
 
 class ThrottledLoginView(LoginView):
@@ -63,6 +68,70 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
+
+
+def google_login(request):
+    if not settings.GOOGLE_AUTH_ENABLED:
+        raise Http404()
+    if request.user.is_authenticated:
+        return redirect('tracker:dashboard')
+    state, nonce = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
+    request.session['google_state'] = state
+    request.session['google_nonce'] = nonce
+    next_url = request.GET.get('next', '')
+    if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        request.session['google_next'] = next_url
+    return redirect(google_auth.authorization_url(request, state, nonce))
+
+
+def google_callback(request):
+    if not settings.GOOGLE_AUTH_ENABLED:
+        raise Http404()
+    state = request.session.pop('google_state', '')
+    nonce = request.session.pop('google_nonce', '')
+    next_url = request.session.pop('google_next', '')
+
+    def fail(message):
+        messages.error(request, message)
+        return redirect('accounts:login')
+
+    key = throttle.make_key('google-callback', throttle.client_ip(request))
+    if throttle.exceeded(key, 30, 3600):
+        return fail('Too many sign-in attempts. Please try again later.')
+    code = request.GET.get('code', '')
+    given_state = request.GET.get('state', '')
+    if request.GET.get('error') or not code or not state or not secrets.compare_digest(state, given_state):
+        return fail('Google sign-in was cancelled or could not be verified. Please try again.')
+    try:
+        tokens = google_auth.exchange_code(request, code)
+        claims = google_auth.read_id_token(tokens.get('id_token', ''), nonce)
+    except google_auth.GoogleAuthError as exc:
+        return fail(str(exc))
+
+    User = get_user_model()
+    identity = GoogleIdentity.objects.select_related('user').filter(subject=claims['sub']).first()
+    created = False
+    if identity:
+        user = identity.user
+        if not user.is_active:
+            return fail('This account is disabled.')
+    else:
+        email = claims['email'].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            return fail('An account with that email already exists. Log in with your password instead.')
+        user = User(username=google_auth.unique_username(email, claims.get('name', '')), email=email)
+        user.set_unusable_password()
+        user.save()
+        GoogleIdentity.objects.create(user=user, subject=claims['sub'])
+        Profile.objects.get_or_create(owner=user)
+        created = True
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    if created:
+        messages.success(request, 'Welcome to FitHub. Set your goals to personalise your dashboard.')
+        return redirect('tracker:goals')
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        return redirect(next_url)
+    return redirect('tracker:dashboard')
 
 
 class ThrottledPasswordResetView(PasswordResetView):
