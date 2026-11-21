@@ -6,7 +6,7 @@ COPY vite.config.js ./
 COPY frontend ./frontend
 RUN npm run build
 
-FROM python:3.13-slim
+FROM python:3.15-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 RUN useradd --create-home --uid 10001 app
 WORKDIR /app
