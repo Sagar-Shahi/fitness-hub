@@ -444,11 +444,11 @@ class GoogleSignInTests(TestCase):
 class PasswordHelpTextTests(TestCase):
     def test_password_rules_list_is_hidden_but_rules_still_enforced(self):
         page = self.client.get(reverse('accounts:register'))
-        self.assertNotContains(page, 'at least 10 characters')
+        self.assertNotContains(page, 'at least 8 characters')
         response = self.client.post(reverse('accounts:register'), {
             'username': 'ShortPw', 'email': 'short@example.com',
             'password1': 'short1', 'password2': 'short1', 'website': '',
         })
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'at least 10 characters')
+        self.assertContains(response, 'at least 8 characters')
         self.assertFalse(User.objects.filter(username='ShortPw').exists())

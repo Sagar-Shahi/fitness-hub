@@ -86,7 +86,7 @@ Both of your checklists were applied. "N/A" means the feature does not exist her
 | Lock record access, access control | Done | Every query is scoped to the owner; another user's workout, meal, weight, cart or order returns 404. Plan content is gated by purchase. Tested for each page and API route. |
 | Block field tampering | Done | Explicit form and serializer field lists; the owner, ids, totals, prices and timestamps cannot be set by a client. The checkout total is recomputed on the server from database prices (tested with a forged price). |
 | Secure session cookies | Done | `Secure`, `HttpOnly`, `SameSite` in production (verified under gunicorn). |
-| Hash passwords | Done | Argon2, with Django's password validators (minimum 10 characters, common and numeric passwords rejected). |
+| Hash passwords | Done | Argon2, with Django's password validators (minimum 8 characters, common and numeric passwords rejected). |
 | Rate limit login, bot protection | Done | Login lockout per IP+username, admin lockout, registration limits plus a honeypot field, checkout limit, API throttles. |
 | Parameterize queries | Done | Django ORM only; no raw SQL. |
 | Validate / sanitize all input | Done | Range checks on every number, date-not-in-future, length limits, per-user quotas (workouts, exercises, meals per day). Bad values give clear errors and never a server error. |
