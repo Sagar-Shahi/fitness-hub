@@ -439,3 +439,16 @@ class GoogleSignInTests(TestCase):
         self.assertRedirects(response, reverse('accounts:login'), fetch_redirect_response=False)
         self.assertNotIn('_auth_user_id', self.client.session)
         self.assertEqual(User.objects.filter(email__iexact='g.user@example.com').count(), 1)
+
+
+class PasswordHelpTextTests(TestCase):
+    def test_password_rules_list_is_hidden_but_rules_still_enforced(self):
+        page = self.client.get(reverse('accounts:register'))
+        self.assertNotContains(page, 'at least 10 characters')
+        response = self.client.post(reverse('accounts:register'), {
+            'username': 'ShortPw', 'email': 'short@example.com',
+            'password1': 'short1', 'password2': 'short1', 'website': '',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'at least 10 characters')
+        self.assertFalse(User.objects.filter(username='ShortPw').exists())
