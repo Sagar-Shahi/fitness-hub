@@ -30,6 +30,7 @@ Security and privacy are design constraints here, not an afterthought.
 - **Personalized nutrition**: adult-only Mifflin-St Jeor estimates with transparent macro calculations; optional body-composition details and no somatotype-based calorie assumptions.
 - **Gear Guide**: curated retailer links with affiliate disclosure; FitHub does not process purchases or payments.
 - **Dashboard**: weekly workout goal, calories left today, workout streak, 7/30/90-day charts. Charts are drawn as SVG on the server, so there is no chart library and no inline script.
+- **Motion and UI**: the About page uses Lenis for smooth scrolling, GSAP for motion, and a React Bits-style `BlurText` component. Dependencies are bundled locally; reduced-motion preferences are respected.
 - **Plan shop**: training and diet plans, cart, orders, and a "My plans" page. The full plan text is only sent to people who bought it.
 - **REST API** with revocable API keys: workouts with nested exercises and optional `set_details` arrays, meals, weight and a summary.
 - Light and dark theme, responsive layout, system fonts only.
@@ -41,6 +42,7 @@ Security and privacy are design constraints here, not an afterthought.
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+npm ci && npm run build
 cp .env.example .env            # sets DJANGO_DEBUG=True for local development only
 python manage.py migrate
 python manage.py seed_demo      # optional: demo user + 8 weeks of data + sample plans (DEBUG only)
@@ -105,7 +107,7 @@ See [SECURITY.md](SECURITY.md) to report a problem.
 ## Deploying
 1. Set environment variables (see `.env.example`): `DJANGO_SECRET_KEY` (long random value), `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS=https://your.domain`, and `DJANGO_TRUSTED_PROXY_COUNT=1` when behind one reverse proxy. Optionally `DATABASE_URL` (Postgres recommended), `ADMIN_URL`, `DJANGO_TIME_ZONE`.
 2. Raise `DJANGO_HSTS_SECONDS` (for example `31536000`) once HTTPS works everywhere.
-3. `python manage.py migrate && python manage.py collectstatic --noinput`, then `gunicorn fithub.wsgi`.
+3. `npm ci && npm run build`, then `python manage.py migrate && python manage.py collectstatic --noinput`, then `gunicorn fithub.wsgi`.
 4. Check with `python manage.py check --deploy`.
 
 A `Dockerfile` (non-root user) is included. I could not pull the `python:3.13-slim` base image where this was written (registry access was blocked), so the image itself is unbuilt. I did run its exact steps by hand as an unprivileged user on Python 3.13 (install requirements, `collectstatic`, `migrate`, 3 gunicorn workers) and the app served pages, static files and `/healthz/` correctly. Run `docker build -t fithub .` once to confirm. Rate limits use Django's cache; with several server processes use a shared cache such as Redis for exact limits.
