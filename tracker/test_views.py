@@ -431,6 +431,13 @@ class MealTests(Base):
         self.assertEqual(response.context['totals']['calories'], 850)
         self.assertContains(response, 'Dal and rice')
 
+    def test_meal_page_offers_private_food_lookup_and_manual_entry(self):
+        response = self.client.get(reverse('tracker:meals'))
+        self.assertContains(response, 'id="food-search"')
+        self.assertContains(response, 'data/food-catalog.json')
+        self.assertContains(response, 'Searches stay in your browser.')
+        self.assertContains(response, 'name="calories"')
+
     def test_bad_input(self):
         for changes in ({'calories': -1}, {'calories': 5001}, {'calories': ''}, {'kind': 'brunch'}, {'protein_g': 501}, {'name': ''},
                         {'date': (days_ago(0) + timedelta(days=1)).isoformat()}):

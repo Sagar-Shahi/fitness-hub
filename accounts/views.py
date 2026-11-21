@@ -62,6 +62,17 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            Profile.objects.update_or_create(
+                owner=user,
+                defaults={
+                    'age': form.cleaned_data.get('age'),
+                    'height_cm': form.cleaned_data.get('height_cm'),
+                    'starting_weight_kg': form.cleaned_data.get('weight_kg'),
+                },
+            )
+            weight = form.cleaned_data.get('weight_kg')
+            if weight is not None:
+                BodyMetric.objects.create(owner=user, weight_kg=weight)
             login(request, user)
             messages.success(request, 'Welcome to FitHub. Set your goals to personalise your dashboard.')
             return redirect('tracker:goals')

@@ -20,6 +20,8 @@ media/
 *.log
 
 # Tools and editors
+node_modules/
+/static/bundles/
 .coverage
 htmlcov/
 .pytest_cache/
