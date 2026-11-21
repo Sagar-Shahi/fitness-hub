@@ -1,67 +1,78 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}About FitHub · Train with purpose{% endblock %}
 {% block description %}Learn about FitHub, a practical fitness platform for tracking workouts, nutrition and progress in one place.{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/about-motion.css' %}">{% endblock %}
+{% block extra_scripts %}<script type="module" src="{% static 'bundles/about.js' %}"></script>{% endblock %}
 {% block content %}
 <div class="about-page">
   <section class="about-hero">
-    <p class="about-kicker">ABOUT FITHUB / BUILT FOR THE WORK</p>
-    <h1>Progress isn't a guess.<br><em>It's built, rep by rep.</em></h1>
-    <p class="about-lead">FitHub brings your training, nutrition and progress together, so you can spend less time trying to remember what you did and more time moving forward.</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Start training free <span aria-hidden="true">↗</span></a>
-      <a class="btn btn-quiet" href="{% url 'home' %}">Back to home</a>
+    <div class="about-hero-copy">
+      <p class="about-kicker">ABOUT FITHUB / BUILT FOR THE WORK</p>
+      <h1>Progress isn't a guess.<br><em><span id="about-react-title" data-text="It's built, rep by rep.">It's built, rep by rep.</span></em></h1>
+      <p class="about-lead">FitHub brings your training, nutrition and progress together, so you can spend less time trying to remember what you did and more time moving forward.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{% url 'accounts:register' %}">Start training free <span aria-hidden="true">↗</span></a>
+        <a class="btn btn-quiet" href="{% url 'accounts:login' %}">Log in</a>
+      </div>
+    </div>
+    <div class="about-session-preview" aria-label="FitHub training session preview">
+      <div class="about-session-top"><span>SAMPLE SESSION / 01</span><span><i></i> STRENGTH</span></div>
+      <div class="about-session-card">
+        <div class="about-session-head"><div><small>TODAY'S WORK</small><strong>Upper body</strong></div><span>4 / 12</span></div>
+        <div class="about-session-row"><span>01</span><strong>Bench press</strong><b>60 kg</b></div>
+        <div class="about-session-row"><span>02</span><strong>Incline press</strong><b>20 kg</b></div>
+        <div class="about-session-row"><span>03</span><strong>Seated row</strong><b>45 kg</b></div>
+        <div class="about-session-progress"><span></span></div>
+      </div>
+      <div class="about-session-footer"><span>TRAIN</span><span>TRACK</span><span>PROGRESS</span></div>
     </div>
   </section>
 
-  <section class="about-section">
-    <div><p class="about-kicker">THE IDEA</p><h2>A clearer way to stay consistent.</h2></div>
-    <div class="about-section-copy">
-      <p>Every training session tells a story: the exercises you chose, the weight you lifted, the reps you completed and the effort you put in. FitHub gives those details a home.</p>
-      <p>It is designed for everyday gym-goers who want a straightforward place to record their work, understand their habits and see progress over time. No complicated setup is needed to get started.</p>
+  <section class="about-flow" aria-labelledby="about-flow-heading">
+    <div class="about-flow-heading">
+      <div><p class="about-kicker">HOW FITHUB WORKS</p><h2 id="about-flow-heading">One simple loop. A clearer picture.</h2></div>
+      <p>FitHub brings the details of your routine together, so your progress is easier to understand over time.</p>
     </div>
-  </section>
-
-  <section>
-    <p class="about-kicker">WHAT YOU CAN DO</p>
-    <div class="about-values">
-      <article class="about-value"><span class="about-value-index">01 / TRAIN</span><h3>Record every set.</h3><p>Save exercises, reps, weight, warm-up sets and completion so your workout history stays useful.</p></article>
-      <article class="about-value"><span class="about-value-index">02 / FUEL</span><h3>Keep an eye on nutrition.</h3><p>Log meals and follow calories and macros alongside your training routine.</p></article>
-      <article class="about-value"><span class="about-value-index">03 / GROW</span><h3>Make progress visible.</h3><p>Use your workout history, weight entries, charts and goals to understand how things change.</p></article>
-    </div>
+    <ol class="about-flow-steps">
+      <li>
+        <div class="about-flow-step-top"><span>STEP 01 / TRAIN</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h6m6 8h6M9 12h6"/></svg></div>
+        <h3>Record the session.</h3>
+        <p>Log exercises, reps, weight and completed sets while you train.</p>
+      </li>
+      <li>
+        <div class="about-flow-step-top"><span>STEP 02 / TRACK</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16v15H4zM8 3v4m8-4v4M4 10h16m-11 4h2m3 0h2m-7 3h2"/></svg></div>
+        <h3>Add the daily context.</h3>
+        <p>Keep meals, calories, macros and weigh-ins alongside your sessions.</p>
+      </li>
+      <li>
+        <div class="about-flow-step-top"><span>STEP 03 / REFLECT</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V5m0 14h17M8 15l4-4 3 2 5-6"/></svg></div>
+        <h3>Review your progress.</h3>
+        <p>Use your workout history, charts and goals to see how your routine is changing.</p>
+      </li>
+    </ol>
   </section>
 
   <section class="about-section">
     <div><p class="about-kicker">OUR APPROACH</p><h2>Useful first. Yours always.</h2></div>
     <div class="about-section-copy">
-      <p>Fitness is personal, and your records should be too. FitHub is built around practical tracking, clear information and giving you control of your own data.</p>
-      <p>FitHub is a training and wellness tracking tool, not a medical service. Use it to support your routine, and speak with a qualified professional for medical or nutrition advice.</p>
+      <p>Fitness is personal; your tracking should be, too. FitHub focuses on practical records, clear information and keeping your data under your control.</p>
     </div>
   </section>
 
   <section class="about-section" id="gear-guide">
-    <div><p class="about-kicker">GEAR GUIDE / USE IT WISELY</p><h2>Choose equipment with care.</h2></div>
+    <div><p class="about-kicker">ALSO IN FITHUB</p><h2>Explore gear for your training.</h2></div>
     <div class="about-section-copy">
-      <p>FitHub's Gear Guide is an informational starting point to help you explore fitness equipment. It is not an endorsement, certification, or guarantee that a product is suitable for every person, workout, or gym.</p>
-      <div class="about-values">
-        <article class="about-value">
-          <span class="about-value-index">RESTRICTIONS</span>
-          <h3>Know what the guide can’t do.</h3>
-          <p>Product details, prices, stock and merchant policies can change. Check the seller’s current listing, sizing, compatibility, return terms and warranty before buying. FitHub does not manufacture, sell, inspect or certify the listed equipment.</p>
-        </article>
-        <article class="about-value">
-          <span class="about-value-index">SAFETY WARNING</span>
-          <h3>Your safety comes first.</h3>
-          <p>Read the manufacturer’s instructions, check equipment for damage before use, use it only as intended and choose a load you can control. Stop if you feel pain or equipment seems unsafe. Ask a qualified trainer or professional for guidance when unsure.</p>
-        </article>
-      </div>
-      <p>FitHub’s Gear Guide is for general information only. It is not medical, injury-prevention or professional equipment-safety advice.</p>
-      <p><a class="btn btn-primary" href="{% url 'shop:store' %}">Open the Gear Guide <span aria-hidden="true">↗</span></a></p>
+      <p>Browse training essentials from independent retailers. FitHub is a guide, not the seller; check current product details and make purchases directly with the retailer.</p>
+      <p><a class="btn btn-primary" href="{% url 'shop:store' %}">Browse the Gear Guide <span aria-hidden="true">↗</span></a></p>
     </div>
   </section>
 
   <section class="about-cta">
     <div><h2>Ready to put your work on record?</h2><p>Start with one workout. Build from there.</p></div>
-    <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create your free account ↗</a>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{% url 'accounts:register' %}">Create your free account <span aria-hidden="true">↗</span></a>
+    </div>
   </section>
 
   <section class="about-section" id="contact">

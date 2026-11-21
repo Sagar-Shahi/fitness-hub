@@ -30,6 +30,52 @@
     if (button) { event.preventDefault(); copyText(button.getAttribute('data-copy'), button); }
   });
 
+
+  // Pick one workout backdrop per page view. Skip it for reduced motion and data saver,
+  // and for signed-in users on small screens, so a workout page never spends mobile data on it.
+  (function () {
+    var video = document.querySelector('.ambient-workout-video[data-src]');
+    var toggle = document.getElementById('video-toggle');
+    if (!video) return;
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var saver = (navigator.connection && navigator.connection.saveData) ||
+      (window.matchMedia && window.matchMedia('(prefers-reduced-data: reduce)').matches);
+    var narrow = window.matchMedia && window.matchMedia('(max-width: 899px)').matches;
+    if (reduced || saver || (video.getAttribute('data-scope') === 'wide' && narrow)) { video.remove(); return; }
+    var sources = [video.getAttribute('data-src')].concat(
+      (video.getAttribute('data-additional-srcs') || '').split('|').filter(Boolean)
+    );
+    video.src = sources[Math.floor(Math.random() * sources.length)];
+    var started = video.play();
+    if (started && started.catch) started.catch(function () { /* autoplay blocked: leave the poster-less backdrop */ });
+    if (!toggle) return;
+    toggle.hidden = false;
+    toggle.addEventListener('click', function () {
+      var pausing = !video.paused;
+      if (pausing) { video.pause(); } else { video.play(); }
+      toggle.setAttribute('aria-pressed', pausing ? 'true' : 'false');
+      toggle.textContent = pausing ? 'Play background video' : 'Pause background video';
+    });
+  })();
+
+  // Show/hide toggle on password fields.
+  document.querySelectorAll('input[type="password"]').forEach(function (input) {
+    if (!input.id) return;
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn btn-quiet btn-small password-toggle';
+    button.textContent = 'Show password';
+    button.setAttribute('aria-controls', input.id);
+    button.setAttribute('aria-pressed', 'false');
+    button.addEventListener('click', function () {
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      button.textContent = show ? 'Hide password' : 'Show password';
+      button.setAttribute('aria-pressed', show ? 'true' : 'false');
+    });
+    input.insertAdjacentElement('afterend', button);
+  });
+
   document.addEventListener('submit', function (event) {
     var message = event.target.getAttribute && event.target.getAttribute('data-confirm');
     if (message && !window.confirm(message)) event.preventDefault();
@@ -596,11 +642,12 @@
     fat: Math.max(0, Number(form.getAttribute('data-current-fat')) || 0)
   };
   var target = Math.max(0, Number(form.getAttribute('data-calorie-target')) || 0);
+  var previewIds = {calories: 'kcal', protein: 'protein', carbs: 'carbs', fat: 'fat'};
   function value(field) { return Math.max(0, Number(field && field.value) || 0); }
   function update() {
     Object.keys(fields).forEach(function (key) {
       var amount = value(fields[key]);
-      var node = document.getElementById('meal-preview-' + key);
+      var node = document.getElementById('meal-preview-' + previewIds[key]);
       if (node) node.textContent = amount;
     });
     var after = current.calories + value(fields.calories);
@@ -619,6 +666,128 @@
       form.querySelectorAll('[data-meal-kind]').forEach(function (item) { item.setAttribute('aria-pressed', item === button ? 'true' : 'false'); });
     });
   });
+
+  var foodSearch = document.getElementById('food-search');
+  var foodSearchStatus = document.getElementById('food-search-status');
+  var foodSearchResults = document.getElementById('food-search-results');
+  var foodPortionWrap = document.getElementById('food-portion-wrap');
+  var foodPortion = document.getElementById('food-portion');
+  var foodPortionHelp = document.getElementById('food-portion-help');
+  var foodName = form.querySelector('[name="name"]');
+  if (foodSearch && foodSearchStatus && foodSearchResults && foodPortionWrap && foodPortion && foodName) {
+    var foodCatalog = [];
+    var foodCatalogReady = false;
+    var selectedFood = null;
+
+    function clearFoodResults() {
+      while (foodSearchResults.firstChild) foodSearchResults.removeChild(foodSearchResults.firstChild);
+    }
+
+    function applyFoodPortion() {
+      if (!selectedFood) return;
+      var grams = Number(foodPortion.value);
+      if (!Number.isFinite(grams) || grams < 1 || grams > 5000) {
+        foodSearchStatus.textContent = 'Enter a portion between 1 and 5000 g.';
+        return;
+      }
+      var amounts = {
+        calories: Math.round(selectedFood.calories_kcal * grams / 100),
+        protein: Math.round(selectedFood.protein_g * grams / 100),
+        carbs: Math.round(selectedFood.carbs_g * grams / 100),
+        fat: Math.round(selectedFood.fat_g * grams / 100)
+      };
+      var limits = {calories: 5000, protein: 500, carbs: 1000, fat: 500};
+      if (Object.keys(amounts).some(function (key) { return amounts[key] > limits[key]; })) {
+        foodSearchStatus.textContent = 'That portion is too large for one meal entry. Reduce the portion size.';
+        return;
+      }
+      Object.keys(amounts).forEach(function (key) {
+        fields[key].value = amounts[key];
+        fields[key].dispatchEvent(new Event('input', {bubbles:true}));
+      });
+      foodSearchStatus.textContent = 'Estimated values filled for ' + grams + ' g of ' + selectedFood.name + '. You can edit any value.';
+    }
+
+    function selectFood(food) {
+      selectedFood = food;
+      foodName.value = food.name;
+      foodPortion.value = food.serving_g;
+      foodPortionHelp.textContent = 'Suggested portion: ' + food.serving_label + '. Adjust the grams to match what you ate.';
+      foodPortionWrap.hidden = false;
+      applyFoodPortion();
+      clearFoodResults();
+      foodSearchResults.hidden = true;
+    }
+
+    function renderFoodResults(query) {
+      clearFoodResults();
+      foodSearchResults.hidden = true;
+      var normalized = query.trim().toLowerCase();
+      if (normalized.length < 2) {
+        foodSearchStatus.textContent = 'Type at least 2 letters to search common foods.';
+        return;
+      }
+      if (!foodCatalogReady) {
+        foodSearchStatus.textContent = 'Loading the local food list...';
+        return;
+      }
+      var matches = foodCatalog.filter(function (food) {
+        return [food.name].concat(food.aliases || []).join(' ').toLowerCase().indexOf(normalized) !== -1;
+      });
+      if (!matches.length) {
+        foodSearchStatus.textContent = 'No match in the starter list. Enter nutrition from the package label or estimate.';
+        return;
+      }
+      matches.slice(0, 8).forEach(function (food) {
+        var item = document.createElement('li');
+        var button = document.createElement('button');
+        var title = document.createElement('strong');
+        var details = document.createElement('span');
+        button.type = 'button';
+        button.className = 'food-search-result';
+        title.textContent = food.name;
+        details.textContent = Math.round(food.calories_kcal) + ' kcal · P ' + food.protein_g + ' g · C ' + food.carbs_g + ' g · F ' + food.fat_g + ' g per 100 g';
+        button.appendChild(title);
+        button.appendChild(details);
+        button.addEventListener('click', function () { selectFood(food); });
+        item.appendChild(button);
+        foodSearchResults.appendChild(item);
+      });
+      foodSearchResults.hidden = false;
+      foodSearchStatus.textContent = matches.length > 8
+        ? 'Showing 8 of ' + matches.length + ' matches. Choose a food to fill the form.'
+        : matches.length + ' match' + (matches.length === 1 ? '' : 'es') + '. Choose a food to fill the form.';
+    }
+
+    foodSearch.addEventListener('input', function () {
+      selectedFood = null;
+      foodPortionWrap.hidden = true;
+      renderFoodResults(foodSearch.value);
+    });
+    foodPortion.addEventListener('input', applyFoodPortion);
+
+    fetch(form.getAttribute('data-food-catalog-url'), {headers: {Accept: 'application/json'}})
+      .then(function (response) {
+        if (!response.ok) throw new Error('Food catalog request failed.');
+        return response.json();
+      })
+      .then(function (payload) {
+        if (!payload || !Array.isArray(payload.foods)) throw new Error('Food catalog has an invalid format.');
+        foodCatalog = payload.foods.filter(function (food) {
+          return food && typeof food.name === 'string' &&
+            ['calories_kcal', 'protein_g', 'carbs_g', 'fat_g', 'serving_g'].every(function (key) {
+              return Number.isFinite(Number(food[key])) && Number(food[key]) >= 0;
+            });
+        });
+        if (!foodCatalog.length) throw new Error('Food catalog contains no usable entries.');
+        foodCatalogReady = true;
+        renderFoodResults(foodSearch.value);
+      })
+      .catch(function () {
+        foodSearchStatus.textContent = 'The local food list could not be loaded. You can still enter nutrition manually.';
+      });
+  }
+
   update();
 })();
 })();

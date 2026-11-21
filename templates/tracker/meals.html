@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Meals · FitHub{% endblock %}
 {% block content %}
 <div class="page-head">
@@ -38,10 +39,25 @@
 </section>
 
 <div class="two-col">
-  <form class="card form-card meal-entry-card" method="post" novalidate id="meal-entry-form" data-current-calories="{{ totals.calories }}" data-current-protein="{{ totals.protein }}" data-current-carbs="{{ totals.carbs }}" data-current-fat="{{ totals.fat }}" data-calorie-target="{{ target }}">
+  <form class="card form-card meal-entry-card" method="post" novalidate id="meal-entry-form" data-food-catalog-url="{% static 'data/food-catalog.json' %}" data-current-calories="{{ totals.calories }}" data-current-protein="{{ totals.protein }}" data-current-carbs="{{ totals.carbs }}" data-current-fat="{{ totals.fat }}" data-calorie-target="{{ target }}">
     <h2 class="card-title">Log a meal</h2>
-    <p class="muted meal-form-intro">Enter the nutrition from your food label or estimate. Your totals update as you type.</p>
+    <p class="muted meal-form-intro">Find a common food to fill in an estimate, or enter values from a label. Your totals update as you type.</p>
     <div class="meal-kind-shortcuts" aria-label="Choose meal type"><button type="button" data-meal-kind="breakfast">☀ Breakfast</button><button type="button" data-meal-kind="lunch">◷ Lunch</button><button type="button" data-meal-kind="dinner">☾ Dinner</button><button type="button" data-meal-kind="snack">＋ Snack</button></div>
+    <section class="meal-food-lookup" aria-labelledby="food-lookup-heading">
+      <h3 id="food-lookup-heading">Find a common food</h3>
+      <label for="food-search">Search foods</label>
+      <input id="food-search" type="search" autocomplete="off" placeholder="Try banana, rice, egg...">
+      <p class="food-search-help" id="food-search-help">Searches stay in your browser. Values are generic estimates per 100 g from <a href="https://fdc.nal.usda.gov/" target="_blank" rel="noopener noreferrer">USDA FoodData Central</a>; packaged foods can differ, so use the label when available.</p>
+      <p class="food-search-status" id="food-search-status" role="status" aria-live="polite">Loading the local food list...</p>
+      <ul class="food-search-results" id="food-search-results" aria-label="Food search results" hidden></ul>
+      <div class="food-portion-wrap" id="food-portion-wrap" hidden>
+        <div class="field">
+          <label for="food-portion">Portion size (g)</label>
+          <input id="food-portion" type="number" min="1" max="5000" step="1" value="100" inputmode="numeric">
+        </div>
+        <p class="food-portion-help" id="food-portion-help"></p>
+      </div>
+    </section>
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
     <div class="form-grid">
