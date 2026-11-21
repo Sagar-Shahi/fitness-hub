@@ -106,6 +106,8 @@ See [SECURITY.md](SECURITY.md) to report a problem.
 3. `python manage.py migrate && python manage.py collectstatic --noinput`, then `gunicorn fithub.wsgi`.
 4. Check with `python manage.py check --deploy`.
 
+**Google sign-in (optional).** Create an OAuth client (type *Web application*) in Google Cloud Console, add `https://YOUR-DOMAIN/accounts/google/callback/` as an authorised redirect URI, then set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. The "Continue with Google" button appears only when both are set. Google accounts are matched by Google's user id, and sign-in is refused if a password account already uses the same email.
+
 A `Dockerfile` (non-root user) is included. I could not pull the `python:3.13-slim` base image where this was written (registry access was blocked), so the image itself is unbuilt. I did run its exact steps by hand as an unprivileged user on Python 3.13 (install requirements, `collectstatic`, `migrate`, 3 gunicorn workers) and the app served pages, static files and `/healthz/` correctly. Run `docker build -t fithub .` once to confirm. Rate limits use Django's cache; with several server processes use a shared cache such as Redis for exact limits.
 
 ## Known limitations and next steps

@@ -101,6 +101,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'shop.context.cart',
+                'core.context.auth_options',
             ],
         },
     },
@@ -180,6 +181,15 @@ X_FRAME_OPTIONS = 'DENY'
 TRUSTED_PROXY_COUNT = env_int('DJANGO_TRUSTED_PROXY_COUNT', 0)
 if TRUSTED_PROXY_COUNT > 0:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# --- Google sign-in (optional) ---------------------------------------------------------------
+# Set both to show a "Continue with Google" button. Create OAuth keys in Google Cloud Console and add
+# https://YOUR-DOMAIN/accounts/google/callback/ as an authorised redirect URI.
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '').strip()
+GOOGLE_AUTH_ENABLED = bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
+# Optional exact callback URL, only needed if the app cannot work out its own public address.
+GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', '').strip()
 
 # --- Rate limits and quotas ------------------------------------------------------------------
 LOGIN_MAX_FAILURES = env_int('LOGIN_MAX_FAILURES', 5)
