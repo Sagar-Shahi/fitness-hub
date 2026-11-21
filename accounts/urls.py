@@ -26,6 +26,8 @@ urlpatterns = [
     path('password-reset/complete/', PasswordResetCompleteView.as_view(
         template_name='accounts/password_reset_complete.html',
     ), name='password-reset-complete'),
+    path('google/login/', views.google_login, name='google-login'),
+    path('google/callback/', views.google_callback, name='google-callback'),
     path('delete/', views.delete_account, name='delete'),
     path('api-keys/', views.api_keys, name='api-keys'),
     path('api-keys/new/', views.api_key_create, name='api-key-create'),

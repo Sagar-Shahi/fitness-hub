@@ -362,3 +362,79 @@ class DeleteAccountTests(TestCase):
         self.client.force_login(self.user)
         self.assertEqual(self.client.get(reverse('accounts:delete')).status_code, 200)
         self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+
+GOOGLE_SETTINGS = dict(GOOGLE_AUTH_ENABLED=True, GOOGLE_CLIENT_ID='client-id', GOOGLE_CLIENT_SECRET='secret')
+
+
+def _id_token(**overrides):
+    import base64
+    import json
+    import time
+    claims = {'iss': 'https://accounts.google.com', 'aud': 'client-id', 'exp': time.time() + 600,
+              'sub': 'g-123', 'email': 'g.user@example.com', 'email_verified': True, 'nonce': 'N'}
+    claims.update(overrides)
+    body = base64.urlsafe_b64encode(json.dumps(claims).encode()).decode().rstrip('=')
+    return f'h.{body}.s'
+
+
+@override_settings(**GOOGLE_SETTINGS)
+class GoogleSignInTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def _start(self):
+        response = self.client.get(reverse('accounts:google-login'))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response['Location'].startswith('https://accounts.google.com/'))
+        session = self.client.session
+        session['google_nonce'] = 'N'
+        session.save()
+        return session['google_state']
+
+    def _callback(self, state, **token_overrides):
+        from unittest import mock
+        with mock.patch('accounts.google_auth.exchange_code', return_value={'id_token': _id_token(**token_overrides)}):
+            return self.client.get(reverse('accounts:google-callback'), {'code': 'c', 'state': state})
+
+    def test_button_shown_only_when_configured(self):
+        self.assertContains(self.client.get(reverse('accounts:login')), 'Continue with Google')
+        with override_settings(GOOGLE_AUTH_ENABLED=False):
+            self.assertNotContains(self.client.get(reverse('accounts:login')), 'Continue with Google')
+            self.assertEqual(self.client.get(reverse('accounts:google-login')).status_code, 404)
+
+    def test_new_google_user_is_created_and_logged_in(self):
+        response = self._callback(self._start())
+        self.assertRedirects(response, reverse('tracker:goals'), fetch_redirect_response=False)
+        user = User.objects.get(email='g.user@example.com')
+        self.assertFalse(user.has_usable_password())
+        self.assertEqual(user.google_identity.subject, 'g-123')
+        self.assertEqual(int(self.client.session['_auth_user_id']), user.pk)
+
+    def test_returning_google_user_logs_in_without_a_duplicate(self):
+        self._callback(self._start())
+        self.client.logout()
+        response = self._callback(self._start())
+        self.assertRedirects(response, reverse('tracker:dashboard'), fetch_redirect_response=False)
+        self.assertEqual(User.objects.filter(email='g.user@example.com').count(), 1)
+
+    def test_wrong_state_is_rejected(self):
+        self._start()
+        response = self._callback('wrong-state')
+        self.assertRedirects(response, reverse('accounts:login'), fetch_redirect_response=False)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    def test_unverified_email_wrong_audience_and_nonce_are_rejected(self):
+        for bad in ({'email_verified': False}, {'aud': 'someone-else'}, {'nonce': 'other'}, {'exp': 1}):
+            cache.clear()
+            response = self._callback(self._start(), **bad)
+            self.assertRedirects(response, reverse('accounts:login'), fetch_redirect_response=False)
+            self.assertNotIn('_auth_user_id', self.client.session)
+        self.assertFalse(User.objects.filter(email='g.user@example.com').exists())
+
+    def test_existing_password_account_with_same_email_is_not_taken_over(self):
+        User.objects.create_user('victim', 'g.user@example.com', PASSWORD)
+        response = self._callback(self._start())
+        self.assertRedirects(response, reverse('accounts:login'), fetch_redirect_response=False)
+        self.assertNotIn('_auth_user_id', self.client.session)
+        self.assertEqual(User.objects.filter(email__iexact='g.user@example.com').count(), 1)

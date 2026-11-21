@@ -42,3 +42,14 @@ class ApiKey(models.Model):
         raw_key = KEY_PREFIX + secrets.token_urlsafe(32)
         key = cls.objects.create(owner=owner, name=name, prefix=raw_key[:10], key_hash=hash_key(raw_key))
         return key, raw_key
+
+
+class GoogleIdentity(models.Model):
+    """Links a FitHub user to a Google account by Google's stable subject id (never by email alone)."""
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='google_identity')
+    subject = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Google sign-in for {self.user}'
