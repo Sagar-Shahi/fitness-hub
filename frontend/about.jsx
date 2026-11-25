@@ -29,7 +29,10 @@ function BlurText({ text }) {
       <span className="visually-hidden">{text}</span>
       <span aria-hidden="true">
         {words.map((word, index) => (
-          <span className="about-blur-word" data-blur-word key={`${word}-${index}`}>{word}</span>
+          <React.Fragment key={`${word}-${index}`}>
+            {index > 0 ? ' ' : null}
+            <span className="about-blur-word" data-blur-word>{word}</span>
+          </React.Fragment>
         ))}
       </span>
     </span>
