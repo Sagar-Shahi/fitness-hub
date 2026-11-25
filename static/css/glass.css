@@ -387,7 +387,7 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
   color: #f6f7ff;
   font-size: clamp(2.55rem, 5vw, 4.6rem);
   line-height: .98;
-  letter-spacing: -.065em;
+  letter-spacing:-.035em;
   font-weight: 860;
 }
 .register-story h2 em {
@@ -650,7 +650,7 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity:.5
   color: #f6f7ff;
   font-size: clamp(2.55rem, 5vw, 4.6rem);
   line-height: .98;
-  letter-spacing: -.065em;
+  letter-spacing:-.035em;
   font-weight: 860;
 }
 .login-story h2 em {
@@ -1281,7 +1281,7 @@ main.container { isolation: isolate; }
   gap: clamp(16px, 3vw, 30px);
 }
 .page-head h1, .dashboard-hero h1, .workout-hero h1 {
-  letter-spacing: -.045em;
+  letter-spacing:-.035em;
   text-wrap: balance;
 }
 .page-head > div > .muted,
@@ -1410,7 +1410,7 @@ a:not(.btn):focus-visible { border-radius: 5px; }
   color: #f4f3ff;
   font-size: clamp(2rem, 4vw, 3.4rem);
   line-height: .98;
-  letter-spacing: -.06em;
+  letter-spacing:-.035em;
 }
 .about-flow-heading > p { max-width: 440px; margin: 0 0 3px; color: #c0c5dc; }
 .about-flow-steps {
@@ -1469,3 +1469,46 @@ a:not(.btn):focus-visible { border-radius: 5px; }
 body > .topbar { position: relative; z-index: 1000; }
 .account-menu[open] { z-index: 1100; }
 .account-menu[open] > .menu { position: absolute; z-index: 1100; }
+
+/* Contrast fixes: the legacy light "espresso" rules in app.css left dark text on the dark glass theme
+   (page titles, stat cards, quick-action tiles, empty states). These keep everything readable. */
+main h1, .page-head h1, .dashboard-hero h1, .workout-hero h1, .hero h1,
+.page-head > div:first-child h1 {
+  color: #f6f4ff;
+  background: none;
+  -webkit-text-fill-color: #f6f4ff;
+}
+main h1 em, .dashboard-hero h1 em, .hero h1 em {
+  color: #c2b0ff;
+  -webkit-text-fill-color: #c2b0ff;
+}
+main .stat {
+  background: linear-gradient(145deg, rgba(87, 82, 139, .42), rgba(24, 40, 64, .66));
+  border-color: rgba(221, 229, 255, .18);
+  color: #f4f5ff;
+}
+main .stat dt { color: #c4cbe0; }
+main .stat dd { color: #f4f5ff; }
+main .stat .stat-note, main .stat-note { color: #b8c1d9; }
+main .stat .stat-denom { color: #b8c1d9; }
+main .dashboard-action, main .dashboard-action strong { color: #f4f5ff; }
+main .dashboard-action small { color: #b8c1d9; }
+main .empty-state, main p.empty-state {
+  background: rgba(20, 25, 42, .5);
+  color: #b8c1d9;
+}
+main .dashboard-stats .stat, main .workout-stats .stat, main .stats .stat, main .stat {
+  background: linear-gradient(145deg, rgba(87, 82, 139, .42), rgba(24, 40, 64, .66));
+  border-color: rgba(221, 229, 255, .18);
+  color: #f4f5ff;
+}
+main .dashboard-stats .stat:after { background: #c2b0ff; opacity: .55; }
+main .dashboard-grid .card {
+  background: linear-gradient(145deg, rgba(48, 54, 92, .5), rgba(20, 28, 48, .72));
+  border-color: rgba(221, 229, 255, .18);
+  color: #f4f5ff;
+}
+main .dashboard-grid .card .macro-row > div { background: rgba(255, 255, 255, .06); border-color: rgba(221, 229, 255, .14); }
+
+/* Layout fix: the story column sat on the row below the form because the form comes first in the HTML. */
+.register-shell, .login-shell { grid-auto-flow: row dense; }
