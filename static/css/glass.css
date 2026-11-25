@@ -1512,3 +1512,20 @@ main .dashboard-grid .card .macro-row > div { background: rgba(255, 255, 255, .0
 
 /* Layout fix: the story column sat on the row below the form because the form comes first in the HTML. */
 .register-shell, .login-shell { grid-auto-flow: row dense; }
+
+/* Phones: the late ".nav { overflow: visible }" rule stopped the nav from scrolling sideways and pushed the
+   whole page wider than the screen. Scroll the nav row, and pin the Explore menu so it is never clipped. */
+@media (max-width: 760px) {
+  .nav { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; max-width: 100%; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav > details.nav-more[open] > .nav-more-menu {
+    position: fixed; left: 12px; right: 12px; top: 124px; width: auto;
+    max-height: calc(100vh - 150px); overflow: auto; z-index: 1200;
+  }
+}
+.nav-more-menu { background: linear-gradient(160deg, rgba(34, 38, 70, .985), rgba(15, 19, 34, .985)); }
+
+/* Titles inside cards (exercise names, section titles) and stat notes: keep them readable at every width. */
+main .card-title, main .exercise-heading .card-title, main .stat dd:not(.stat-note) { color: #f4f5ff; }
+main .stat dd.stat-note { font-size: .82rem; line-height: 1.4; font-weight: 400; margin-top: 4px; }
+main .add-set-label { color: #f4f5ff; }
